@@ -1,0 +1,608 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# Copyright 2012, 2013 Junko Tsuji
+
+# HeatLogo wrapper to show physicochemical property of
+# amino acid sequences.
+
+# built-in modules
+import sys, re
+import os.path, commands, string
+from time import strftime, gmtime
+
+from numpy import array
+from corebio.matrix import Motif
+from corebio.utils.deoptparse import DeOptionParser
+from optparse import OptionGroup
+
+from corebio import seq_io
+from corebio.seq import SeqList, unambiguous_protein_alphabet
+
+from weblogolib import parse_prior
+from weblogolib import LogoOptions, LogoData, LogoFormat, writePssm
+from weblogolib import std_units, formatters, png_print_formatter
+from weblogolib import pdf_formatter, eps_formatter, jpeg_formatter
+from weblogolib import png_formatter, svg_formatter, txt_formatter
+from weblogolib import stats_tests, heat_color_schemes
+from weblogolib.colorscheme import hydrophobicity, monochrome
+
+from sslogolib.io import *
+from sslogolib.ssfunc import *
+from sslogolib.ssvals import physichem_color_schemes
+from sslogolib.ssvals import structure_alphabet
+from sslogolib.ssdump import dumpData
+
+
+# option parser
+def buildOptionParser():
+    usage = "Usage: %prog --psipred-path $PATH --poodlel-path $PATH [options] < sequence_data.fa"
+    description = "Create sequence and structure logo to show sequence conservation and protein structures"
+    op = DeOptionParser(usage=usage, description=description, add_verbose_options = False)
+
+    soft_grp   = OptionGroup(op, "Software Setting Options (*Required*)")
+    io_grp     = OptionGroup(op, "Input/Output Options")
+    aa_grp     = OptionGroup(op, "Sequence Logo Options")
+    st_grp     = OptionGroup(op, "Structure Logo Options")
+    format_grp = OptionGroup(op, "Logo Format Options")
+
+    op.add_option_group(soft_grp)
+    op.add_option_group(io_grp)
+    op.add_option_group(aa_grp)
+    op.add_option_group(st_grp)
+    op.add_option_group(format_grp)
+
+    # ============   Software Setting Options   ============ #
+    soft_grp.add_option("", "--psipred-path",
+        dest="psipred",
+        action="store",
+        type="string",
+        default="",
+        help="Path to PsiPred executable",
+        metavar="PATH")
+
+    soft_grp.add_option("", "--poodlel-path",
+        dest="poodlel",
+        action="store",
+        type="string",
+        default="",
+        help="Path to Poodle-L executable",
+        metavar="PATH")
+
+    # ============         IO Options          ============ #
+    io_grp.add_option("-v", "--verbose",
+        dest="verbose",
+        default=True,
+        action="store_false",
+        help="Toggle switch to be verbose: print what 'heatlogoSS' is doing (default: on)")
+
+    io_grp.add_option("-i", "--input",
+        dest="fin",
+        action="store",
+        type="string",
+        default=sys.stdin,
+        help="Protein sequence input file (default: stdin)",
+        metavar="FILENAME")
+
+    fin_choices = dict(seq_io.format_names())
+    io_grp.add_option("-f", "--input-format",
+        dest="input_parser",
+        action="store",
+        type="dict",
+        default=seq_io,
+        choices=fin_choices,
+        help="Type of multiple sequence alignment file: %s" % ', '.join([f.names[0] for f in seq_io.formats]),
+        metavar="FORMAT")
+
+    io_grp.add_option("-o", "--output",
+        dest="output",
+        default="out",
+        help="Output file (default: %default)",
+        metavar="FILENAME")
+
+    io_grp.add_option("-F", "--output-format",
+        dest="formatter",
+        action="store",
+        metavar="FORMAT",
+        help="Format of output: eps (default), png, png_print, pdf, jpeg, svg, logodata. A comma-separated string (e.g. eps,png,jpeg) generates multiple format at once.",
+        default="eps")
+
+    io_grp.add_option("-d", "--workdir",
+        dest="wd",
+        action="store",
+        type="string",
+        default="./out_" + strftime("%Y%m%d%H%M%S", gmtime()),
+        help="Work directory to store calculation results of disorder and secondary predictions (default: %default)",
+        metavar="DIRECTORY")
+
+    # strings used in help messages
+    color_choices = heat_color_schemes.keys()
+    color_choices.sort()
+
+    # ============       Format Options        ============ #
+    format_grp.add_option("-I", "--first-index",
+        dest="first_index",
+        action="store",
+        type="int",
+        default = 1,
+        help="Index of first position in protein sequence data (default: 1)",
+        metavar="INDEX")
+
+    format_grp.add_option("-s", "--start",
+        dest="logo_start",
+        action="store",
+        type="int",
+        default=None,
+        help="Lower bound (i.e. start position) of sequence to display",
+        metavar="INDEX")
+
+    format_grp.add_option("-e", "--end",
+        dest="logo_end",
+        action="store",
+        type="int",
+        default=None,
+        help="Upper bound (i.e. end position) of sequence to display",
+        metavar="INDEX")
+
+    # ============  Sequence HeatLogo Options  ============ #
+    aa_grp.add_option("", "--aa-pwm-prob",
+        dest="aa_pwm_prob",
+        action="store",
+        type="string",
+        metavar="FILENAME",
+        default=None,
+        help="Output position weight matrix composed of logarithmic probabilities")
+
+    aa_grp.add_option("", "--aa-pwm-pval",
+        dest="aa_pwm_pval",
+        action="store",
+        type="string",
+        metavar="FILENAME",
+        default=None,
+        help="Output position weight matrix of P-values")
+
+    aa_grp.add_option("", "--aa-quench",
+        dest="aa_quench",
+        action="store_true",
+        help="Turn off heatmap color-coding, and display 'normal' sequence logo colored by each symbol",
+        default=False)
+
+    aa_grp.add_option("", "--aa-composition",
+        dest="aa_composition",
+        action="store",
+        type="string",
+        default="auto",
+        help="The expected composition of the sequences. HeatLogoSS accepts three types of formats: (1) String: 'auto' (default), 'equiprobable', or 'none' (do not perform any compositional adjustment, Heatmap: off). The automatic option uses a typical distribution for proteins and equiprobable distribution for everything else. (2) Explicit distribution of amino acids (e.g. \"{'A':14, 'R':8, 'N':2, 'D':7, ...}\"). (3) Tab-delimited file containing each amino acid and its expected composition in each line.",
+        metavar="COMP.")
+
+    aa_grp.add_option("", "--aa-second-data",
+        dest="aa_second_data",
+        action="store",
+        type="string",
+        default=None,
+        help="Second dataset file to compare with the input. HeatLogoSS measures statistical significance at each column by comparing the number of symbols appered in input and second datasets. Accepted formats: %s." % ', '.join([ f.names[0] for f in seq_io.formats]),
+        metavar="FILENAME")
+
+    aa_grp.add_option("", "--aa-units",
+        dest="aa_units",
+        action="store",
+        choices=std_units.keys(),
+        type="choice",
+        metavar="UNIT",
+        help="A unit of entropy ('bits' (default), 'nats', 'digits'), or a unit of free energy ('kT', 'kJ/mol', 'kcal/mol'), or 'probability' for probabilities",
+        default="bits")
+
+    stats_choices = stats_tests.keys()
+    stats_choices.sort()
+    aa_grp.add_option("", "--aa-stats-test",
+        dest="stats_func",
+        action="store",
+        type="dict",
+        choices=stats_tests,
+        metavar="TEST",
+        default=stats_tests['t-test'],
+        help="Specify a statistical test to calculate p-values (%s)" % ", ".join(stats_choices))
+
+    aa_grp.add_option("", "--aa-heat-scheme",
+        dest="aa_heat_scheme",
+        action="store",
+        type="dict",
+        choices=heat_color_schemes,
+        metavar="SCHEME",
+        default=heat_color_schemes['thermography'],
+        help="Specify a heatmap color scheme to color-code over/under-representation of amino acids (%s)" % \
+             ", ".join(color_choices))
+
+    aa_grp.add_option("", "--aa-hide-colorkey",
+        dest="aa_show_colorkey",
+        action="store_false",
+        help="Toggle switch to hide a heatmap color key on the right side of a sequence logo (default: off)",
+        default=True)
+
+    aa_grp.add_option("", "--aa-title",
+        dest="aa_title",
+        action="store",
+        type="string",
+        help="Logo title text",
+        default = "",
+        metavar="TEXT")
+
+    aa_grp.add_option("", "--aa-show-xaxis",
+        dest="aa_show_xaxis",
+        action="store_false",
+        help="Display seqeunce numbers along X-axis? (default: on)",
+        default=True)
+
+    aa_grp.add_option("", "--aa-xlabel",
+        dest="aa_xaxis_label",
+        action="store",
+        type="string",
+        default="",
+        help="X-axis label",
+        metavar="TEXT")
+
+    aa_grp.add_option("", "--aa-yaxis",
+        dest="aa_yaxis_scale",
+        action="store",
+        type="float",
+        default=None,
+        help="Hight of Y-axis in units (default: maximum value with uninformative prior)",
+        metavar="UNIT")
+
+    aa_grp.add_option("", "--aa-show-yaxis",
+        dest="aa_show_yaxis",
+        action="store_false",
+        help="Display entropy scale along Y-axis? (default: on)",
+        default=True)
+
+    aa_grp.add_option("", "--aa-ylabel",
+        dest="aa_yaxis_label",
+        action="store",
+        type="string",
+        default=None,
+        help="Y-axis label",
+        metavar="TEXT")
+
+    aa_grp.add_option("", "--aa-ticmarks",
+        dest="aa_yaxis_tic_interval",
+        action="store",
+        type="float",
+        default=1,
+        help="Distance between ticmarks (default: 1)",
+        metavar="NUMBER")
+
+    aa_grp.add_option("", "--aa-errorbars",
+        dest="aa_show_errorbars",
+        action="store_false",
+        help="Hide error bars",
+        default=True)
+
+    # ============ Structure HeatLogo Options  ============ #
+    st_grp.add_option("", "--st-pwm-prob",
+        dest="st_pwm_prob",
+        action="store",
+        type="string",
+        metavar="FILENAME",
+        default=None,
+        help="Output position weight matrix composed of structure prediction probabilities")
+
+    st_grp.add_option("", "--st-title",
+        dest="st_title",
+        action="store",
+        type="string",
+        help="Logo title text",
+        default = "",
+        metavar="TEXT")
+
+    st_grp.add_option("", "--st-show-xaxis",
+        dest="st_show_xaxis",
+        action="store_false",
+        help="Display seqeunce numbers along X-axis? (default: on)",
+        default=True)
+
+    st_grp.add_option("", "--st-xlabel",
+        dest="st_xaxis_label",
+        action="store",
+        type="string",
+        default="",
+        help="X-axis label",
+        metavar="TEXT")
+
+    st_grp.add_option("", "--st-yaxis",
+        dest="st_yaxis_scale",
+        action="store",
+        type="float",
+        default=None,
+        help="Hight of Y-axis in units (default: maximum value with uninformative prior)",
+        metavar="UNIT")
+
+    st_grp.add_option("", "--st-show-yaxis",
+        dest="st_show_yaxis",
+        action="store_false",
+        help="Display entropy scale along Y-axis? (default: on)",
+        default=True)
+
+    st_grp.add_option("", "--st-ylabel",
+        dest="st_yaxis_label",
+        action="store",
+        type="string",
+        default=None,
+        help="Y-axis label",
+        metavar="TEXT")
+
+    st_grp.add_option("", "--st-ticmarks",
+        dest="st_yaxis_tic_interval",
+        action="store",
+        type="float",
+        default=1,
+        help="Distance between ticmarks (default: 1)",
+        metavar="NUMBER")
+
+    return op
+
+
+# check arguments
+def checkArguments(opts):
+    if not os.path.exists(opts.poodlel + "/predict_disorder.pl"):
+        raise Exception("can't find 'Poodle-L' executable")
+    if not os.path.exists(opts.psipred + "/runpsipred"):
+        raise Exception("can't find 'PsiPred' executable")
+
+
+# main function
+delList = []
+written = []
+def main(prog, opts, wd):
+
+    # formatter extensions
+    deformatters = {
+     eps_formatter:       '.eps',
+     pdf_formatter:       '.pdf',
+     png_formatter:       '.png',
+     png_print_formatter: '.png',
+     jpeg_formatter:      '.jpg',
+     svg_formatter:       '.svg',
+     txt_formatter:       '.txt'
+    }
+
+    if opts.verbose:
+        sys.stderr.write(prog + ": loading sequence data ...\n")
+
+    rawSeqs = readSequence(opts.fin, opts.input_parser.read)
+    L = len(rawSeqs)
+    if L < 3:
+        raise Exception("number of sequences should be > 2")
+
+    checkArguments(opts)
+
+    # modify basic options
+    logoOpts = LogoOptions()
+    logoOpts.show_fineprint  = False
+    logoOpts.scale_width     = False
+    logoOpts.logo_start      = opts.logo_start
+    logoOpts.logo_end        = opts.logo_end
+    logoOpts.first_index     = opts.first_index
+    logoOpts.stacks_per_line = 100000
+
+    ex = []
+    formatter = []
+    for formatter_string in opts.formatter.split(","):
+        formatter_string = formatter_string.replace(" ", "")
+        if formatter_string == "":
+            continue
+        if formatter_string not in formatters:
+            raise Exception(formatter_string + " is not supported as the output format")
+        formatter.append(formatters[formatter_string])
+        ex.append(deformatters[formatters[formatter_string]])
+
+    # temporary logo files
+    output = os.path.basename(opts.output)
+    aaOutput = []
+    stOutput = []
+    finalOutput = []
+    for i in range(len(formatter)):
+        aaOutput.append(wd + "/" + output + "_aa" + ex[i])
+        stOutput.append(wd + "/" + output + "_st" + ex[i])
+        finalOutput.append(wd + "/" + output + ex[i])
+
+    # data file for reusing calculation results
+    aaDump = wd + "/aaDump"
+    stDump = wd + "/stDump"
+
+    if opts.verbose:
+        sys.stderr.write(prog + ": preprocessing: generate single fasta files ...\n")
+    fastaWd = wd + "/fasta"
+    commands.getoutput("mkdir " + fastaWd)
+    fasta, exclude = makeSingleFasta(rawSeqs, fastaWd)
+    delList.append(fastaWd)
+
+    if len(exclude) == len(rawSeqs):
+        # Poodle-L window = 20aa,  PsiPred window = 15aa
+        raise Exception("input sequence must be longer than 20aa")
+
+    if exclude:
+        if opts.verbose:
+            sys.stderr.write(prog + ": input sequence must be longer than 20aa ...\n")
+            sys.stderr.write(prog + ": excluding " +
+                                    ", ".join([str(e+1) for e in exclude]) + "th sequences ...\n")
+        seqs = SeqList([rawSeqs[i] for i in range(L) if i not in exclude], unambiguous_protein_alphabet)
+    else:
+        seqs = rawSeqs
+
+
+    ########  Sequence HeatLogo Creation  ########
+    if opts.verbose:
+        sys.stderr.write(prog + ": generating Sequence Logo ...\n")
+    aaList = [opts.aa_units,              opts.aa_heat_scheme,
+              opts.aa_quench,             opts.aa_show_colorkey,
+              opts.aa_title,              opts.aa_show_xaxis,
+              opts.aa_show_yaxis,         opts.aa_yaxis_scale,
+              opts.aa_xaxis_label,        opts.aa_yaxis_label,
+              opts.aa_yaxis_tic_interval, opts.aa_show_errorbars]
+
+
+    aaOpts = formatOptions(logoOpts, aaList, hydrophobicity)
+    aaOpts.stats_func = opts.stats_func
+    aaSeqs = SeqList([s for s in seqs], seqs.alphabet)
+    prior, compos = parse_prior(opts.aa_composition, seqs.alphabet)
+
+    if opts.aa_second_data is not None:
+        ngSeqs = readSequence(opts.aa_second_data, opts.input_parser.read)
+        ngprior, ngcompos = parse_prior(opts.aa_composition, seqs.alphabet)
+        ngData = LogoData.from_seqs(ngSeqs, aaOpts.stats_func, ngprior, ngcompos)
+        aaData = LogoData.from_seqs(aaSeqs, aaOpts.stats_func, prior, compos, ngData)
+    else:
+        aaData = LogoData.from_seqs(aaSeqs, aaOpts.stats_func, prior, compos)
+    aaFormat = LogoFormat(aaData, aaOpts)
+
+    for i in range(len(formatter)):
+        fout = open(aaOutput[i], "w")
+        formatter[i](aaData, aaFormat, fout)
+        if i == 0:
+            dumpData(aaData, aaDump)
+        written.append([aaOutput[i]])
+
+    if opts.aa_pwm_prob:
+        output = os.path.basename(opts.aa_pwm_prob)
+        aaPssm = wd + "/" + output
+        writePssm(aaData, aaFormat, aaPssm)
+        if opts.verbose:
+            sys.stderr.write(prog +
+            ": output Sequence Logo Log-Probability PWM: [" + aaPssm.replace("./", "") + "]\n")
+    if opts.aa_pwm_pval:
+        output = os.path.basename(opts.aa_pwm_pval)
+        aaPssm = wd + "/" + output
+        writePssm(aaData, aaFormat, aaPssm, True)
+        if opts.verbose:
+            sys.stderr.write(prog +
+            ": output Sequence Logo P-value PWM: [" + aaPssm.replace("./", "") + "]\n")
+    ########    Sequence HeatLogo Ends    ########
+
+
+    ######## Structure HeatLogo Creation  ########
+    stList = ["probability",              opts.aa_heat_scheme,
+              True,                       None,
+              opts.st_title,              opts.st_show_xaxis,
+              opts.st_show_yaxis,         opts.st_yaxis_scale,
+              opts.st_xaxis_label,        opts.st_yaxis_label,
+              opts.st_yaxis_tic_interval, False]
+    stOpts = formatOptions(logoOpts, stList, monochrome)
+
+    if opts.verbose:
+        sys.stderr.write(prog + ": executing Poodle-L ...\n")
+    poodleWd, poodleRes = wd + "/poodleL_cal/", wd + "/poodleL_res/"
+    init = "mkdir " + poodleWd + " " + poodleRes
+    exe = opts.poodlel + "/predict_disorder.pl %s " + poodleWd
+    outDat = "ls " + poodleWd + "disorder*.result"
+    clean = "mv " + poodleWd + "/* " + poodleRes
+    index = [1]
+    poodleProb = exePredict(init, exe, fasta, outDat, "labels", index, clean)
+    delList.extend([poodleWd, poodleRes])
+
+    if opts.verbose:
+        sys.stderr.write(prog + ": executing PsiPred ...\n")
+    psipredWd, psipredRes = wd + "/psipred_cal/", wd + "/psipred_res/"
+    init = "mkdir " + psipredWd + " " + psipredRes
+    exe = opts.psipred + "/runpsipred %s " + psipredWd
+    outDat = "ls " + psipredWd + "*.ss2"
+    clean = "mv " + psipredWd + "/* " + psipredRes
+    index = [3, 4, 5]
+    psipredProb = exePredict(init, exe, fasta, outDat, "#", index, clean)
+    delList.extend([psipredWd, psipredRes])
+
+    if opts.verbose:
+        sys.stderr.write(prog + ": generaging Structure Logo ...\n")
+
+    stProb = mergeResults(seqs, poodleProb, psipredProb)
+    stProb = Motif(structure_alphabet, stProb)
+    stData = LogoData(len(seqs[0]), structure_alphabet, stProb)
+    stFormat = LogoFormat(stData, stOpts)
+    if opts.aa_show_colorkey == True:
+        stFormat.line_margin_right += stFormat.char_width + stFormat.fontsize * 2
+        stFormat.line_width  = (stFormat.stack_width * stFormat.stacks_per_line +
+                                stFormat.line_margin_left + stFormat.line_margin_right )
+        stFormat.logo_width = int(2 * stFormat.logo_margin + stFormat.line_width )
+
+    for i in range(len(formatter)):
+        fout = open(stOutput[i], "w")
+        formatter[i](stData, stFormat, fout, False)
+        if i == 0:
+            dumpData(stData, stDump)
+        written[i].append(stOutput[i])
+
+    if opts.st_pwm_prob:
+        output = os.path.basename(opts.st_pwm_prob)
+        stPssm = wd + "/" + output
+        writePssm(stData, stFormat, stPssm, False, True)
+        if opts.verbose:
+            sys.stderr.write(prog +
+            ": output Structure Logo Probability PWM: [" + stPssm.replace("./", "") + "]\n")
+    ########   Structure HeatLogo Ends    ########
+
+    return finalOutput
+
+
+# merge ~2 track(s) to one
+def merge(wd, written, montage, outfile, verbose, prog):
+    if verbose:
+        sys.stderr.write(prog + ": merge Sequence and Structure Logos into one ...\n")
+
+    success = []
+    pat = re.compile("No such file or directory", re.I)
+    for i in range(len(written)):
+        L = len(written[i])
+        params = " -tile 1x" + str(L) + " -geometry +1200 "
+        if L > 1:
+            files = " ".join(written[i])
+            commands.getoutput(montage + " " + files + params + outfile[i])
+            if pat.findall(commands.getoutput("ls " + outfile[i])):
+                if verbose:
+                    sys.stderr.write(prog + ": merge failed, separate logo files are: ["
+                                          + ", ".join([w.replace("./", "") for w in written[i]]) + "]\n")
+                success.append(False)
+            else:
+                if verbose:
+                    sys.stderr.write(prog + ": merge successed: ["
+                                          + outfile[i].replace("./", "") + "]\n")
+                success.append(True)
+    return success
+
+
+# clean up function
+def clean(success, written, dellist, verbose, prog):
+    if verbose:
+        sys.stderr.write(prog + ": clean up ...\n")
+    D = " ".join(dellist)
+    for i in range(len(success)):
+        if success[i] == True:
+            D = D + " " + " ".join(written[i])
+    commands.getoutput("rm -r " + D)
+
+
+if __name__ == "__main__":
+    prog = os.path.basename(sys.argv[0])
+    op = buildOptionParser()
+
+    if not len(sys.argv[1:]):
+        sys.exit(prog + ": error: need more arguments")
+    (opts, args) = op.parse_args(sys.argv[1:])
+    if args:
+        sys.exit(prog + ": error: unparsable argument(s): %s" % args)
+
+    # create work directory to store temporary files
+    commands.getoutput("mkdir " + opts.wd)
+
+    try:
+        outfile = main(prog, opts, opts.wd)
+        montage = commands.getoutput("which montage")
+        if written:
+            success = merge(opts.wd, written, montage, outfile, opts.verbose, prog)
+            clean(success, written, delList, opts.verbose, prog)
+    except KeyboardInterrupt:
+        commands.getoutput("rm -rf " + opts.wd)
+    except Exception, e:
+        sys.exit(prog + ": error: " + str(e))
+        commands.getoutput("rm -rf " + opts.wd)
+    finally:
+        if written == []:
+            commands.getoutput("rm -rf " + opts.wd)

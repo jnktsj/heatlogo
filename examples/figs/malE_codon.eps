@@ -1,0 +1,4944 @@
+%!PS-Adobe-3.0 EPSF-3.0
+%%Title:        Sequence Logo: 
+%%Creator:      HeatLogo 1.0
+%%CreationDate: 2012-10-02 18:02:27.329553
+%%BoundingBox:  0  0  408  80 
+%%Pages: 0
+%%DocumentFonts: 
+%%EndComments
+
+
+% ---- VARIABLES ----
+
+/True   true def
+/False  false def
+
+/debug              False        def
+
+/logo_height        80  def
+/logo_width         408  def
+/logo_title         () def
+/show_title         False def
+
+/logo_margin        2 def
+/xaxis_label_height 6.0 def
+/title_height       0 def
+/stroke_width       0.5 def
+/tic_length         5 def
+
+/lines_per_logo     1 def
+/line_width         404.6 def
+/line_height        70.0 def
+/line_margin_left   30.0 def
+/line_margin_right  39.8 def
+/line_margin_bottom 12.0 def
+/line_margin_top    4 def
+
+/stack_width         10.8 def
+/stack_height        54.0 def
+/stacks_per_line     31 def
+/stack_margin        0.5 def
+
+/show_yaxis             True def      
+/show_yaxis_label       True def
+/yaxis_label            (bits) def
+/yaxis_scale          4.2 def              % height in units 
+/yaxis_tic_interval     1.0 def           % in units
+/yaxis_minor_tic_interval 0.2 def   % in units
+
+/show_xaxis_label       False def             % True or False
+/show_xaxis             True def                   % True or False
+/xaxis_label            () def
+/xaxis_tic_interval     1 def
+/rotate_numbers         False def               % True or False
+/number_interval        5 def
+/show_ends              False def
+/end_type               (-) def          % d: DNA, p: PROTEIN, -: none
+
+/show_colorkey          True def                % True or False
+/p_values               %
+[ (+0.01) %
+ (+0.025) %
+ (+0.05) %
+ (+0.1) %
+ (+0.3) %
+ ( 0.5) %
+ (-0.3) %
+ (-0.1) %
+ (-0.05) %
+ (-0.025) %
+ (-0.01) %
+] def
+/p_colors                %
+[[ 1.0 0.0 0.0 ] %
+[ 1.0 0.4 0.0 ] %
+[ 1.0 0.8 0.0 ] %
+[ 1.0 1.0 0.0 ] %
+[ 0.8 1.0 0.2 ] %
+[ 0.0 1.0 0.0 ] %
+[ 0.0 1.0 0.8 ] %
+[ 0.0 1.0 1.0 ] %
+[ 0.0 0.4 1.0 ] %
+[ 0.0 0.0 1.0 ] %
+[ 0.2 0.0 0.6 ] %
+] def
+
+/show_fineprint         True def
+/fineprint              (HeatLogo 1.0) def
+/logo_label             () def
+
+/show_boxes             False def    % True or False
+/shrink                 false def    % True or False
+/shrink_fraction        0.5 def               
+
+/show_errorbars         True def      % True or False
+/errorbar_fraction      0.9 def
+/errorbar_width_fraction  0.25 def
+/errorbar_gray          0.75 def
+
+/fontsize               10 def
+/small_fontsize         6 def
+/title_fontsize         12 def
+/number_fontsize        8 def
+
+
+/UseCIEColor true def       % Fix for issue 4
+/default_color [ 0.0 0.0 0.0 ] def 
+/color_dict << 
+
+>> def
+
+% ---- DERIVED PARAMETERS ----
+
+/char_width stack_width 2 stack_margin mul sub def
+/char_width2 char_width 2 div def
+/char_width4 char_width 4 div def
+
+% movements to place 5'/N and 3'/C symbols
+/leftEndDeltaX  fontsize neg         def
+/leftEndDeltaY  fontsize 1.25 mul neg def
+/rightEndDeltaX fontsize 0.25 mul     def
+/rightEndDeltaY leftEndDeltaY        def
+
+% ---- PROCEDURES ----
+
+
+/SetTitleFont {/ArialMT findfont title_fontsize scalefont setfont} bind def
+/SetLogoFont  {/Arial-BoldMT findfont char_width  scalefont setfont} bind def
+/SetStringFont{/ArialMT findfont fontsize scalefont setfont} bind def
+/SetPrimeFont {/Symbol findfont fontsize scalefont setfont} bind def
+/SetSmallFont {/ArialMT findfont small_fontsize scalefont setfont} bind def
+/SetNumberFont {/ArialMT findfont number_fontsize scalefont setfont} bind def
+
+/DrawBox { % width height 
+    /hh exch def
+    /ww exch def
+    gsave
+        0.2 setlinewidth
+        %0.5 setgray
+        
+        %0 0 moveto 
+        hh 0 rlineto
+        0 ww rlineto
+        hh neg 0 rlineto
+        0 ww neg rlineto
+        stroke
+    grestore
+} bind def
+
+/FillBox { % width height color
+    /cl exch def
+    /hh exch def
+    /ww exch def
+    gsave
+        cl aload pop setrgbcolor
+        hh 0 rlineto
+        0 ww rlineto
+        hh neg 0 rlineto
+        0 ww neg rlineto
+        fill
+    grestore
+} bind def
+
+/DrawArrow { % X bottomY topY arrowLen
+    /arrowLen exch def
+    /topY exch def
+    /bottomY exch def
+    /X exch def
+    gsave
+    stroke_width setlinewidth
+    X bottomY moveto
+    arrowLen 3 div neg arrowLen rlineto
+    X bottomY moveto
+    arrowLen 3 div arrowLen rlineto
+
+    X bottomY moveto
+    X topY lineto
+
+    X topY moveto
+    arrowLen 3 div neg arrowLen neg rlineto
+    X topY moveto
+    arrowLen 3 div arrowLen neg rlineto    
+    stroke
+    grestore
+} bind def
+
+/DrawColorKey {
+    /tlen p_colors length def
+    /index tlen 1 sub def
+
+    /box_height stack_height tlen div def
+    /box_width stack_width 2 div def
+    /box_margin box_height index div def
+
+    % movements to place color key chart
+    /colorKeyDeltaX line_width line_margin_right sub
+        fontsize add fontsize 0.5 mul add def
+    show_ends { /colorKeyDeltaX colorKeyDeltaX fontsize add def } if
+    /colorKeyDeltaY logo_height logo_margin sub title_height sub
+        line_height sub box_height 2 div add def
+
+    % draw arrow
+    gsave
+    colorKeyDeltaX box_width 0.7 mul sub
+    colorKeyDeltaY
+    colorKeyDeltaY box_height tlen mul add box_margin index mul add
+    box_height
+    DrawArrow
+    grestore
+    
+    gsave
+    tlen {
+            colorKeyDeltaX colorKeyDeltaY
+            moveto
+
+            gsave
+            box_height box_width
+            p_colors index get
+            FillBox
+            grestore
+            
+            colorKeyDeltaX box_width add
+            colorKeyDeltaY box_height 2 div add
+            moveto
+
+            SetSmallFont
+            0 0 0 setrgbcolor
+            p_values index get show
+            
+            /index index 1 sub def
+            /colorKeyDeltaY box_height box_margin add colorKeyDeltaY add def
+    } repeat
+
+    gsave
+    SetSmallFont
+    colorKeyDeltaX
+    colorKeyDeltaY small_fontsize 2 div add
+    moveto
+    0 0 0 setrgbcolor
+    (P-value) show
+    grestore
+    
+    grestore
+} def
+
+/StartLogo { 
+  %save 
+  gsave 
+
+  debug { 
+    logo_margin logo_margin moveto
+    logo_height logo_margin 2 mul sub
+    logo_width logo_margin 2 mul sub
+    DrawBox } if
+    
+  show_title { DrawTitle } if
+  show_xaxis_label { DrawXaxisLable } if
+  show_fineprint { DrawFineprint } if
+  show_colorkey { DrawColorKey } if
+  DrawLogoLabel
+
+  MoveToFirstLine
+} bind def
+
+
+/DrawLogoLabel {
+  gsave 
+    SetTitleFont
+    
+    logo_margin
+    logo_height title_fontsize sub logo_margin sub
+    moveto
+    
+    debug { title_fontsize logo_label stringwidth pop DrawBox } if
+    0 title_fontsize 4 div rmoveto % Move up to baseline (approximatly)
+    logo_label show
+    
+  grestore
+} bind def
+
+/DrawTitle {
+  gsave 
+    SetTitleFont
+    
+    logo_width 2 div logo_title stringwidth pop 2 div sub 
+    logo_height title_fontsize sub logo_margin sub
+    moveto
+    
+    debug { title_fontsize logo_title stringwidth pop DrawBox } if
+    
+    0 title_fontsize 4 div rmoveto % Move up to baseline (approximatly)
+    logo_title show
+    
+  grestore
+} bind def
+
+/DrawXaxisLable {
+  % Print X-axis label, bottom center
+  gsave
+    SetStringFont
+
+    logo_width 2 div xaxis_label stringwidth pop 2 div sub
+    xaxis_label_height logo_margin add fontsize sub
+    moveto
+    %fontsize 3 div
+    
+    debug { fontsize xaxis_label stringwidth pop DrawBox } if
+
+    xaxis_label show
+
+  grestore
+} bind def
+
+
+/DrawFineprint {
+    gsave
+    
+    SetSmallFont
+
+    logo_width fineprint stringwidth pop sub 
+        logo_margin sub line_margin_right sub
+    logo_margin 
+    moveto
+    
+    debug { small_fontsize fineprint stringwidth pop DrawBox } if
+        
+    fineprint show
+    grestore
+} bind def
+
+
+/MoveToFirstLine {
+    logo_margin 
+    logo_height logo_margin sub title_height sub line_height sub
+    moveto
+} bind def
+
+/EndLogo { 
+  grestore 
+  %showpage 
+  %restore 
+} bind def
+
+
+/StartLine{ 
+    gsave 
+  
+    % Draw outer box
+    debug { line_height line_width DrawBox } if  
+
+    % Move to lower left corner of content area
+    line_margin_left line_margin_bottom rmoveto
+
+    % Draw inner content box
+    debug { 
+        line_height line_margin_bottom sub line_margin_top sub
+        line_width line_margin_left sub line_margin_right sub
+        DrawBox
+    } if  
+  
+    show_yaxis { DrawYaxis } if
+    show_xaxis { DrawLeftEnd } if
+    
+} bind def
+
+/EndLine{ 
+    show_xaxis { DrawRightEnd } if
+    grestore 
+    0 line_height neg rmoveto 
+} bind def
+
+
+/DrawYaxis {
+  gsave    
+    stack_margin neg 0 translate
+    DrawYaxisBar
+    DrawYaxisLabel
+  grestore
+} bind def
+
+
+/DrawYaxisBar { 
+  gsave  
+    stack_margin neg 0 rmoveto
+    
+    SetNumberFont
+    stroke_width setlinewidth
+    
+    /str 10 string def % string to hold number  
+    /smallgap stack_margin  def
+
+    % Draw first tic and bar
+    gsave    
+      tic_length neg 0 rmoveto 
+      tic_length 0 rlineto 
+      0 stack_height rlineto
+      stroke
+    grestore
+
+    % Draw the tics
+    % initial increment limit proc for
+    0 yaxis_tic_interval yaxis_scale abs 
+    {/loopnumber exch def
+
+      % convert the number coming from the loop to a string
+      % and find its width
+      loopnumber 10 str cvrs
+      /stringnumber exch def % string representing the number
+
+      stringnumber stringwidth pop
+      /numberwidth exch def % width of number to show
+
+      /halfnumberheight
+         stringnumber CharBoxHeight 2 div
+      def
+
+      gsave
+        numberwidth % move back width of number
+        neg loopnumber stack_height yaxis_scale div mul % shift on y axis
+        halfnumberheight sub % down half the digit
+        rmoveto % move back the width of the string
+
+        tic_length neg smallgap sub % Move back a bit more  
+        0 rmoveto % move back the width of the tic  
+
+        stringnumber show
+        smallgap 0 rmoveto % Make a small gap  
+
+        % now show the tic mark
+        0 halfnumberheight rmoveto % shift up again
+        tic_length 0 rlineto
+        stroke
+     grestore
+    } for
+    
+    % Draw the minor tics
+    % initial increment limit proc for
+    0 yaxis_minor_tic_interval yaxis_scale abs 
+    {/loopnumber2 exch def
+      gsave
+        0
+        loopnumber2 stack_height yaxis_scale div mul 
+        rmoveto 
+
+        tic_length 2 div neg 0 rlineto
+        stroke
+     grestore
+    } for    
+    
+  grestore
+} bind def
+
+/DrawYaxisLabel {
+  gsave
+    SetStringFont
+
+    % How far we move left depends on the size of
+    % the tic labels.
+    /str 10 string def % string to hold number  
+    yaxis_scale yaxis_tic_interval div cvi yaxis_tic_interval mul 
+    str cvs stringwidth pop
+    tic_length 1.25 mul  add neg  
+
+    stack_height
+    yaxis_label stringwidth pop
+    sub 2 div
+
+    rmoveto
+    90 rotate
+    
+    yaxis_label show
+  grestore
+} bind def
+
+
+%Take a single character and return the bounding box
+/CharBox { % <char> CharBox <lx> <ly> <ux> <uy>
+  gsave
+    newpath
+    0 0 moveto
+    % take the character off the stack and use it here:
+    true charpath 
+    flattenpath 
+    pathbbox % compute bounding box of 1 pt. char => lx ly ux uy
+    % the path is here, but toss it away ...
+  grestore
+} bind def
+
+
+% The height of a characters bounding box
+/CharBoxHeight { % <char> CharBoxHeight <num>
+  CharBox
+  exch pop sub neg exch pop
+} bind def
+
+
+% The width of a characters bounding box
+/CharBoxWidth { % <char> CharBoxHeight <num>
+  CharBox
+  pop exch pop sub neg 
+} bind def
+
+
+/DrawLeftEnd {
+  gsave
+    SetStringFont
+    leftEndDeltaX leftEndDeltaY rmoveto
+    
+    show_ends {
+        debug { leftEndDeltaY neg leftEndDeltaX neg DrawBox } if
+        end_type (d) eq {(5) show DrawPrime} if
+        end_type (p) eq {(N) show} if
+    } if
+  grestore
+} bind def
+
+/DrawRightEnd { 
+  gsave
+    SetStringFont
+    rightEndDeltaX rightEndDeltaY rmoveto
+    
+    show_ends {
+        debug { rightEndDeltaY neg leftEndDeltaX neg  DrawBox } if
+        end_type (d) eq {(3) show DrawPrime} if
+        end_type (p) eq {(C) show} if
+    } if
+  grestore
+} bind def
+
+/DrawPrime {
+  gsave
+    SetPrimeFont
+    (\242) show 
+  grestore
+} bind def
+
+
+/StartStack {  % <stackNumber> startstack
+  show_xaxis {DrawNumber}{pop} ifelse
+  gsave
+  debug { stack_height stack_width DrawBox } if
+    
+} bind def
+
+/EndStack {
+  grestore
+  stack_width 0 rmoveto
+} bind def
+
+
+/DrawNumber { % number MakeNumber
+    /n exch def
+    
+    
+  gsave
+    %0 stack_margin neg rmoveto
+    stroke_width setlinewidth
+    stack_width  0 rlineto
+    stack_width 2 div neg 0 rmoveto
+    
+    n () eq 
+    {  0 tic_length 4 div neg rlineto  } 
+    { 0 tic_length 2 div neg rlineto } 
+    ifelse
+
+    stroke
+  grestore   
+
+
+
+  gsave
+    n
+    SetNumberFont
+    stack_width 2 div tic_length 2 div neg rmoveto 
+
+    rotate_numbers {
+        90 rotate     
+        dup stringwidth pop neg % find the length of the number
+        stack_margin sub        % Move down a bit
+        (0) CharBoxHeight 2 div neg % left half height of numbers
+        rmoveto 
+        show
+    } {
+        dup stringwidth pop neg 2 div number_fontsize neg  rmoveto
+        show
+    } ifelse
+    
+    
+
+  grestore
+} bind def
+
+
+
+% Draw a character whose height is proportional to symbol bits
+/ShowSymbol{ % interval character ShowSymbol
+    /char exch def
+    /interval exch def
+    /fraction_width exch def
+    
+    /char_height 
+       interval yaxis_scale div stack_height mul
+       stack_margin sub
+       dup 
+       % if char_height is negative or very small replace with zero 
+       % BUG FIX: This used to be '0.0 gt' but it seems that DrawHeight
+       % has a finite, non-zero minimum, which results in a rangecheck error
+       0.01 gt {}{pop 0.0} ifelse 
+    def 
+
+    char_height 0.0 gt {
+        show_boxes {
+            gsave
+                /ww char_height stack_margin add def
+                /hh stack_width def
+                stroke_width setlinewidth
+                hh 0 rlineto
+                0 ww rlineto
+                hh neg 0 rlineto
+                0 ww neg rlineto
+                stroke
+            grestore 
+        } if
+
+        gsave
+            stack_margin stack_margin rmoveto
+            debug { char_height char_width DrawBox } if
+            1 fraction_width sub char_width mul 2 div  0 rmoveto
+            fraction_width char_width mul char_height char DrawChar
+        grestore
+        
+    } if
+    0 interval yaxis_scale div stack_height mul rmoveto
+} bind def
+
+
+/DrawChar { % <width> <height> <char> ShowChar
+    /tc exch def    % The character
+    /ysize exch def % the y size of the character
+    /xsize exch def % the x size of the character
+    /xmulfactor 1 def 
+    /ymulfactor 1 def
+    
+    gsave
+        SetLogoFont    
+        tc SetColor
+
+        % IReplacementHack
+        % Deal with the lack of bars on the letter 'I' in Arial and Helvetica
+        % by replacing with 'I' from Courier.
+        tc (I) eq {
+            /Courier findfont char_width  scalefont setfont    
+        } if
+
+
+        shrink {
+            xsize 1 shrink_fraction sub 2 div mul
+            ysize 1 shrink_fraction sub 2 div mul rmoveto 
+            shrink_fraction shrink_fraction scale
+        } if
+        
+        % Calculate the font scaling factors
+        % Loop twice to catch small correction due to first scaling
+        2 {
+            gsave
+            xmulfactor ymulfactor scale
+      
+            ysize % desired size of character in points
+            tc CharBoxHeight 
+            dup 0.0 ne {
+                div % factor by which to scale up the character
+                /ymulfactor exch def
+            } {pop pop} ifelse
+
+            xsize % desired size of character in points
+            tc CharBoxWidth  
+            dup 0.0 ne {
+                div % factor by which to scale up the character
+                /xmulfactor exch def
+            } {pop pop} ifelse
+            grestore
+        } repeat
+
+
+  
+        % Draw the character
+        xmulfactor ymulfactor scale
+        % Move lower left corner of character to start point
+        tc CharBox pop pop % llx lly : Lower left corner
+        exch neg exch neg
+        rmoveto
+        
+        tc show    
+
+    grestore
+} bind def
+
+
+/SetColor{ % <char> SetColor
+  dup color_dict exch known {
+    color_dict exch get aload pop setrgbcolor
+  } {
+    pop
+    default_color aload pop setrgbcolor
+  } ifelse 
+} bind def
+
+/DrawErrorbar{ % interval_down interval_up DrawErrorbar
+    
+    gsave
+    /points_per_unit stack_height yaxis_scale div def 
+    /height_up   exch points_per_unit mul def 
+    /height_down exch points_per_unit mul def
+    
+    show_errorbars {
+    
+    stroke_width setlinewidth
+    errorbar_gray setgray     
+    stack_width 2 div 0 rmoveto
+    
+    /errorbar_width char_width errorbar_width_fraction mul def
+    /errorbar_width2 errorbar_width 2 div def
+    
+    gsave 
+        0 height_down neg rmoveto
+        errorbar_width2 neg 0 rlineto
+        errorbar_width 0 rlineto
+        errorbar_width2 neg 0 rlineto
+        0 height_down errorbar_fraction mul rlineto 
+        stroke
+    grestore
+
+    gsave 
+        0 height_up  rmoveto
+        errorbar_width2 neg 0 rlineto
+        errorbar_width 0 rlineto
+        errorbar_width2 neg 0 rlineto
+        0 height_up neg errorbar_fraction mul rlineto 
+        stroke
+    grestore
+    } if
+           
+    grestore
+    
+} bind def
+
+/DrawErrorbarFirst{ % interval_down interval_up center DrawErrorbarFirst
+    gsave
+    /points_per_unit stack_height yaxis_scale div def 
+    /center   exch points_per_unit mul def 
+
+    0 center rmoveto
+    DrawErrorbar
+    grestore
+} bind def
+
+
+%%EndProlog
+
+%%Page: 1 1
+
+% Example Data
+%StartLogo
+%    StartLine
+%        (1) StartStack
+%            1.2 (C) ShowSymbol
+%            2.2 (I) ShowSymbol
+%            0.5 0.5 DrawErrorbar
+%        EndStack
+%        (2) StartStack
+%            0.5 (I) ShowSymbol
+%            0.9 (L) ShowSymbol
+%            1.0 (G) ShowSymbol
+%            
+%            0.5 0.5 DrawErrorbar        
+%        EndStack
+%        (234) StartStack
+%        EndStack
+%        (235) StartStack
+%        EndStack
+%    EndLine
+%EndLogo
+
+StartLogo
+StartLine
+/color_dict <<
+  (AAA) [ 0.0 1.0 0.8 ]
+  (AAC) [ 0.0 1.0 0.8 ]
+  (AAG) [ 0.0 1.0 0.8 ]
+  (AAT) [ 0.0 1.0 0.8 ]
+  (ACA) [ 0.0 1.0 0.8 ]
+  (ACC) [ 0.0 1.0 0.8 ]
+  (ACG) [ 0.0 1.0 0.8 ]
+  (ACT) [ 0.0 1.0 0.8 ]
+  (AGA) [ 0.0 1.0 0.8 ]
+  (AGC) [ 0.0 1.0 0.8 ]
+  (AGG) [ 0.0 1.0 0.8 ]
+  (AGT) [ 0.0 1.0 0.8 ]
+  (ATA) [ 0.0 1.0 0.8 ]
+  (ATC) [ 0.0 1.0 0.8 ]
+  (ATG) [ 1.0 0.0 0.0 ]
+  (ATT) [ 0.0 1.0 0.8 ]
+  (CAA) [ 0.0 1.0 0.8 ]
+  (CAC) [ 0.0 1.0 0.8 ]
+  (CAG) [ 0.0 1.0 0.8 ]
+  (CAT) [ 0.0 1.0 0.8 ]
+  (CCA) [ 0.0 1.0 0.8 ]
+  (CCC) [ 0.0 1.0 0.8 ]
+  (CCG) [ 0.0 1.0 0.8 ]
+  (CCT) [ 0.0 1.0 0.8 ]
+  (CGA) [ 0.0 1.0 0.8 ]
+  (CGC) [ 0.0 1.0 0.8 ]
+  (CGG) [ 0.0 1.0 0.8 ]
+  (CGT) [ 0.0 1.0 0.8 ]
+  (CTA) [ 0.0 1.0 0.8 ]
+  (CTC) [ 0.0 1.0 0.8 ]
+  (CTG) [ 0.0 1.0 0.8 ]
+  (CTT) [ 0.0 1.0 0.8 ]
+  (GAA) [ 0.0 1.0 0.8 ]
+  (GAC) [ 0.0 1.0 0.8 ]
+  (GAG) [ 0.0 1.0 0.8 ]
+  (GAT) [ 0.0 1.0 0.8 ]
+  (GCA) [ 0.0 1.0 0.8 ]
+  (GCC) [ 0.0 1.0 0.8 ]
+  (GCG) [ 0.0 1.0 0.8 ]
+  (GCT) [ 0.0 1.0 0.8 ]
+  (GGA) [ 0.0 1.0 0.8 ]
+  (GGC) [ 0.0 1.0 0.8 ]
+  (GGG) [ 0.0 1.0 0.8 ]
+  (GGT) [ 0.0 1.0 0.8 ]
+  (GTA) [ 0.0 1.0 0.8 ]
+  (GTC) [ 0.0 1.0 0.8 ]
+  (GTG) [ 0.0 1.0 0.8 ]
+  (GTT) [ 0.0 1.0 0.8 ]
+  (TAA) [ 0.0 1.0 0.8 ]
+  (TAC) [ 0.0 1.0 0.8 ]
+  (TAG) [ 0.0 1.0 0.8 ]
+  (TAT) [ 0.0 1.0 0.8 ]
+  (TCA) [ 0.0 1.0 0.8 ]
+  (TCC) [ 0.0 1.0 0.8 ]
+  (TCG) [ 0.0 1.0 0.8 ]
+  (TCT) [ 0.0 1.0 0.8 ]
+  (TGA) [ 0.0 1.0 0.8 ]
+  (TGC) [ 0.0 1.0 0.8 ]
+  (TGG) [ 0.0 1.0 0.8 ]
+  (TGT) [ 0.0 1.0 0.8 ]
+  (TTA) [ 0.0 1.0 0.8 ]
+  (TTC) [ 0.0 1.0 0.8 ]
+  (TTG) [ 0.0 1.0 0.8 ]
+  (TTT) [ 0.0 1.0 0.8 ]
+>> def
+() StartStack
+ 1.000000 0.000000 (TTT) ShowSymbol
+ 1.000000 0.000000 (TTG) ShowSymbol
+ 1.000000 0.000000 (TTC) ShowSymbol
+ 1.000000 0.000000 (TTA) ShowSymbol
+ 1.000000 0.000000 (TGT) ShowSymbol
+ 1.000000 0.000000 (TGG) ShowSymbol
+ 1.000000 0.000000 (TGC) ShowSymbol
+ 1.000000 0.000000 (TGA) ShowSymbol
+ 1.000000 0.000000 (TCT) ShowSymbol
+ 1.000000 0.000000 (TCG) ShowSymbol
+ 1.000000 0.000000 (TCC) ShowSymbol
+ 1.000000 0.000000 (TCA) ShowSymbol
+ 1.000000 0.000000 (TAT) ShowSymbol
+ 1.000000 0.000000 (TAG) ShowSymbol
+ 1.000000 0.000000 (TAC) ShowSymbol
+ 1.000000 0.000000 (TAA) ShowSymbol
+ 1.000000 0.000000 (GTT) ShowSymbol
+ 1.000000 0.000000 (GTG) ShowSymbol
+ 1.000000 0.000000 (GTC) ShowSymbol
+ 1.000000 0.000000 (GTA) ShowSymbol
+ 1.000000 0.000000 (GGT) ShowSymbol
+ 1.000000 0.000000 (GGG) ShowSymbol
+ 1.000000 0.000000 (GGC) ShowSymbol
+ 1.000000 0.000000 (GGA) ShowSymbol
+ 1.000000 0.000000 (GCT) ShowSymbol
+ 1.000000 0.000000 (GCG) ShowSymbol
+ 1.000000 0.000000 (GCC) ShowSymbol
+ 1.000000 0.000000 (GCA) ShowSymbol
+ 1.000000 0.000000 (GAT) ShowSymbol
+ 1.000000 0.000000 (GAG) ShowSymbol
+ 1.000000 0.000000 (GAC) ShowSymbol
+ 1.000000 0.000000 (GAA) ShowSymbol
+ 1.000000 0.000000 (CTT) ShowSymbol
+ 1.000000 0.000000 (CTG) ShowSymbol
+ 1.000000 0.000000 (CTC) ShowSymbol
+ 1.000000 0.000000 (CTA) ShowSymbol
+ 1.000000 0.000000 (CGT) ShowSymbol
+ 1.000000 0.000000 (CGG) ShowSymbol
+ 1.000000 0.000000 (CGC) ShowSymbol
+ 1.000000 0.000000 (CGA) ShowSymbol
+ 1.000000 0.000000 (CCT) ShowSymbol
+ 1.000000 0.000000 (CCG) ShowSymbol
+ 1.000000 0.000000 (CCC) ShowSymbol
+ 1.000000 0.000000 (CCA) ShowSymbol
+ 1.000000 0.000000 (CAT) ShowSymbol
+ 1.000000 0.000000 (CAG) ShowSymbol
+ 1.000000 0.000000 (CAC) ShowSymbol
+ 1.000000 0.000000 (CAA) ShowSymbol
+ 1.000000 0.000000 (ATT) ShowSymbol
+ 1.000000 0.000000 (ATC) ShowSymbol
+ 1.000000 0.000000 (ATA) ShowSymbol
+ 1.000000 0.000000 (AGT) ShowSymbol
+ 1.000000 0.000000 (AGG) ShowSymbol
+ 1.000000 0.000000 (AGC) ShowSymbol
+ 1.000000 0.000000 (AGA) ShowSymbol
+ 1.000000 0.000000 (ACT) ShowSymbol
+ 1.000000 0.000000 (ACG) ShowSymbol
+ 1.000000 0.000000 (ACC) ShowSymbol
+ 1.000000 0.000000 (ACA) ShowSymbol
+ 1.000000 0.000000 (AAT) ShowSymbol
+ 1.000000 0.000000 (AAG) ShowSymbol
+ 1.000000 0.000000 (AAC) ShowSymbol
+ 1.000000 0.000000 (AAA) ShowSymbol
+ 1.000000 3.524856 (ATG) ShowSymbol
+ 0.859655 0.675144 DrawErrorbar
+EndStack
+
+/color_dict <<
+  (AAA) [ 1.0 0.0 0.0 ]
+  (AAC) [ 0.0 1.0 0.8 ]
+  (AAG) [ 1.0 0.0 0.0 ]
+  (AAT) [ 0.0 1.0 0.8 ]
+  (ACA) [ 1.0 0.0 0.0 ]
+  (ACC) [ 0.0 1.0 0.8 ]
+  (ACG) [ 0.0 1.0 0.8 ]
+  (ACT) [ 0.0 1.0 0.8 ]
+  (AGA) [ 0.0 1.0 0.8 ]
+  (AGC) [ 0.0 1.0 0.8 ]
+  (AGG) [ 0.0 1.0 0.8 ]
+  (AGT) [ 0.0 1.0 0.8 ]
+  (ATA) [ 1.0 0.0 0.0 ]
+  (ATC) [ 0.0 1.0 0.8 ]
+  (ATG) [ 0.0 1.0 0.8 ]
+  (ATT) [ 0.0 1.0 0.8 ]
+  (CAA) [ 0.0 1.0 0.8 ]
+  (CAC) [ 1.0 0.8 0.0 ]
+  (CAG) [ 0.0 1.0 0.8 ]
+  (CAT) [ 0.0 1.0 0.8 ]
+  (CCA) [ 0.0 1.0 0.8 ]
+  (CCC) [ 0.0 1.0 0.8 ]
+  (CCG) [ 0.0 1.0 0.8 ]
+  (CCT) [ 0.0 1.0 0.8 ]
+  (CGA) [ 0.0 1.0 0.8 ]
+  (CGC) [ 0.0 1.0 0.8 ]
+  (CGG) [ 0.0 1.0 0.8 ]
+  (CGT) [ 0.0 1.0 0.8 ]
+  (CTA) [ 0.0 1.0 0.8 ]
+  (CTC) [ 0.0 1.0 0.8 ]
+  (CTG) [ 0.0 1.0 0.8 ]
+  (CTT) [ 0.0 1.0 0.8 ]
+  (GAA) [ 0.0 1.0 0.8 ]
+  (GAC) [ 0.0 1.0 0.8 ]
+  (GAG) [ 0.0 1.0 0.8 ]
+  (GAT) [ 0.0 1.0 0.8 ]
+  (GCA) [ 0.0 1.0 0.8 ]
+  (GCC) [ 0.0 1.0 0.8 ]
+  (GCG) [ 0.0 1.0 0.8 ]
+  (GCT) [ 0.0 1.0 0.8 ]
+  (GGA) [ 0.0 1.0 0.8 ]
+  (GGC) [ 0.0 1.0 0.8 ]
+  (GGG) [ 0.0 1.0 0.8 ]
+  (GGT) [ 0.0 1.0 0.8 ]
+  (GTA) [ 0.0 1.0 0.8 ]
+  (GTC) [ 0.0 1.0 0.8 ]
+  (GTG) [ 0.0 1.0 0.8 ]
+  (GTT) [ 0.0 1.0 0.8 ]
+  (TAA) [ 0.0 1.0 0.8 ]
+  (TAC) [ 0.0 1.0 0.8 ]
+  (TAG) [ 0.0 1.0 0.8 ]
+  (TAT) [ 0.0 1.0 0.8 ]
+  (TCA) [ 0.0 1.0 0.8 ]
+  (TCC) [ 0.0 1.0 0.8 ]
+  (TCG) [ 0.0 1.0 0.8 ]
+  (TCT) [ 0.0 1.0 0.8 ]
+  (TGA) [ 0.0 1.0 0.8 ]
+  (TGC) [ 0.0 1.0 0.8 ]
+  (TGG) [ 0.0 1.0 0.8 ]
+  (TGT) [ 0.0 1.0 0.8 ]
+  (TTA) [ 0.0 1.0 0.8 ]
+  (TTC) [ 0.0 1.0 0.8 ]
+  (TTG) [ 0.0 1.0 0.8 ]
+  (TTT) [ 0.0 1.0 0.8 ]
+>> def
+() StartStack
+ 1.000000 0.000000 (TTT) ShowSymbol
+ 1.000000 0.000000 (TTG) ShowSymbol
+ 1.000000 0.000000 (TTC) ShowSymbol
+ 1.000000 0.000000 (TTA) ShowSymbol
+ 1.000000 0.000000 (TGT) ShowSymbol
+ 1.000000 0.000000 (TGG) ShowSymbol
+ 1.000000 0.000000 (TGC) ShowSymbol
+ 1.000000 0.000000 (TGA) ShowSymbol
+ 1.000000 0.000000 (TCT) ShowSymbol
+ 1.000000 0.000000 (TCG) ShowSymbol
+ 1.000000 0.000000 (TCC) ShowSymbol
+ 1.000000 0.000000 (TCA) ShowSymbol
+ 1.000000 0.000000 (TAT) ShowSymbol
+ 1.000000 0.000000 (TAG) ShowSymbol
+ 1.000000 0.000000 (TAC) ShowSymbol
+ 1.000000 0.000000 (TAA) ShowSymbol
+ 1.000000 0.000000 (GTT) ShowSymbol
+ 1.000000 0.000000 (GTG) ShowSymbol
+ 1.000000 0.000000 (GTC) ShowSymbol
+ 1.000000 0.000000 (GTA) ShowSymbol
+ 1.000000 0.000000 (GGT) ShowSymbol
+ 1.000000 0.000000 (GGG) ShowSymbol
+ 1.000000 0.000000 (GGC) ShowSymbol
+ 1.000000 0.000000 (GGA) ShowSymbol
+ 1.000000 0.000000 (GCT) ShowSymbol
+ 1.000000 0.000000 (GCG) ShowSymbol
+ 1.000000 0.000000 (GCC) ShowSymbol
+ 1.000000 0.000000 (GCA) ShowSymbol
+ 1.000000 0.000000 (GAT) ShowSymbol
+ 1.000000 0.000000 (GAG) ShowSymbol
+ 1.000000 0.000000 (GAC) ShowSymbol
+ 1.000000 0.000000 (GAA) ShowSymbol
+ 1.000000 0.000000 (CTT) ShowSymbol
+ 1.000000 0.000000 (CTG) ShowSymbol
+ 1.000000 0.000000 (CTC) ShowSymbol
+ 1.000000 0.000000 (CTA) ShowSymbol
+ 1.000000 0.000000 (CGT) ShowSymbol
+ 1.000000 0.000000 (CGG) ShowSymbol
+ 1.000000 0.000000 (CGC) ShowSymbol
+ 1.000000 0.000000 (CGA) ShowSymbol
+ 1.000000 0.000000 (CCT) ShowSymbol
+ 1.000000 0.000000 (CCG) ShowSymbol
+ 1.000000 0.000000 (CCC) ShowSymbol
+ 1.000000 0.000000 (CCA) ShowSymbol
+ 1.000000 0.000000 (CAT) ShowSymbol
+ 1.000000 0.000000 (CAG) ShowSymbol
+ 1.000000 0.000000 (CAA) ShowSymbol
+ 1.000000 0.000000 (ATT) ShowSymbol
+ 1.000000 0.000000 (ATG) ShowSymbol
+ 1.000000 0.000000 (ATC) ShowSymbol
+ 1.000000 0.000000 (AGT) ShowSymbol
+ 1.000000 0.000000 (AGG) ShowSymbol
+ 1.000000 0.000000 (AGC) ShowSymbol
+ 1.000000 0.000000 (AGA) ShowSymbol
+ 1.000000 0.000000 (ACT) ShowSymbol
+ 1.000000 0.000000 (ACG) ShowSymbol
+ 1.000000 0.000000 (ACC) ShowSymbol
+ 1.000000 0.000000 (AAT) ShowSymbol
+ 1.000000 0.000000 (AAC) ShowSymbol
+ 1.000000 0.185395 (CAC) ShowSymbol
+ 1.000000 0.185395 (ATA) ShowSymbol
+ 1.000000 0.185395 (ACA) ShowSymbol
+ 1.000000 0.370789 (AAG) ShowSymbol
+ 1.000000 1.668552 (AAA) ShowSymbol
+ 0.836306 0.836306 DrawErrorbar
+EndStack
+
+/color_dict <<
+  (AAA) [ 1.0 0.0 0.0 ]
+  (AAC) [ 1.0 1.0 0.0 ]
+  (AAG) [ 1.0 0.4 0.0 ]
+  (AAT) [ 1.0 1.0 0.0 ]
+  (ACA) [ 0.0 1.0 0.8 ]
+  (ACC) [ 0.0 1.0 0.8 ]
+  (ACG) [ 0.0 1.0 0.8 ]
+  (ACT) [ 0.0 1.0 0.8 ]
+  (AGA) [ 0.0 1.0 0.8 ]
+  (AGC) [ 0.0 1.0 0.8 ]
+  (AGG) [ 0.0 1.0 0.8 ]
+  (AGT) [ 0.0 1.0 0.8 ]
+  (ATA) [ 1.0 0.0 0.0 ]
+  (ATC) [ 1.0 0.0 0.0 ]
+  (ATG) [ 0.0 1.0 0.8 ]
+  (ATT) [ 1.0 1.0 0.0 ]
+  (CAA) [ 0.0 1.0 0.8 ]
+  (CAC) [ 0.0 1.0 0.8 ]
+  (CAG) [ 0.0 1.0 0.8 ]
+  (CAT) [ 0.0 1.0 0.8 ]
+  (CCA) [ 0.0 1.0 0.8 ]
+  (CCC) [ 0.0 1.0 0.8 ]
+  (CCG) [ 0.0 1.0 0.8 ]
+  (CCT) [ 0.0 1.0 0.8 ]
+  (CGA) [ 0.0 1.0 0.8 ]
+  (CGC) [ 0.0 1.0 0.8 ]
+  (CGG) [ 0.0 1.0 0.8 ]
+  (CGT) [ 0.0 1.0 0.8 ]
+  (CTA) [ 0.0 1.0 0.8 ]
+  (CTC) [ 0.0 1.0 0.8 ]
+  (CTG) [ 0.0 1.0 0.8 ]
+  (CTT) [ 0.0 1.0 0.8 ]
+  (GAA) [ 0.0 1.0 0.8 ]
+  (GAC) [ 0.0 1.0 0.8 ]
+  (GAG) [ 0.0 1.0 0.8 ]
+  (GAT) [ 0.0 1.0 0.8 ]
+  (GCA) [ 0.0 1.0 0.8 ]
+  (GCC) [ 0.0 1.0 0.8 ]
+  (GCG) [ 0.0 1.0 0.8 ]
+  (GCT) [ 0.0 1.0 0.8 ]
+  (GGA) [ 0.0 1.0 0.8 ]
+  (GGC) [ 0.0 1.0 0.8 ]
+  (GGG) [ 0.0 1.0 0.8 ]
+  (GGT) [ 0.0 1.0 0.8 ]
+  (GTA) [ 0.0 1.0 0.8 ]
+  (GTC) [ 0.0 1.0 0.8 ]
+  (GTG) [ 0.0 1.0 0.8 ]
+  (GTT) [ 0.0 1.0 0.8 ]
+  (TAA) [ 0.0 1.0 0.8 ]
+  (TAC) [ 0.0 1.0 0.8 ]
+  (TAG) [ 0.0 1.0 0.8 ]
+  (TAT) [ 0.0 1.0 0.8 ]
+  (TCA) [ 0.0 1.0 0.8 ]
+  (TCC) [ 0.0 1.0 0.8 ]
+  (TCG) [ 0.0 1.0 0.8 ]
+  (TCT) [ 0.0 1.0 0.8 ]
+  (TGA) [ 0.0 1.0 0.8 ]
+  (TGC) [ 0.0 1.0 0.8 ]
+  (TGG) [ 0.0 1.0 0.8 ]
+  (TGT) [ 0.0 1.0 0.8 ]
+  (TTA) [ 0.0 1.0 0.8 ]
+  (TTC) [ 0.0 1.0 0.8 ]
+  (TTG) [ 0.0 1.0 0.8 ]
+  (TTT) [ 0.0 1.0 0.8 ]
+>> def
+() StartStack
+ 1.000000 0.000000 (TTT) ShowSymbol
+ 1.000000 0.000000 (TTG) ShowSymbol
+ 1.000000 0.000000 (TTC) ShowSymbol
+ 1.000000 0.000000 (TTA) ShowSymbol
+ 1.000000 0.000000 (TGT) ShowSymbol
+ 1.000000 0.000000 (TGG) ShowSymbol
+ 1.000000 0.000000 (TGC) ShowSymbol
+ 1.000000 0.000000 (TGA) ShowSymbol
+ 1.000000 0.000000 (TCT) ShowSymbol
+ 1.000000 0.000000 (TCG) ShowSymbol
+ 1.000000 0.000000 (TCC) ShowSymbol
+ 1.000000 0.000000 (TCA) ShowSymbol
+ 1.000000 0.000000 (TAT) ShowSymbol
+ 1.000000 0.000000 (TAG) ShowSymbol
+ 1.000000 0.000000 (TAC) ShowSymbol
+ 1.000000 0.000000 (TAA) ShowSymbol
+ 1.000000 0.000000 (GTT) ShowSymbol
+ 1.000000 0.000000 (GTG) ShowSymbol
+ 1.000000 0.000000 (GTC) ShowSymbol
+ 1.000000 0.000000 (GTA) ShowSymbol
+ 1.000000 0.000000 (GGT) ShowSymbol
+ 1.000000 0.000000 (GGG) ShowSymbol
+ 1.000000 0.000000 (GGC) ShowSymbol
+ 1.000000 0.000000 (GGA) ShowSymbol
+ 1.000000 0.000000 (GCT) ShowSymbol
+ 1.000000 0.000000 (GCG) ShowSymbol
+ 1.000000 0.000000 (GCC) ShowSymbol
+ 1.000000 0.000000 (GCA) ShowSymbol
+ 1.000000 0.000000 (GAT) ShowSymbol
+ 1.000000 0.000000 (GAG) ShowSymbol
+ 1.000000 0.000000 (GAC) ShowSymbol
+ 1.000000 0.000000 (GAA) ShowSymbol
+ 1.000000 0.000000 (CTT) ShowSymbol
+ 1.000000 0.000000 (CTG) ShowSymbol
+ 1.000000 0.000000 (CTC) ShowSymbol
+ 1.000000 0.000000 (CTA) ShowSymbol
+ 1.000000 0.000000 (CGT) ShowSymbol
+ 1.000000 0.000000 (CGG) ShowSymbol
+ 1.000000 0.000000 (CGC) ShowSymbol
+ 1.000000 0.000000 (CGA) ShowSymbol
+ 1.000000 0.000000 (CCT) ShowSymbol
+ 1.000000 0.000000 (CCG) ShowSymbol
+ 1.000000 0.000000 (CCC) ShowSymbol
+ 1.000000 0.000000 (CCA) ShowSymbol
+ 1.000000 0.000000 (CAT) ShowSymbol
+ 1.000000 0.000000 (CAG) ShowSymbol
+ 1.000000 0.000000 (CAC) ShowSymbol
+ 1.000000 0.000000 (CAA) ShowSymbol
+ 1.000000 0.000000 (ATG) ShowSymbol
+ 1.000000 0.000000 (AGT) ShowSymbol
+ 1.000000 0.000000 (AGG) ShowSymbol
+ 1.000000 0.000000 (AGC) ShowSymbol
+ 1.000000 0.000000 (AGA) ShowSymbol
+ 1.000000 0.000000 (ACT) ShowSymbol
+ 1.000000 0.000000 (ACG) ShowSymbol
+ 1.000000 0.000000 (ACC) ShowSymbol
+ 1.000000 0.000000 (ACA) ShowSymbol
+ 1.000000 0.215858 (ATT) ShowSymbol
+ 1.000000 0.215858 (AAT) ShowSymbol
+ 1.000000 0.215858 (AAG) ShowSymbol
+ 1.000000 0.215858 (AAC) ShowSymbol
+ 1.000000 0.431716 (ATC) ShowSymbol
+ 1.000000 0.431716 (ATA) ShowSymbol
+ 1.000000 0.431716 (AAA) ShowSymbol
+ 0.695524 0.695524 DrawErrorbar
+EndStack
+
+/color_dict <<
+  (AAA) [ 1.0 0.0 0.0 ]
+  (AAC) [ 0.0 1.0 0.8 ]
+  (AAG) [ 0.0 1.0 0.8 ]
+  (AAT) [ 1.0 0.8 0.0 ]
+  (ACA) [ 1.0 0.0 0.0 ]
+  (ACC) [ 0.0 1.0 0.8 ]
+  (ACG) [ 0.0 1.0 0.8 ]
+  (ACT) [ 0.0 1.0 0.8 ]
+  (AGA) [ 0.0 1.0 0.8 ]
+  (AGC) [ 0.0 1.0 0.8 ]
+  (AGG) [ 0.0 1.0 0.8 ]
+  (AGT) [ 0.0 1.0 0.8 ]
+  (ATA) [ 0.0 1.0 0.8 ]
+  (ATC) [ 0.0 1.0 0.8 ]
+  (ATG) [ 0.0 1.0 0.8 ]
+  (ATT) [ 0.0 1.0 0.8 ]
+  (CAA) [ 0.0 1.0 0.8 ]
+  (CAC) [ 0.0 1.0 0.8 ]
+  (CAG) [ 0.0 1.0 0.8 ]
+  (CAT) [ 0.0 1.0 0.8 ]
+  (CCA) [ 0.0 1.0 0.8 ]
+  (CCC) [ 0.0 1.0 0.8 ]
+  (CCG) [ 0.0 1.0 0.8 ]
+  (CCT) [ 0.0 1.0 0.8 ]
+  (CGA) [ 0.0 1.0 0.8 ]
+  (CGC) [ 0.0 1.0 0.8 ]
+  (CGG) [ 0.0 1.0 0.8 ]
+  (CGT) [ 0.0 1.0 0.8 ]
+  (CTA) [ 0.0 1.0 0.8 ]
+  (CTC) [ 0.0 1.0 0.8 ]
+  (CTG) [ 0.0 1.0 0.8 ]
+  (CTT) [ 0.0 1.0 0.8 ]
+  (GAA) [ 0.0 1.0 0.8 ]
+  (GAC) [ 0.0 1.0 0.8 ]
+  (GAG) [ 0.0 1.0 0.8 ]
+  (GAT) [ 0.0 1.0 0.8 ]
+  (GCA) [ 0.0 1.0 0.8 ]
+  (GCC) [ 0.0 1.0 0.8 ]
+  (GCG) [ 0.0 1.0 0.8 ]
+  (GCT) [ 0.0 1.0 0.8 ]
+  (GGA) [ 0.0 1.0 0.8 ]
+  (GGC) [ 0.0 1.0 0.8 ]
+  (GGG) [ 0.0 1.0 0.8 ]
+  (GGT) [ 0.0 1.0 0.8 ]
+  (GTA) [ 0.0 1.0 0.8 ]
+  (GTC) [ 0.0 1.0 0.8 ]
+  (GTG) [ 0.0 1.0 0.8 ]
+  (GTT) [ 0.0 1.0 0.8 ]
+  (TAA) [ 0.0 1.0 0.8 ]
+  (TAC) [ 0.0 1.0 0.8 ]
+  (TAG) [ 0.0 1.0 0.8 ]
+  (TAT) [ 0.0 1.0 0.8 ]
+  (TCA) [ 0.0 1.0 0.8 ]
+  (TCC) [ 0.0 1.0 0.8 ]
+  (TCG) [ 0.0 1.0 0.8 ]
+  (TCT) [ 0.0 1.0 0.8 ]
+  (TGA) [ 0.0 1.0 0.8 ]
+  (TGC) [ 0.0 1.0 0.8 ]
+  (TGG) [ 0.0 1.0 0.8 ]
+  (TGT) [ 0.0 1.0 0.8 ]
+  (TTA) [ 0.0 1.0 0.8 ]
+  (TTC) [ 0.0 1.0 0.8 ]
+  (TTG) [ 0.0 1.0 0.8 ]
+  (TTT) [ 0.0 1.0 0.8 ]
+>> def
+() StartStack
+ 1.000000 0.000000 (TTT) ShowSymbol
+ 1.000000 0.000000 (TTG) ShowSymbol
+ 1.000000 0.000000 (TTC) ShowSymbol
+ 1.000000 0.000000 (TTA) ShowSymbol
+ 1.000000 0.000000 (TGT) ShowSymbol
+ 1.000000 0.000000 (TGG) ShowSymbol
+ 1.000000 0.000000 (TGC) ShowSymbol
+ 1.000000 0.000000 (TGA) ShowSymbol
+ 1.000000 0.000000 (TCT) ShowSymbol
+ 1.000000 0.000000 (TCG) ShowSymbol
+ 1.000000 0.000000 (TCC) ShowSymbol
+ 1.000000 0.000000 (TCA) ShowSymbol
+ 1.000000 0.000000 (TAT) ShowSymbol
+ 1.000000 0.000000 (TAG) ShowSymbol
+ 1.000000 0.000000 (TAC) ShowSymbol
+ 1.000000 0.000000 (TAA) ShowSymbol
+ 1.000000 0.000000 (GTT) ShowSymbol
+ 1.000000 0.000000 (GTG) ShowSymbol
+ 1.000000 0.000000 (GTC) ShowSymbol
+ 1.000000 0.000000 (GTA) ShowSymbol
+ 1.000000 0.000000 (GGT) ShowSymbol
+ 1.000000 0.000000 (GGG) ShowSymbol
+ 1.000000 0.000000 (GGC) ShowSymbol
+ 1.000000 0.000000 (GGA) ShowSymbol
+ 1.000000 0.000000 (GCT) ShowSymbol
+ 1.000000 0.000000 (GCG) ShowSymbol
+ 1.000000 0.000000 (GCC) ShowSymbol
+ 1.000000 0.000000 (GCA) ShowSymbol
+ 1.000000 0.000000 (GAT) ShowSymbol
+ 1.000000 0.000000 (GAG) ShowSymbol
+ 1.000000 0.000000 (GAC) ShowSymbol
+ 1.000000 0.000000 (GAA) ShowSymbol
+ 1.000000 0.000000 (CTT) ShowSymbol
+ 1.000000 0.000000 (CTG) ShowSymbol
+ 1.000000 0.000000 (CTC) ShowSymbol
+ 1.000000 0.000000 (CTA) ShowSymbol
+ 1.000000 0.000000 (CGT) ShowSymbol
+ 1.000000 0.000000 (CGG) ShowSymbol
+ 1.000000 0.000000 (CGC) ShowSymbol
+ 1.000000 0.000000 (CGA) ShowSymbol
+ 1.000000 0.000000 (CCT) ShowSymbol
+ 1.000000 0.000000 (CCG) ShowSymbol
+ 1.000000 0.000000 (CCC) ShowSymbol
+ 1.000000 0.000000 (CCA) ShowSymbol
+ 1.000000 0.000000 (CAT) ShowSymbol
+ 1.000000 0.000000 (CAG) ShowSymbol
+ 1.000000 0.000000 (CAC) ShowSymbol
+ 1.000000 0.000000 (CAA) ShowSymbol
+ 1.000000 0.000000 (ATT) ShowSymbol
+ 1.000000 0.000000 (ATG) ShowSymbol
+ 1.000000 0.000000 (ATC) ShowSymbol
+ 1.000000 0.000000 (ATA) ShowSymbol
+ 1.000000 0.000000 (AGT) ShowSymbol
+ 1.000000 0.000000 (AGG) ShowSymbol
+ 1.000000 0.000000 (AGC) ShowSymbol
+ 1.000000 0.000000 (AGA) ShowSymbol
+ 1.000000 0.000000 (ACT) ShowSymbol
+ 1.000000 0.000000 (ACG) ShowSymbol
+ 1.000000 0.000000 (ACC) ShowSymbol
+ 1.000000 0.000000 (AAG) ShowSymbol
+ 1.000000 0.000000 (AAC) ShowSymbol
+ 1.000000 0.338227 (AAT) ShowSymbol
+ 1.000000 0.676454 (ACA) ShowSymbol
+ 1.000000 1.352909 (AAA) ShowSymbol
+ 0.845326 0.845326 DrawErrorbar
+EndStack
+
+/color_dict <<
+  (AAA) [ 0.0 1.0 0.8 ]
+  (AAC) [ 0.0 1.0 0.8 ]
+  (AAG) [ 0.0 1.0 0.8 ]
+  (AAT) [ 0.0 1.0 0.8 ]
+  (ACA) [ 1.0 0.0 0.0 ]
+  (ACC) [ 1.0 0.8 0.0 ]
+  (ACG) [ 0.0 1.0 0.8 ]
+  (ACT) [ 1.0 0.0 0.0 ]
+  (AGA) [ 0.0 1.0 0.8 ]
+  (AGC) [ 0.0 1.0 0.8 ]
+  (AGG) [ 0.0 1.0 0.8 ]
+  (AGT) [ 0.0 1.0 0.8 ]
+  (ATA) [ 0.0 1.0 0.8 ]
+  (ATC) [ 0.0 1.0 0.8 ]
+  (ATG) [ 0.0 1.0 0.8 ]
+  (ATT) [ 0.0 1.0 0.8 ]
+  (CAA) [ 0.0 1.0 0.8 ]
+  (CAC) [ 0.0 1.0 0.8 ]
+  (CAG) [ 0.0 1.0 0.8 ]
+  (CAT) [ 0.0 1.0 0.8 ]
+  (CCA) [ 0.0 1.0 0.8 ]
+  (CCC) [ 0.0 1.0 0.8 ]
+  (CCG) [ 0.0 1.0 0.8 ]
+  (CCT) [ 0.0 1.0 0.8 ]
+  (CGA) [ 0.0 1.0 0.8 ]
+  (CGC) [ 0.0 1.0 0.8 ]
+  (CGG) [ 0.0 1.0 0.8 ]
+  (CGT) [ 0.0 1.0 0.8 ]
+  (CTA) [ 0.0 1.0 0.8 ]
+  (CTC) [ 0.0 1.0 0.8 ]
+  (CTG) [ 0.0 1.0 0.8 ]
+  (CTT) [ 0.0 1.0 0.8 ]
+  (GAA) [ 0.0 1.0 0.8 ]
+  (GAC) [ 0.0 1.0 0.8 ]
+  (GAG) [ 0.0 1.0 0.8 ]
+  (GAT) [ 0.0 1.0 0.8 ]
+  (GCA) [ 0.0 1.0 0.8 ]
+  (GCC) [ 0.0 1.0 0.8 ]
+  (GCG) [ 0.0 1.0 0.8 ]
+  (GCT) [ 0.0 1.0 0.8 ]
+  (GGA) [ 0.0 1.0 0.8 ]
+  (GGC) [ 0.0 1.0 0.8 ]
+  (GGG) [ 0.0 1.0 0.8 ]
+  (GGT) [ 0.0 1.0 0.8 ]
+  (GTA) [ 0.0 1.0 0.8 ]
+  (GTC) [ 0.0 1.0 0.8 ]
+  (GTG) [ 0.0 1.0 0.8 ]
+  (GTT) [ 0.0 1.0 0.8 ]
+  (TAA) [ 0.0 1.0 0.8 ]
+  (TAC) [ 0.0 1.0 0.8 ]
+  (TAG) [ 0.0 1.0 0.8 ]
+  (TAT) [ 0.0 1.0 0.8 ]
+  (TCA) [ 0.0 1.0 0.8 ]
+  (TCC) [ 1.0 0.0 0.0 ]
+  (TCG) [ 0.0 1.0 0.8 ]
+  (TCT) [ 0.0 1.0 0.8 ]
+  (TGA) [ 0.0 1.0 0.8 ]
+  (TGC) [ 0.0 1.0 0.8 ]
+  (TGG) [ 0.0 1.0 0.8 ]
+  (TGT) [ 0.0 1.0 0.8 ]
+  (TTA) [ 0.0 1.0 0.8 ]
+  (TTC) [ 0.0 1.0 0.8 ]
+  (TTG) [ 0.0 1.0 0.8 ]
+  (TTT) [ 0.0 1.0 0.8 ]
+>> def
+(5) StartStack
+ 1.000000 0.000000 (TTT) ShowSymbol
+ 1.000000 0.000000 (TTG) ShowSymbol
+ 1.000000 0.000000 (TTC) ShowSymbol
+ 1.000000 0.000000 (TTA) ShowSymbol
+ 1.000000 0.000000 (TGT) ShowSymbol
+ 1.000000 0.000000 (TGG) ShowSymbol
+ 1.000000 0.000000 (TGC) ShowSymbol
+ 1.000000 0.000000 (TGA) ShowSymbol
+ 1.000000 0.000000 (TCT) ShowSymbol
+ 1.000000 0.000000 (TCG) ShowSymbol
+ 1.000000 0.000000 (TCA) ShowSymbol
+ 1.000000 0.000000 (TAT) ShowSymbol
+ 1.000000 0.000000 (TAG) ShowSymbol
+ 1.000000 0.000000 (TAC) ShowSymbol
+ 1.000000 0.000000 (TAA) ShowSymbol
+ 1.000000 0.000000 (GTT) ShowSymbol
+ 1.000000 0.000000 (GTG) ShowSymbol
+ 1.000000 0.000000 (GTC) ShowSymbol
+ 1.000000 0.000000 (GTA) ShowSymbol
+ 1.000000 0.000000 (GGT) ShowSymbol
+ 1.000000 0.000000 (GGG) ShowSymbol
+ 1.000000 0.000000 (GGC) ShowSymbol
+ 1.000000 0.000000 (GGA) ShowSymbol
+ 1.000000 0.000000 (GCT) ShowSymbol
+ 1.000000 0.000000 (GCG) ShowSymbol
+ 1.000000 0.000000 (GCC) ShowSymbol
+ 1.000000 0.000000 (GCA) ShowSymbol
+ 1.000000 0.000000 (GAT) ShowSymbol
+ 1.000000 0.000000 (GAG) ShowSymbol
+ 1.000000 0.000000 (GAC) ShowSymbol
+ 1.000000 0.000000 (GAA) ShowSymbol
+ 1.000000 0.000000 (CTT) ShowSymbol
+ 1.000000 0.000000 (CTG) ShowSymbol
+ 1.000000 0.000000 (CTC) ShowSymbol
+ 1.000000 0.000000 (CTA) ShowSymbol
+ 1.000000 0.000000 (CGT) ShowSymbol
+ 1.000000 0.000000 (CGG) ShowSymbol
+ 1.000000 0.000000 (CGC) ShowSymbol
+ 1.000000 0.000000 (CGA) ShowSymbol
+ 1.000000 0.000000 (CCT) ShowSymbol
+ 1.000000 0.000000 (CCG) ShowSymbol
+ 1.000000 0.000000 (CCC) ShowSymbol
+ 1.000000 0.000000 (CCA) ShowSymbol
+ 1.000000 0.000000 (CAT) ShowSymbol
+ 1.000000 0.000000 (CAG) ShowSymbol
+ 1.000000 0.000000 (CAC) ShowSymbol
+ 1.000000 0.000000 (CAA) ShowSymbol
+ 1.000000 0.000000 (ATT) ShowSymbol
+ 1.000000 0.000000 (ATG) ShowSymbol
+ 1.000000 0.000000 (ATC) ShowSymbol
+ 1.000000 0.000000 (ATA) ShowSymbol
+ 1.000000 0.000000 (AGT) ShowSymbol
+ 1.000000 0.000000 (AGG) ShowSymbol
+ 1.000000 0.000000 (AGC) ShowSymbol
+ 1.000000 0.000000 (AGA) ShowSymbol
+ 1.000000 0.000000 (ACG) ShowSymbol
+ 1.000000 0.000000 (AAT) ShowSymbol
+ 1.000000 0.000000 (AAG) ShowSymbol
+ 1.000000 0.000000 (AAC) ShowSymbol
+ 1.000000 0.000000 (AAA) ShowSymbol
+ 1.000000 0.389636 (TCC) ShowSymbol
+ 1.000000 0.389636 (ACC) ShowSymbol
+ 1.000000 0.779272 (ACA) ShowSymbol
+ 1.000000 1.168908 (ACT) ShowSymbol
+ 0.792987 0.792987 DrawErrorbar
+EndStack
+
+/color_dict <<
+  (AAA) [ 0.0 1.0 0.8 ]
+  (AAC) [ 0.0 1.0 0.8 ]
+  (AAG) [ 0.0 1.0 0.8 ]
+  (AAT) [ 0.0 1.0 0.8 ]
+  (ACA) [ 0.0 1.0 0.8 ]
+  (ACC) [ 0.0 1.0 0.8 ]
+  (ACG) [ 0.0 1.0 0.8 ]
+  (ACT) [ 0.0 1.0 0.8 ]
+  (AGA) [ 0.0 1.0 0.8 ]
+  (AGC) [ 0.0 1.0 0.8 ]
+  (AGG) [ 0.0 1.0 0.8 ]
+  (AGT) [ 0.0 1.0 0.8 ]
+  (ATA) [ 0.0 1.0 0.8 ]
+  (ATC) [ 0.0 1.0 0.8 ]
+  (ATG) [ 0.0 1.0 0.8 ]
+  (ATT) [ 0.0 1.0 0.8 ]
+  (CAA) [ 0.0 1.0 0.8 ]
+  (CAC) [ 0.0 1.0 0.8 ]
+  (CAG) [ 0.0 1.0 0.8 ]
+  (CAT) [ 0.0 1.0 0.8 ]
+  (CCA) [ 0.0 1.0 0.8 ]
+  (CCC) [ 0.0 1.0 0.8 ]
+  (CCG) [ 0.0 1.0 0.8 ]
+  (CCT) [ 0.0 1.0 0.8 ]
+  (CGA) [ 0.0 1.0 0.8 ]
+  (CGC) [ 0.0 1.0 0.8 ]
+  (CGG) [ 0.0 1.0 0.8 ]
+  (CGT) [ 0.0 1.0 0.8 ]
+  (CTA) [ 0.0 1.0 0.8 ]
+  (CTC) [ 0.0 1.0 0.8 ]
+  (CTG) [ 0.0 1.0 0.8 ]
+  (CTT) [ 0.0 1.0 0.8 ]
+  (GAA) [ 0.0 1.0 0.8 ]
+  (GAC) [ 0.0 1.0 0.8 ]
+  (GAG) [ 0.0 1.0 0.8 ]
+  (GAT) [ 0.0 1.0 0.8 ]
+  (GCA) [ 0.0 1.0 0.8 ]
+  (GCC) [ 0.0 1.0 0.8 ]
+  (GCG) [ 0.0 1.0 0.8 ]
+  (GCT) [ 0.0 1.0 0.8 ]
+  (GGA) [ 0.0 1.0 0.8 ]
+  (GGC) [ 0.0 1.0 0.8 ]
+  (GGG) [ 0.0 1.0 0.8 ]
+  (GGT) [ 0.0 1.0 0.8 ]
+  (GTA) [ 0.0 1.0 0.8 ]
+  (GTC) [ 0.0 1.0 0.8 ]
+  (GTG) [ 0.0 1.0 0.8 ]
+  (GTT) [ 0.0 1.0 0.8 ]
+  (TAA) [ 0.0 1.0 0.8 ]
+  (TAC) [ 0.0 1.0 0.8 ]
+  (TAG) [ 0.0 1.0 0.8 ]
+  (TAT) [ 0.0 1.0 0.8 ]
+  (TCA) [ 0.0 1.0 0.8 ]
+  (TCC) [ 0.0 1.0 0.8 ]
+  (TCG) [ 0.0 1.0 0.8 ]
+  (TCT) [ 0.0 1.0 0.8 ]
+  (TGA) [ 0.0 1.0 0.8 ]
+  (TGC) [ 0.0 1.0 0.8 ]
+  (TGG) [ 0.0 1.0 0.8 ]
+  (TGT) [ 0.0 1.0 0.8 ]
+  (TTA) [ 1.0 0.0 0.0 ]
+  (TTC) [ 0.0 1.0 0.8 ]
+  (TTG) [ 0.0 1.0 0.8 ]
+  (TTT) [ 0.0 1.0 0.8 ]
+>> def
+() StartStack
+ 1.000000 0.000000 (TTT) ShowSymbol
+ 1.000000 0.000000 (TTG) ShowSymbol
+ 1.000000 0.000000 (TTC) ShowSymbol
+ 1.000000 0.000000 (TGT) ShowSymbol
+ 1.000000 0.000000 (TGG) ShowSymbol
+ 1.000000 0.000000 (TGC) ShowSymbol
+ 1.000000 0.000000 (TGA) ShowSymbol
+ 1.000000 0.000000 (TCT) ShowSymbol
+ 1.000000 0.000000 (TCG) ShowSymbol
+ 1.000000 0.000000 (TCC) ShowSymbol
+ 1.000000 0.000000 (TCA) ShowSymbol
+ 1.000000 0.000000 (TAT) ShowSymbol
+ 1.000000 0.000000 (TAG) ShowSymbol
+ 1.000000 0.000000 (TAC) ShowSymbol
+ 1.000000 0.000000 (TAA) ShowSymbol
+ 1.000000 0.000000 (GTT) ShowSymbol
+ 1.000000 0.000000 (GTG) ShowSymbol
+ 1.000000 0.000000 (GTC) ShowSymbol
+ 1.000000 0.000000 (GTA) ShowSymbol
+ 1.000000 0.000000 (GGT) ShowSymbol
+ 1.000000 0.000000 (GGG) ShowSymbol
+ 1.000000 0.000000 (GGC) ShowSymbol
+ 1.000000 0.000000 (GGA) ShowSymbol
+ 1.000000 0.000000 (GCT) ShowSymbol
+ 1.000000 0.000000 (GCG) ShowSymbol
+ 1.000000 0.000000 (GCC) ShowSymbol
+ 1.000000 0.000000 (GCA) ShowSymbol
+ 1.000000 0.000000 (GAT) ShowSymbol
+ 1.000000 0.000000 (GAG) ShowSymbol
+ 1.000000 0.000000 (GAC) ShowSymbol
+ 1.000000 0.000000 (GAA) ShowSymbol
+ 1.000000 0.000000 (CTT) ShowSymbol
+ 1.000000 0.000000 (CTG) ShowSymbol
+ 1.000000 0.000000 (CTC) ShowSymbol
+ 1.000000 0.000000 (CTA) ShowSymbol
+ 1.000000 0.000000 (CGT) ShowSymbol
+ 1.000000 0.000000 (CGG) ShowSymbol
+ 1.000000 0.000000 (CGC) ShowSymbol
+ 1.000000 0.000000 (CGA) ShowSymbol
+ 1.000000 0.000000 (CCT) ShowSymbol
+ 1.000000 0.000000 (CCG) ShowSymbol
+ 1.000000 0.000000 (CCC) ShowSymbol
+ 1.000000 0.000000 (CCA) ShowSymbol
+ 1.000000 0.000000 (CAT) ShowSymbol
+ 1.000000 0.000000 (CAG) ShowSymbol
+ 1.000000 0.000000 (CAC) ShowSymbol
+ 1.000000 0.000000 (CAA) ShowSymbol
+ 1.000000 0.000000 (ATT) ShowSymbol
+ 1.000000 0.000000 (ATG) ShowSymbol
+ 1.000000 0.000000 (ATC) ShowSymbol
+ 1.000000 0.000000 (ATA) ShowSymbol
+ 1.000000 0.000000 (AGT) ShowSymbol
+ 1.000000 0.000000 (AGG) ShowSymbol
+ 1.000000 0.000000 (AGC) ShowSymbol
+ 1.000000 0.000000 (AGA) ShowSymbol
+ 1.000000 0.000000 (ACT) ShowSymbol
+ 1.000000 0.000000 (ACG) ShowSymbol
+ 1.000000 0.000000 (ACC) ShowSymbol
+ 1.000000 0.000000 (ACA) ShowSymbol
+ 1.000000 0.000000 (AAT) ShowSymbol
+ 1.000000 0.000000 (AAG) ShowSymbol
+ 1.000000 0.000000 (AAC) ShowSymbol
+ 1.000000 0.000000 (AAA) ShowSymbol
+ 1.000000 2.141590 (TTA) ShowSymbol
+ 0.829669 0.829669 DrawErrorbar
+EndStack
+
+/color_dict <<
+  (AAA) [ 1.0 0.4 0.0 ]
+  (AAC) [ 0.0 1.0 0.8 ]
+  (AAG) [ 0.0 1.0 0.8 ]
+  (AAT) [ 0.0 1.0 0.8 ]
+  (ACA) [ 0.0 1.0 0.8 ]
+  (ACC) [ 0.0 1.0 0.8 ]
+  (ACG) [ 0.0 1.0 0.8 ]
+  (ACT) [ 0.0 1.0 0.8 ]
+  (AGA) [ 0.0 1.0 0.8 ]
+  (AGC) [ 0.0 1.0 0.8 ]
+  (AGG) [ 0.0 1.0 0.8 ]
+  (AGT) [ 0.0 1.0 0.8 ]
+  (ATA) [ 0.0 1.0 0.8 ]
+  (ATC) [ 0.0 1.0 0.8 ]
+  (ATG) [ 0.0 1.0 0.8 ]
+  (ATT) [ 0.0 1.0 0.8 ]
+  (CAA) [ 0.0 1.0 0.8 ]
+  (CAC) [ 0.0 1.0 0.8 ]
+  (CAG) [ 0.0 1.0 0.8 ]
+  (CAT) [ 0.0 1.0 0.8 ]
+  (CCA) [ 0.0 1.0 0.8 ]
+  (CCC) [ 0.0 1.0 0.8 ]
+  (CCG) [ 0.0 1.0 0.8 ]
+  (CCT) [ 0.0 1.0 0.8 ]
+  (CGA) [ 0.0 1.0 0.8 ]
+  (CGC) [ 0.0 1.0 0.8 ]
+  (CGG) [ 0.0 1.0 0.8 ]
+  (CGT) [ 0.0 1.0 0.8 ]
+  (CTA) [ 0.0 1.0 0.8 ]
+  (CTC) [ 0.0 1.0 0.8 ]
+  (CTG) [ 0.0 1.0 0.8 ]
+  (CTT) [ 0.0 1.0 0.8 ]
+  (GAA) [ 0.0 1.0 0.8 ]
+  (GAC) [ 0.0 1.0 0.8 ]
+  (GAG) [ 0.0 1.0 0.8 ]
+  (GAT) [ 0.0 1.0 0.8 ]
+  (GCA) [ 0.0 1.0 0.8 ]
+  (GCC) [ 0.0 1.0 0.8 ]
+  (GCG) [ 0.0 1.0 0.8 ]
+  (GCT) [ 0.0 1.0 0.8 ]
+  (GGA) [ 0.0 1.0 0.8 ]
+  (GGC) [ 0.0 1.0 0.8 ]
+  (GGG) [ 0.0 1.0 0.8 ]
+  (GGT) [ 0.0 1.0 0.8 ]
+  (GTA) [ 0.0 1.0 0.8 ]
+  (GTC) [ 0.0 1.0 0.8 ]
+  (GTG) [ 0.0 1.0 0.8 ]
+  (GTT) [ 0.0 1.0 0.8 ]
+  (TAA) [ 0.0 1.0 0.8 ]
+  (TAC) [ 0.0 1.0 0.8 ]
+  (TAG) [ 0.0 1.0 0.8 ]
+  (TAT) [ 0.0 1.0 0.8 ]
+  (TCA) [ 0.0 1.0 0.8 ]
+  (TCC) [ 0.0 1.0 0.8 ]
+  (TCG) [ 0.0 1.0 0.8 ]
+  (TCT) [ 0.0 1.0 0.8 ]
+  (TGA) [ 0.0 1.0 0.8 ]
+  (TGC) [ 0.0 1.0 0.8 ]
+  (TGG) [ 0.0 1.0 0.8 ]
+  (TGT) [ 0.0 1.0 0.8 ]
+  (TTA) [ 0.0 1.0 0.8 ]
+  (TTC) [ 0.0 1.0 0.8 ]
+  (TTG) [ 0.0 1.0 0.8 ]
+  (TTT) [ 0.0 1.0 0.8 ]
+>> def
+() StartStack
+ 1.000000 0.000000 (TTT) ShowSymbol
+ 1.000000 0.000000 (TTG) ShowSymbol
+ 1.000000 0.000000 (TTC) ShowSymbol
+ 1.000000 0.000000 (TTA) ShowSymbol
+ 1.000000 0.000000 (TGT) ShowSymbol
+ 1.000000 0.000000 (TGG) ShowSymbol
+ 1.000000 0.000000 (TGC) ShowSymbol
+ 1.000000 0.000000 (TGA) ShowSymbol
+ 1.000000 0.000000 (TCT) ShowSymbol
+ 1.000000 0.000000 (TCG) ShowSymbol
+ 1.000000 0.000000 (TCC) ShowSymbol
+ 1.000000 0.000000 (TCA) ShowSymbol
+ 1.000000 0.000000 (TAT) ShowSymbol
+ 1.000000 0.000000 (TAG) ShowSymbol
+ 1.000000 0.000000 (TAC) ShowSymbol
+ 1.000000 0.000000 (TAA) ShowSymbol
+ 1.000000 0.000000 (GTT) ShowSymbol
+ 1.000000 0.000000 (GTG) ShowSymbol
+ 1.000000 0.000000 (GTC) ShowSymbol
+ 1.000000 0.000000 (GTA) ShowSymbol
+ 1.000000 0.000000 (GGT) ShowSymbol
+ 1.000000 0.000000 (GGG) ShowSymbol
+ 1.000000 0.000000 (GGC) ShowSymbol
+ 1.000000 0.000000 (GGA) ShowSymbol
+ 1.000000 0.000000 (GCT) ShowSymbol
+ 1.000000 0.000000 (GCG) ShowSymbol
+ 1.000000 0.000000 (GCC) ShowSymbol
+ 1.000000 0.000000 (GCA) ShowSymbol
+ 1.000000 0.000000 (GAT) ShowSymbol
+ 1.000000 0.000000 (GAG) ShowSymbol
+ 1.000000 0.000000 (GAC) ShowSymbol
+ 1.000000 0.000000 (GAA) ShowSymbol
+ 1.000000 0.000000 (CTT) ShowSymbol
+ 1.000000 0.000000 (CTG) ShowSymbol
+ 1.000000 0.000000 (CTC) ShowSymbol
+ 1.000000 0.000000 (CTA) ShowSymbol
+ 1.000000 0.000000 (CGT) ShowSymbol
+ 1.000000 0.000000 (CGG) ShowSymbol
+ 1.000000 0.000000 (CGC) ShowSymbol
+ 1.000000 0.000000 (CGA) ShowSymbol
+ 1.000000 0.000000 (CCT) ShowSymbol
+ 1.000000 0.000000 (CCG) ShowSymbol
+ 1.000000 0.000000 (CCC) ShowSymbol
+ 1.000000 0.000000 (CCA) ShowSymbol
+ 1.000000 0.000000 (CAT) ShowSymbol
+ 1.000000 0.000000 (CAG) ShowSymbol
+ 1.000000 0.000000 (CAC) ShowSymbol
+ 1.000000 0.000000 (CAA) ShowSymbol
+ 1.000000 0.000000 (ATT) ShowSymbol
+ 1.000000 0.000000 (ATG) ShowSymbol
+ 1.000000 0.000000 (ATC) ShowSymbol
+ 1.000000 0.000000 (ATA) ShowSymbol
+ 1.000000 0.000000 (AGT) ShowSymbol
+ 1.000000 0.000000 (AGG) ShowSymbol
+ 1.000000 0.000000 (AGC) ShowSymbol
+ 1.000000 0.000000 (AGA) ShowSymbol
+ 1.000000 0.000000 (ACT) ShowSymbol
+ 1.000000 0.000000 (ACG) ShowSymbol
+ 1.000000 0.000000 (ACC) ShowSymbol
+ 1.000000 0.000000 (ACA) ShowSymbol
+ 1.000000 0.000000 (AAT) ShowSymbol
+ 1.000000 0.000000 (AAG) ShowSymbol
+ 1.000000 0.000000 (AAC) ShowSymbol
+ 1.000000 2.046192 (AAA) ShowSymbol
+ 0.848447 0.848447 DrawErrorbar
+EndStack
+
+/color_dict <<
+  (AAA) [ 0.0 1.0 0.8 ]
+  (AAC) [ 0.0 1.0 0.8 ]
+  (AAG) [ 0.0 1.0 0.8 ]
+  (AAT) [ 0.0 1.0 0.8 ]
+  (ACA) [ 0.0 1.0 0.8 ]
+  (ACC) [ 0.0 1.0 0.8 ]
+  (ACG) [ 0.0 1.0 0.8 ]
+  (ACT) [ 0.0 1.0 0.8 ]
+  (AGA) [ 0.0 1.0 0.8 ]
+  (AGC) [ 0.0 1.0 0.8 ]
+  (AGG) [ 0.0 1.0 0.8 ]
+  (AGT) [ 0.0 1.0 0.8 ]
+  (ATA) [ 0.0 1.0 0.8 ]
+  (ATC) [ 0.0 1.0 0.8 ]
+  (ATG) [ 0.0 1.0 0.8 ]
+  (ATT) [ 0.0 1.0 0.8 ]
+  (CAA) [ 0.0 1.0 0.8 ]
+  (CAC) [ 0.0 1.0 0.8 ]
+  (CAG) [ 0.0 1.0 0.8 ]
+  (CAT) [ 0.0 1.0 0.8 ]
+  (CCA) [ 0.0 1.0 0.8 ]
+  (CCC) [ 0.0 1.0 0.8 ]
+  (CCG) [ 0.0 1.0 0.8 ]
+  (CCT) [ 0.0 1.0 0.8 ]
+  (CGA) [ 0.0 1.0 0.8 ]
+  (CGC) [ 0.0 1.0 0.8 ]
+  (CGG) [ 0.0 1.0 0.8 ]
+  (CGT) [ 0.0 1.0 0.8 ]
+  (CTA) [ 0.0 1.0 0.8 ]
+  (CTC) [ 0.0 1.0 0.8 ]
+  (CTG) [ 0.0 1.0 0.8 ]
+  (CTT) [ 0.0 1.0 0.8 ]
+  (GAA) [ 0.0 1.0 0.8 ]
+  (GAC) [ 0.0 1.0 0.8 ]
+  (GAG) [ 0.0 1.0 0.8 ]
+  (GAT) [ 0.0 1.0 0.8 ]
+  (GCA) [ 0.0 1.0 0.8 ]
+  (GCC) [ 0.0 1.0 0.8 ]
+  (GCG) [ 0.0 1.0 0.8 ]
+  (GCT) [ 0.0 1.0 0.8 ]
+  (GGA) [ 0.0 1.0 0.8 ]
+  (GGC) [ 0.0 1.0 0.8 ]
+  (GGG) [ 0.0 1.0 0.8 ]
+  (GGT) [ 0.0 1.0 0.8 ]
+  (GTA) [ 1.0 0.0 0.0 ]
+  (GTC) [ 0.0 1.0 0.8 ]
+  (GTG) [ 0.0 1.0 0.8 ]
+  (GTT) [ 0.0 1.0 0.8 ]
+  (TAA) [ 0.0 1.0 0.8 ]
+  (TAC) [ 0.0 1.0 0.8 ]
+  (TAG) [ 0.0 1.0 0.8 ]
+  (TAT) [ 0.0 1.0 0.8 ]
+  (TCA) [ 0.0 1.0 0.8 ]
+  (TCC) [ 0.0 1.0 0.8 ]
+  (TCG) [ 0.0 1.0 0.8 ]
+  (TCT) [ 0.0 1.0 0.8 ]
+  (TGA) [ 0.0 1.0 0.8 ]
+  (TGC) [ 0.0 1.0 0.8 ]
+  (TGG) [ 0.0 1.0 0.8 ]
+  (TGT) [ 0.0 1.0 0.8 ]
+  (TTA) [ 0.0 1.0 0.8 ]
+  (TTC) [ 0.0 1.0 0.8 ]
+  (TTG) [ 0.0 1.0 0.8 ]
+  (TTT) [ 0.0 1.0 0.8 ]
+>> def
+() StartStack
+ 1.000000 0.000000 (TTT) ShowSymbol
+ 1.000000 0.000000 (TTG) ShowSymbol
+ 1.000000 0.000000 (TTC) ShowSymbol
+ 1.000000 0.000000 (TTA) ShowSymbol
+ 1.000000 0.000000 (TGT) ShowSymbol
+ 1.000000 0.000000 (TGG) ShowSymbol
+ 1.000000 0.000000 (TGC) ShowSymbol
+ 1.000000 0.000000 (TGA) ShowSymbol
+ 1.000000 0.000000 (TCT) ShowSymbol
+ 1.000000 0.000000 (TCG) ShowSymbol
+ 1.000000 0.000000 (TCC) ShowSymbol
+ 1.000000 0.000000 (TCA) ShowSymbol
+ 1.000000 0.000000 (TAT) ShowSymbol
+ 1.000000 0.000000 (TAG) ShowSymbol
+ 1.000000 0.000000 (TAC) ShowSymbol
+ 1.000000 0.000000 (TAA) ShowSymbol
+ 1.000000 0.000000 (GTT) ShowSymbol
+ 1.000000 0.000000 (GTG) ShowSymbol
+ 1.000000 0.000000 (GTC) ShowSymbol
+ 1.000000 0.000000 (GGT) ShowSymbol
+ 1.000000 0.000000 (GGG) ShowSymbol
+ 1.000000 0.000000 (GGC) ShowSymbol
+ 1.000000 0.000000 (GGA) ShowSymbol
+ 1.000000 0.000000 (GCT) ShowSymbol
+ 1.000000 0.000000 (GCG) ShowSymbol
+ 1.000000 0.000000 (GCC) ShowSymbol
+ 1.000000 0.000000 (GCA) ShowSymbol
+ 1.000000 0.000000 (GAT) ShowSymbol
+ 1.000000 0.000000 (GAG) ShowSymbol
+ 1.000000 0.000000 (GAC) ShowSymbol
+ 1.000000 0.000000 (GAA) ShowSymbol
+ 1.000000 0.000000 (CTT) ShowSymbol
+ 1.000000 0.000000 (CTG) ShowSymbol
+ 1.000000 0.000000 (CTC) ShowSymbol
+ 1.000000 0.000000 (CTA) ShowSymbol
+ 1.000000 0.000000 (CGT) ShowSymbol
+ 1.000000 0.000000 (CGG) ShowSymbol
+ 1.000000 0.000000 (CGC) ShowSymbol
+ 1.000000 0.000000 (CGA) ShowSymbol
+ 1.000000 0.000000 (CCT) ShowSymbol
+ 1.000000 0.000000 (CCG) ShowSymbol
+ 1.000000 0.000000 (CCC) ShowSymbol
+ 1.000000 0.000000 (CCA) ShowSymbol
+ 1.000000 0.000000 (CAT) ShowSymbol
+ 1.000000 0.000000 (CAG) ShowSymbol
+ 1.000000 0.000000 (CAC) ShowSymbol
+ 1.000000 0.000000 (CAA) ShowSymbol
+ 1.000000 0.000000 (ATT) ShowSymbol
+ 1.000000 0.000000 (ATG) ShowSymbol
+ 1.000000 0.000000 (ATC) ShowSymbol
+ 1.000000 0.000000 (ATA) ShowSymbol
+ 1.000000 0.000000 (AGT) ShowSymbol
+ 1.000000 0.000000 (AGG) ShowSymbol
+ 1.000000 0.000000 (AGC) ShowSymbol
+ 1.000000 0.000000 (AGA) ShowSymbol
+ 1.000000 0.000000 (ACT) ShowSymbol
+ 1.000000 0.000000 (ACG) ShowSymbol
+ 1.000000 0.000000 (ACC) ShowSymbol
+ 1.000000 0.000000 (ACA) ShowSymbol
+ 1.000000 0.000000 (AAT) ShowSymbol
+ 1.000000 0.000000 (AAG) ShowSymbol
+ 1.000000 0.000000 (AAC) ShowSymbol
+ 1.000000 0.000000 (AAA) ShowSymbol
+ 1.000000 2.179584 (GTA) ShowSymbol
+ 0.838705 0.838705 DrawErrorbar
+EndStack
+
+/color_dict <<
+  (AAA) [ 1.0 0.0 0.0 ]
+  (AAC) [ 0.8 1.0 0.2 ]
+  (AAG) [ 1.0 0.0 0.0 ]
+  (AAT) [ 0.0 1.0 0.8 ]
+  (ACA) [ 0.0 1.0 0.8 ]
+  (ACC) [ 0.0 1.0 0.8 ]
+  (ACG) [ 0.0 1.0 0.8 ]
+  (ACT) [ 1.0 0.4 0.0 ]
+  (AGA) [ 0.0 1.0 0.8 ]
+  (AGC) [ 0.0 1.0 0.8 ]
+  (AGG) [ 0.0 1.0 0.8 ]
+  (AGT) [ 0.0 1.0 0.8 ]
+  (ATA) [ 0.0 1.0 0.8 ]
+  (ATC) [ 0.0 1.0 0.8 ]
+  (ATG) [ 0.0 1.0 0.8 ]
+  (ATT) [ 0.0 1.0 0.8 ]
+  (CAA) [ 0.0 1.0 0.8 ]
+  (CAC) [ 0.0 1.0 0.8 ]
+  (CAG) [ 0.0 1.0 0.8 ]
+  (CAT) [ 0.0 1.0 0.8 ]
+  (CCA) [ 0.0 1.0 0.8 ]
+  (CCC) [ 0.0 1.0 0.8 ]
+  (CCG) [ 0.0 1.0 0.8 ]
+  (CCT) [ 0.0 1.0 0.8 ]
+  (CGA) [ 0.0 1.0 0.8 ]
+  (CGC) [ 0.0 1.0 0.8 ]
+  (CGG) [ 0.0 1.0 0.8 ]
+  (CGT) [ 0.0 1.0 0.8 ]
+  (CTA) [ 0.0 1.0 0.8 ]
+  (CTC) [ 0.0 1.0 0.8 ]
+  (CTG) [ 0.0 1.0 0.8 ]
+  (CTT) [ 0.0 1.0 0.8 ]
+  (GAA) [ 0.0 1.0 0.8 ]
+  (GAC) [ 0.0 1.0 0.8 ]
+  (GAG) [ 0.0 1.0 0.8 ]
+  (GAT) [ 0.0 1.0 0.8 ]
+  (GCA) [ 0.0 1.0 0.8 ]
+  (GCC) [ 0.0 1.0 0.8 ]
+  (GCG) [ 0.0 1.0 0.8 ]
+  (GCT) [ 0.0 1.0 0.8 ]
+  (GGA) [ 0.0 1.0 0.8 ]
+  (GGC) [ 1.0 0.0 0.0 ]
+  (GGG) [ 0.0 1.0 0.8 ]
+  (GGT) [ 1.0 0.0 0.0 ]
+  (GTA) [ 0.0 1.0 0.8 ]
+  (GTC) [ 1.0 0.8 0.0 ]
+  (GTG) [ 0.0 1.0 0.8 ]
+  (GTT) [ 0.0 1.0 0.8 ]
+  (TAA) [ 0.0 1.0 0.8 ]
+  (TAC) [ 0.0 1.0 0.8 ]
+  (TAG) [ 0.0 1.0 0.8 ]
+  (TAT) [ 0.0 1.0 0.8 ]
+  (TCA) [ 0.0 1.0 0.8 ]
+  (TCC) [ 0.0 1.0 0.8 ]
+  (TCG) [ 0.0 1.0 0.8 ]
+  (TCT) [ 0.0 1.0 0.8 ]
+  (TGA) [ 0.0 1.0 0.8 ]
+  (TGC) [ 0.0 1.0 0.8 ]
+  (TGG) [ 0.0 1.0 0.8 ]
+  (TGT) [ 0.0 1.0 0.8 ]
+  (TTA) [ 0.0 1.0 0.8 ]
+  (TTC) [ 0.0 1.0 0.8 ]
+  (TTG) [ 0.0 1.0 0.8 ]
+  (TTT) [ 0.0 1.0 0.8 ]
+>> def
+() StartStack
+ 1.000000 0.000000 (TTT) ShowSymbol
+ 1.000000 0.000000 (TTG) ShowSymbol
+ 1.000000 0.000000 (TTC) ShowSymbol
+ 1.000000 0.000000 (TTA) ShowSymbol
+ 1.000000 0.000000 (TGT) ShowSymbol
+ 1.000000 0.000000 (TGG) ShowSymbol
+ 1.000000 0.000000 (TGC) ShowSymbol
+ 1.000000 0.000000 (TGA) ShowSymbol
+ 1.000000 0.000000 (TCT) ShowSymbol
+ 1.000000 0.000000 (TCG) ShowSymbol
+ 1.000000 0.000000 (TCC) ShowSymbol
+ 1.000000 0.000000 (TCA) ShowSymbol
+ 1.000000 0.000000 (TAT) ShowSymbol
+ 1.000000 0.000000 (TAG) ShowSymbol
+ 1.000000 0.000000 (TAC) ShowSymbol
+ 1.000000 0.000000 (TAA) ShowSymbol
+ 1.000000 0.000000 (GTT) ShowSymbol
+ 1.000000 0.000000 (GTG) ShowSymbol
+ 1.000000 0.000000 (GTA) ShowSymbol
+ 1.000000 0.000000 (GGG) ShowSymbol
+ 1.000000 0.000000 (GGA) ShowSymbol
+ 1.000000 0.000000 (GCT) ShowSymbol
+ 1.000000 0.000000 (GCG) ShowSymbol
+ 1.000000 0.000000 (GCC) ShowSymbol
+ 1.000000 0.000000 (GCA) ShowSymbol
+ 1.000000 0.000000 (GAT) ShowSymbol
+ 1.000000 0.000000 (GAG) ShowSymbol
+ 1.000000 0.000000 (GAC) ShowSymbol
+ 1.000000 0.000000 (GAA) ShowSymbol
+ 1.000000 0.000000 (CTT) ShowSymbol
+ 1.000000 0.000000 (CTG) ShowSymbol
+ 1.000000 0.000000 (CTC) ShowSymbol
+ 1.000000 0.000000 (CTA) ShowSymbol
+ 1.000000 0.000000 (CGT) ShowSymbol
+ 1.000000 0.000000 (CGG) ShowSymbol
+ 1.000000 0.000000 (CGC) ShowSymbol
+ 1.000000 0.000000 (CGA) ShowSymbol
+ 1.000000 0.000000 (CCT) ShowSymbol
+ 1.000000 0.000000 (CCG) ShowSymbol
+ 1.000000 0.000000 (CCC) ShowSymbol
+ 1.000000 0.000000 (CCA) ShowSymbol
+ 1.000000 0.000000 (CAT) ShowSymbol
+ 1.000000 0.000000 (CAG) ShowSymbol
+ 1.000000 0.000000 (CAC) ShowSymbol
+ 1.000000 0.000000 (CAA) ShowSymbol
+ 1.000000 0.000000 (ATT) ShowSymbol
+ 1.000000 0.000000 (ATG) ShowSymbol
+ 1.000000 0.000000 (ATC) ShowSymbol
+ 1.000000 0.000000 (ATA) ShowSymbol
+ 1.000000 0.000000 (AGT) ShowSymbol
+ 1.000000 0.000000 (AGG) ShowSymbol
+ 1.000000 0.000000 (AGC) ShowSymbol
+ 1.000000 0.000000 (AGA) ShowSymbol
+ 1.000000 0.000000 (ACG) ShowSymbol
+ 1.000000 0.000000 (ACC) ShowSymbol
+ 1.000000 0.000000 (ACA) ShowSymbol
+ 1.000000 0.000000 (AAT) ShowSymbol
+ 1.000000 0.128761 (GTC) ShowSymbol
+ 1.000000 0.128761 (ACT) ShowSymbol
+ 1.000000 0.128761 (AAC) ShowSymbol
+ 1.000000 0.257521 (GGT) ShowSymbol
+ 1.000000 0.257521 (AAG) ShowSymbol
+ 1.000000 0.515042 (GGC) ShowSymbol
+ 1.000000 0.643803 (AAA) ShowSymbol
+ 0.618947 0.618947 DrawErrorbar
+EndStack
+
+/color_dict <<
+  (AAA) [ 0.8 1.0 0.2 ]
+  (AAC) [ 0.0 1.0 0.8 ]
+  (AAG) [ 0.0 1.0 0.8 ]
+  (AAT) [ 0.0 1.0 0.8 ]
+  (ACA) [ 0.0 1.0 0.8 ]
+  (ACC) [ 0.0 1.0 0.8 ]
+  (ACG) [ 1.0 0.8 0.0 ]
+  (ACT) [ 0.0 1.0 0.8 ]
+  (AGA) [ 0.0 1.0 0.8 ]
+  (AGC) [ 0.0 1.0 0.8 ]
+  (AGG) [ 0.0 1.0 0.8 ]
+  (AGT) [ 0.0 1.0 0.8 ]
+  (ATA) [ 1.0 0.0 0.0 ]
+  (ATC) [ 0.0 1.0 0.8 ]
+  (ATG) [ 0.8 1.0 0.2 ]
+  (ATT) [ 1.0 0.8 0.0 ]
+  (CAA) [ 0.0 1.0 0.8 ]
+  (CAC) [ 0.0 1.0 0.8 ]
+  (CAG) [ 0.0 1.0 0.8 ]
+  (CAT) [ 0.0 1.0 0.8 ]
+  (CCA) [ 0.0 1.0 0.8 ]
+  (CCC) [ 0.0 1.0 0.8 ]
+  (CCG) [ 0.0 1.0 0.8 ]
+  (CCT) [ 0.0 1.0 0.8 ]
+  (CGA) [ 0.0 1.0 0.8 ]
+  (CGC) [ 0.0 1.0 0.8 ]
+  (CGG) [ 0.0 1.0 0.8 ]
+  (CGT) [ 1.0 1.0 0.0 ]
+  (CTA) [ 0.0 1.0 0.8 ]
+  (CTC) [ 1.0 0.0 0.0 ]
+  (CTG) [ 0.0 1.0 0.8 ]
+  (CTT) [ 1.0 1.0 0.0 ]
+  (GAA) [ 0.0 1.0 0.8 ]
+  (GAC) [ 0.0 1.0 0.8 ]
+  (GAG) [ 0.0 1.0 0.8 ]
+  (GAT) [ 0.0 1.0 0.8 ]
+  (GCA) [ 1.0 0.0 0.0 ]
+  (GCC) [ 0.8 1.0 0.2 ]
+  (GCG) [ 0.0 1.0 0.8 ]
+  (GCT) [ 1.0 0.8 0.0 ]
+  (GGA) [ 0.0 1.0 0.8 ]
+  (GGC) [ 0.0 1.0 0.8 ]
+  (GGG) [ 0.0 1.0 0.8 ]
+  (GGT) [ 0.0 1.0 0.8 ]
+  (GTA) [ 1.0 0.8 0.0 ]
+  (GTC) [ 0.0 1.0 0.8 ]
+  (GTG) [ 0.0 1.0 0.8 ]
+  (GTT) [ 0.0 1.0 0.8 ]
+  (TAA) [ 0.0 1.0 0.8 ]
+  (TAC) [ 0.0 1.0 0.8 ]
+  (TAG) [ 0.0 1.0 0.8 ]
+  (TAT) [ 0.0 1.0 0.8 ]
+  (TCA) [ 0.0 1.0 0.8 ]
+  (TCC) [ 0.0 1.0 0.8 ]
+  (TCG) [ 0.0 1.0 0.8 ]
+  (TCT) [ 0.0 1.0 0.8 ]
+  (TGA) [ 0.0 1.0 0.8 ]
+  (TGC) [ 1.0 0.4 0.0 ]
+  (TGG) [ 0.0 1.0 0.8 ]
+  (TGT) [ 0.0 1.0 0.8 ]
+  (TTA) [ 0.0 1.0 0.8 ]
+  (TTC) [ 0.0 1.0 0.8 ]
+  (TTG) [ 0.0 1.0 0.8 ]
+  (TTT) [ 0.0 1.0 0.8 ]
+>> def
+(10) StartStack
+ 1.000000 0.000000 (TTT) ShowSymbol
+ 1.000000 0.000000 (TTG) ShowSymbol
+ 1.000000 0.000000 (TTC) ShowSymbol
+ 1.000000 0.000000 (TTA) ShowSymbol
+ 1.000000 0.000000 (TGT) ShowSymbol
+ 1.000000 0.000000 (TGG) ShowSymbol
+ 1.000000 0.000000 (TGA) ShowSymbol
+ 1.000000 0.000000 (TCT) ShowSymbol
+ 1.000000 0.000000 (TCG) ShowSymbol
+ 1.000000 0.000000 (TCC) ShowSymbol
+ 1.000000 0.000000 (TCA) ShowSymbol
+ 1.000000 0.000000 (TAT) ShowSymbol
+ 1.000000 0.000000 (TAG) ShowSymbol
+ 1.000000 0.000000 (TAC) ShowSymbol
+ 1.000000 0.000000 (TAA) ShowSymbol
+ 1.000000 0.000000 (GTT) ShowSymbol
+ 1.000000 0.000000 (GTG) ShowSymbol
+ 1.000000 0.000000 (GTC) ShowSymbol
+ 1.000000 0.000000 (GGT) ShowSymbol
+ 1.000000 0.000000 (GGG) ShowSymbol
+ 1.000000 0.000000 (GGC) ShowSymbol
+ 1.000000 0.000000 (GGA) ShowSymbol
+ 1.000000 0.000000 (GCG) ShowSymbol
+ 1.000000 0.000000 (GAT) ShowSymbol
+ 1.000000 0.000000 (GAG) ShowSymbol
+ 1.000000 0.000000 (GAC) ShowSymbol
+ 1.000000 0.000000 (GAA) ShowSymbol
+ 1.000000 0.000000 (CTG) ShowSymbol
+ 1.000000 0.000000 (CTA) ShowSymbol
+ 1.000000 0.000000 (CGG) ShowSymbol
+ 1.000000 0.000000 (CGC) ShowSymbol
+ 1.000000 0.000000 (CGA) ShowSymbol
+ 1.000000 0.000000 (CCT) ShowSymbol
+ 1.000000 0.000000 (CCG) ShowSymbol
+ 1.000000 0.000000 (CCC) ShowSymbol
+ 1.000000 0.000000 (CCA) ShowSymbol
+ 1.000000 0.000000 (CAT) ShowSymbol
+ 1.000000 0.000000 (CAG) ShowSymbol
+ 1.000000 0.000000 (CAC) ShowSymbol
+ 1.000000 0.000000 (CAA) ShowSymbol
+ 1.000000 0.000000 (ATC) ShowSymbol
+ 1.000000 0.000000 (AGT) ShowSymbol
+ 1.000000 0.000000 (AGG) ShowSymbol
+ 1.000000 0.000000 (AGC) ShowSymbol
+ 1.000000 0.000000 (AGA) ShowSymbol
+ 1.000000 0.000000 (ACT) ShowSymbol
+ 1.000000 0.000000 (ACC) ShowSymbol
+ 1.000000 0.000000 (ACA) ShowSymbol
+ 1.000000 0.000000 (AAT) ShowSymbol
+ 1.000000 0.000000 (AAG) ShowSymbol
+ 1.000000 0.000000 (AAC) ShowSymbol
+ 1.000000 0.110376 (TGC) ShowSymbol
+ 1.000000 0.110376 (GTA) ShowSymbol
+ 1.000000 0.110376 (GCT) ShowSymbol
+ 1.000000 0.110376 (GCC) ShowSymbol
+ 1.000000 0.110376 (CTT) ShowSymbol
+ 1.000000 0.110376 (CGT) ShowSymbol
+ 1.000000 0.110376 (ATG) ShowSymbol
+ 1.000000 0.110376 (ACG) ShowSymbol
+ 1.000000 0.110376 (AAA) ShowSymbol
+ 1.000000 0.220751 (CTC) ShowSymbol
+ 1.000000 0.220751 (ATT) ShowSymbol
+ 1.000000 0.220751 (ATA) ShowSymbol
+ 1.000000 0.331127 (GCA) ShowSymbol
+ 0.542892 0.542892 DrawErrorbar
+EndStack
+
+/color_dict <<
+  (AAA) [ 1.0 0.0 0.0 ]
+  (AAC) [ 0.0 1.0 0.8 ]
+  (AAG) [ 1.0 0.0 0.0 ]
+  (AAT) [ 0.0 1.0 0.8 ]
+  (ACA) [ 0.0 1.0 0.8 ]
+  (ACC) [ 0.0 1.0 0.8 ]
+  (ACG) [ 0.0 1.0 0.8 ]
+  (ACT) [ 1.0 0.4 0.0 ]
+  (AGA) [ 0.0 1.0 0.8 ]
+  (AGC) [ 0.0 1.0 0.8 ]
+  (AGG) [ 0.0 1.0 0.8 ]
+  (AGT) [ 1.0 0.4 0.0 ]
+  (ATA) [ 0.0 1.0 0.8 ]
+  (ATC) [ 0.0 1.0 0.8 ]
+  (ATG) [ 0.0 1.0 0.8 ]
+  (ATT) [ 0.0 1.0 0.8 ]
+  (CAA) [ 0.0 1.0 0.8 ]
+  (CAC) [ 0.0 1.0 0.8 ]
+  (CAG) [ 0.0 1.0 0.8 ]
+  (CAT) [ 0.0 1.0 0.8 ]
+  (CCA) [ 0.0 1.0 0.8 ]
+  (CCC) [ 0.0 1.0 0.8 ]
+  (CCG) [ 0.0 1.0 0.8 ]
+  (CCT) [ 0.0 1.0 0.8 ]
+  (CGA) [ 0.0 1.0 0.8 ]
+  (CGC) [ 1.0 0.0 0.0 ]
+  (CGG) [ 0.0 1.0 0.8 ]
+  (CGT) [ 1.0 1.0 0.0 ]
+  (CTA) [ 0.0 1.0 0.8 ]
+  (CTC) [ 0.0 1.0 0.8 ]
+  (CTG) [ 0.0 1.0 0.8 ]
+  (CTT) [ 0.0 1.0 0.8 ]
+  (GAA) [ 0.0 1.0 0.8 ]
+  (GAC) [ 0.0 1.0 0.8 ]
+  (GAG) [ 0.0 1.0 0.8 ]
+  (GAT) [ 0.0 1.0 0.8 ]
+  (GCA) [ 0.0 1.0 0.8 ]
+  (GCC) [ 0.0 1.0 0.8 ]
+  (GCG) [ 0.0 1.0 0.8 ]
+  (GCT) [ 1.0 0.8 0.0 ]
+  (GGA) [ 0.0 1.0 0.8 ]
+  (GGC) [ 0.8 1.0 0.2 ]
+  (GGG) [ 0.0 1.0 0.8 ]
+  (GGT) [ 0.0 1.0 0.8 ]
+  (GTA) [ 0.0 1.0 0.8 ]
+  (GTC) [ 1.0 1.0 0.0 ]
+  (GTG) [ 0.0 1.0 0.8 ]
+  (GTT) [ 1.0 1.0 0.0 ]
+  (TAA) [ 0.0 1.0 0.8 ]
+  (TAC) [ 0.0 1.0 0.8 ]
+  (TAG) [ 0.0 1.0 0.8 ]
+  (TAT) [ 0.0 1.0 0.8 ]
+  (TCA) [ 0.0 1.0 0.8 ]
+  (TCC) [ 0.0 1.0 0.8 ]
+  (TCG) [ 0.0 1.0 0.8 ]
+  (TCT) [ 0.0 1.0 0.8 ]
+  (TGA) [ 0.0 1.0 0.8 ]
+  (TGC) [ 0.0 1.0 0.8 ]
+  (TGG) [ 0.0 1.0 0.8 ]
+  (TGT) [ 1.0 0.0 0.0 ]
+  (TTA) [ 0.0 1.0 0.8 ]
+  (TTC) [ 0.0 1.0 0.8 ]
+  (TTG) [ 1.0 1.0 0.0 ]
+  (TTT) [ 0.0 1.0 0.8 ]
+>> def
+() StartStack
+ 1.000000 0.000000 (TTT) ShowSymbol
+ 1.000000 0.000000 (TTC) ShowSymbol
+ 1.000000 0.000000 (TTA) ShowSymbol
+ 1.000000 0.000000 (TGG) ShowSymbol
+ 1.000000 0.000000 (TGC) ShowSymbol
+ 1.000000 0.000000 (TGA) ShowSymbol
+ 1.000000 0.000000 (TCT) ShowSymbol
+ 1.000000 0.000000 (TCG) ShowSymbol
+ 1.000000 0.000000 (TCC) ShowSymbol
+ 1.000000 0.000000 (TCA) ShowSymbol
+ 1.000000 0.000000 (TAT) ShowSymbol
+ 1.000000 0.000000 (TAG) ShowSymbol
+ 1.000000 0.000000 (TAC) ShowSymbol
+ 1.000000 0.000000 (TAA) ShowSymbol
+ 1.000000 0.000000 (GTG) ShowSymbol
+ 1.000000 0.000000 (GTA) ShowSymbol
+ 1.000000 0.000000 (GGT) ShowSymbol
+ 1.000000 0.000000 (GGG) ShowSymbol
+ 1.000000 0.000000 (GGA) ShowSymbol
+ 1.000000 0.000000 (GCG) ShowSymbol
+ 1.000000 0.000000 (GCC) ShowSymbol
+ 1.000000 0.000000 (GCA) ShowSymbol
+ 1.000000 0.000000 (GAT) ShowSymbol
+ 1.000000 0.000000 (GAG) ShowSymbol
+ 1.000000 0.000000 (GAC) ShowSymbol
+ 1.000000 0.000000 (GAA) ShowSymbol
+ 1.000000 0.000000 (CTT) ShowSymbol
+ 1.000000 0.000000 (CTG) ShowSymbol
+ 1.000000 0.000000 (CTC) ShowSymbol
+ 1.000000 0.000000 (CTA) ShowSymbol
+ 1.000000 0.000000 (CGG) ShowSymbol
+ 1.000000 0.000000 (CGA) ShowSymbol
+ 1.000000 0.000000 (CCT) ShowSymbol
+ 1.000000 0.000000 (CCG) ShowSymbol
+ 1.000000 0.000000 (CCC) ShowSymbol
+ 1.000000 0.000000 (CCA) ShowSymbol
+ 1.000000 0.000000 (CAT) ShowSymbol
+ 1.000000 0.000000 (CAG) ShowSymbol
+ 1.000000 0.000000 (CAC) ShowSymbol
+ 1.000000 0.000000 (CAA) ShowSymbol
+ 1.000000 0.000000 (ATT) ShowSymbol
+ 1.000000 0.000000 (ATG) ShowSymbol
+ 1.000000 0.000000 (ATC) ShowSymbol
+ 1.000000 0.000000 (ATA) ShowSymbol
+ 1.000000 0.000000 (AGG) ShowSymbol
+ 1.000000 0.000000 (AGC) ShowSymbol
+ 1.000000 0.000000 (AGA) ShowSymbol
+ 1.000000 0.000000 (ACG) ShowSymbol
+ 1.000000 0.000000 (ACC) ShowSymbol
+ 1.000000 0.000000 (ACA) ShowSymbol
+ 1.000000 0.000000 (AAT) ShowSymbol
+ 1.000000 0.000000 (AAC) ShowSymbol
+ 1.000000 0.108760 (TTG) ShowSymbol
+ 1.000000 0.108760 (TGT) ShowSymbol
+ 1.000000 0.108760 (GTT) ShowSymbol
+ 1.000000 0.108760 (GTC) ShowSymbol
+ 1.000000 0.108760 (GGC) ShowSymbol
+ 1.000000 0.108760 (GCT) ShowSymbol
+ 1.000000 0.108760 (CGT) ShowSymbol
+ 1.000000 0.108760 (AGT) ShowSymbol
+ 1.000000 0.108760 (ACT) ShowSymbol
+ 1.000000 0.217520 (AAG) ShowSymbol
+ 1.000000 0.326281 (AAA) ShowSymbol
+ 1.000000 0.435041 (CGC) ShowSymbol
+ 0.554141 0.554141 DrawErrorbar
+EndStack
+
+/color_dict <<
+  (AAA) [ 1.0 0.0 0.0 ]
+  (AAC) [ 0.8 1.0 0.2 ]
+  (AAG) [ 0.0 1.0 0.8 ]
+  (AAT) [ 0.0 1.0 0.8 ]
+  (ACA) [ 1.0 0.0 0.0 ]
+  (ACC) [ 0.8 1.0 0.2 ]
+  (ACG) [ 0.0 1.0 0.8 ]
+  (ACT) [ 1.0 0.0 0.0 ]
+  (AGA) [ 0.0 1.0 0.8 ]
+  (AGC) [ 0.0 1.0 0.8 ]
+  (AGG) [ 0.0 1.0 0.8 ]
+  (AGT) [ 0.0 1.0 0.8 ]
+  (ATA) [ 0.0 1.0 0.8 ]
+  (ATC) [ 1.0 0.0 0.0 ]
+  (ATG) [ 0.0 1.0 0.8 ]
+  (ATT) [ 0.0 1.0 0.8 ]
+  (CAA) [ 0.0 1.0 0.8 ]
+  (CAC) [ 0.0 1.0 0.8 ]
+  (CAG) [ 0.0 1.0 0.8 ]
+  (CAT) [ 0.0 1.0 0.8 ]
+  (CCA) [ 0.0 1.0 0.8 ]
+  (CCC) [ 0.0 1.0 0.8 ]
+  (CCG) [ 0.0 1.0 0.8 ]
+  (CCT) [ 0.0 1.0 0.8 ]
+  (CGA) [ 0.0 1.0 0.8 ]
+  (CGC) [ 0.0 1.0 0.8 ]
+  (CGG) [ 0.0 1.0 0.8 ]
+  (CGT) [ 0.0 1.0 0.8 ]
+  (CTA) [ 0.0 1.0 0.8 ]
+  (CTC) [ 0.0 1.0 0.8 ]
+  (CTG) [ 0.0 1.0 0.0 ]
+  (CTT) [ 0.0 1.0 0.8 ]
+  (GAA) [ 0.0 1.0 0.8 ]
+  (GAC) [ 0.0 1.0 0.8 ]
+  (GAG) [ 0.0 1.0 0.8 ]
+  (GAT) [ 0.0 1.0 0.8 ]
+  (GCA) [ 0.0 1.0 0.8 ]
+  (GCC) [ 0.0 1.0 0.8 ]
+  (GCG) [ 0.0 1.0 0.8 ]
+  (GCT) [ 0.0 1.0 0.8 ]
+  (GGA) [ 0.0 1.0 0.8 ]
+  (GGC) [ 0.0 1.0 0.8 ]
+  (GGG) [ 0.0 1.0 0.8 ]
+  (GGT) [ 0.0 1.0 0.8 ]
+  (GTA) [ 0.0 1.0 0.8 ]
+  (GTC) [ 0.0 1.0 0.8 ]
+  (GTG) [ 0.0 1.0 0.8 ]
+  (GTT) [ 1.0 1.0 0.0 ]
+  (TAA) [ 0.0 1.0 0.8 ]
+  (TAC) [ 0.0 1.0 0.8 ]
+  (TAG) [ 0.0 1.0 0.8 ]
+  (TAT) [ 0.0 1.0 0.8 ]
+  (TCA) [ 0.0 1.0 0.8 ]
+  (TCC) [ 0.0 1.0 0.8 ]
+  (TCG) [ 0.0 1.0 0.8 ]
+  (TCT) [ 0.0 1.0 0.8 ]
+  (TGA) [ 0.0 1.0 0.8 ]
+  (TGC) [ 0.0 1.0 0.8 ]
+  (TGG) [ 0.0 1.0 0.8 ]
+  (TGT) [ 0.0 1.0 0.8 ]
+  (TTA) [ 0.0 1.0 0.8 ]
+  (TTC) [ 1.0 0.0 0.0 ]
+  (TTG) [ 0.0 1.0 0.8 ]
+  (TTT) [ 0.0 1.0 0.8 ]
+>> def
+() StartStack
+ 1.000000 0.000000 (TTT) ShowSymbol
+ 1.000000 0.000000 (TTG) ShowSymbol
+ 1.000000 0.000000 (TTA) ShowSymbol
+ 1.000000 0.000000 (TGT) ShowSymbol
+ 1.000000 0.000000 (TGG) ShowSymbol
+ 1.000000 0.000000 (TGC) ShowSymbol
+ 1.000000 0.000000 (TGA) ShowSymbol
+ 1.000000 0.000000 (TCT) ShowSymbol
+ 1.000000 0.000000 (TCG) ShowSymbol
+ 1.000000 0.000000 (TCC) ShowSymbol
+ 1.000000 0.000000 (TCA) ShowSymbol
+ 1.000000 0.000000 (TAT) ShowSymbol
+ 1.000000 0.000000 (TAG) ShowSymbol
+ 1.000000 0.000000 (TAC) ShowSymbol
+ 1.000000 0.000000 (TAA) ShowSymbol
+ 1.000000 0.000000 (GTG) ShowSymbol
+ 1.000000 0.000000 (GTC) ShowSymbol
+ 1.000000 0.000000 (GTA) ShowSymbol
+ 1.000000 0.000000 (GGT) ShowSymbol
+ 1.000000 0.000000 (GGG) ShowSymbol
+ 1.000000 0.000000 (GGC) ShowSymbol
+ 1.000000 0.000000 (GGA) ShowSymbol
+ 1.000000 0.000000 (GCT) ShowSymbol
+ 1.000000 0.000000 (GCG) ShowSymbol
+ 1.000000 0.000000 (GCC) ShowSymbol
+ 1.000000 0.000000 (GCA) ShowSymbol
+ 1.000000 0.000000 (GAT) ShowSymbol
+ 1.000000 0.000000 (GAG) ShowSymbol
+ 1.000000 0.000000 (GAC) ShowSymbol
+ 1.000000 0.000000 (GAA) ShowSymbol
+ 1.000000 0.000000 (CTT) ShowSymbol
+ 1.000000 0.000000 (CTC) ShowSymbol
+ 1.000000 0.000000 (CTA) ShowSymbol
+ 1.000000 0.000000 (CGT) ShowSymbol
+ 1.000000 0.000000 (CGG) ShowSymbol
+ 1.000000 0.000000 (CGC) ShowSymbol
+ 1.000000 0.000000 (CGA) ShowSymbol
+ 1.000000 0.000000 (CCT) ShowSymbol
+ 1.000000 0.000000 (CCG) ShowSymbol
+ 1.000000 0.000000 (CCC) ShowSymbol
+ 1.000000 0.000000 (CCA) ShowSymbol
+ 1.000000 0.000000 (CAT) ShowSymbol
+ 1.000000 0.000000 (CAG) ShowSymbol
+ 1.000000 0.000000 (CAC) ShowSymbol
+ 1.000000 0.000000 (CAA) ShowSymbol
+ 1.000000 0.000000 (ATT) ShowSymbol
+ 1.000000 0.000000 (ATG) ShowSymbol
+ 1.000000 0.000000 (ATA) ShowSymbol
+ 1.000000 0.000000 (AGT) ShowSymbol
+ 1.000000 0.000000 (AGG) ShowSymbol
+ 1.000000 0.000000 (AGC) ShowSymbol
+ 1.000000 0.000000 (AGA) ShowSymbol
+ 1.000000 0.000000 (ACG) ShowSymbol
+ 1.000000 0.000000 (AAT) ShowSymbol
+ 1.000000 0.000000 (AAG) ShowSymbol
+ 1.000000 0.116105 (GTT) ShowSymbol
+ 1.000000 0.116105 (CTG) ShowSymbol
+ 1.000000 0.116105 (ACC) ShowSymbol
+ 1.000000 0.116105 (ACA) ShowSymbol
+ 1.000000 0.116105 (AAC) ShowSymbol
+ 1.000000 0.232211 (TTC) ShowSymbol
+ 1.000000 0.232211 (ACT) ShowSymbol
+ 1.000000 0.464422 (ATC) ShowSymbol
+ 1.000000 0.580527 (AAA) ShowSymbol
+ 0.586024 0.586024 DrawErrorbar
+EndStack
+
+/color_dict <<
+  (AAA) [ 0.0 1.0 0.8 ]
+  (AAC) [ 0.0 1.0 0.8 ]
+  (AAG) [ 0.0 1.0 0.8 ]
+  (AAT) [ 0.0 1.0 0.8 ]
+  (ACA) [ 0.0 1.0 0.8 ]
+  (ACC) [ 0.0 1.0 0.8 ]
+  (ACG) [ 0.0 1.0 0.8 ]
+  (ACT) [ 1.0 0.4 0.0 ]
+  (AGA) [ 0.0 1.0 0.8 ]
+  (AGC) [ 1.0 1.0 0.0 ]
+  (AGG) [ 0.0 1.0 0.8 ]
+  (AGT) [ 0.0 1.0 0.8 ]
+  (ATA) [ 1.0 0.0 0.0 ]
+  (ATC) [ 1.0 1.0 0.0 ]
+  (ATG) [ 0.0 1.0 0.8 ]
+  (ATT) [ 0.0 1.0 0.8 ]
+  (CAA) [ 0.0 1.0 0.8 ]
+  (CAC) [ 0.0 1.0 0.8 ]
+  (CAG) [ 0.0 1.0 0.8 ]
+  (CAT) [ 0.0 1.0 0.8 ]
+  (CCA) [ 0.0 1.0 0.8 ]
+  (CCC) [ 0.0 1.0 0.8 ]
+  (CCG) [ 0.0 1.0 0.8 ]
+  (CCT) [ 0.0 1.0 0.8 ]
+  (CGA) [ 0.0 1.0 0.8 ]
+  (CGC) [ 0.0 1.0 0.8 ]
+  (CGG) [ 0.0 1.0 0.8 ]
+  (CGT) [ 0.0 1.0 0.8 ]
+  (CTA) [ 0.0 1.0 0.8 ]
+  (CTC) [ 1.0 0.0 0.0 ]
+  (CTG) [ 1.0 1.0 0.0 ]
+  (CTT) [ 0.0 1.0 0.8 ]
+  (GAA) [ 0.0 1.0 0.8 ]
+  (GAC) [ 0.0 1.0 0.8 ]
+  (GAG) [ 0.0 1.0 0.8 ]
+  (GAT) [ 0.0 1.0 0.8 ]
+  (GCA) [ 0.0 1.0 0.8 ]
+  (GCC) [ 0.0 1.0 0.8 ]
+  (GCG) [ 0.0 1.0 0.8 ]
+  (GCT) [ 0.0 1.0 0.8 ]
+  (GGA) [ 0.0 1.0 0.8 ]
+  (GGC) [ 0.0 1.0 0.8 ]
+  (GGG) [ 0.0 1.0 0.8 ]
+  (GGT) [ 0.0 1.0 0.8 ]
+  (GTA) [ 0.0 1.0 0.8 ]
+  (GTC) [ 1.0 1.0 0.0 ]
+  (GTG) [ 0.0 1.0 0.8 ]
+  (GTT) [ 0.0 1.0 0.8 ]
+  (TAA) [ 0.0 1.0 0.8 ]
+  (TAC) [ 0.0 1.0 0.8 ]
+  (TAG) [ 0.0 1.0 0.8 ]
+  (TAT) [ 0.0 1.0 0.8 ]
+  (TCA) [ 1.0 0.4 0.0 ]
+  (TCC) [ 0.0 1.0 0.8 ]
+  (TCG) [ 0.0 1.0 0.8 ]
+  (TCT) [ 0.0 1.0 0.8 ]
+  (TGA) [ 0.0 1.0 0.8 ]
+  (TGC) [ 0.0 1.0 0.8 ]
+  (TGG) [ 0.0 1.0 0.8 ]
+  (TGT) [ 0.0 1.0 0.8 ]
+  (TTA) [ 1.0 1.0 0.0 ]
+  (TTC) [ 1.0 1.0 0.0 ]
+  (TTG) [ 0.0 1.0 0.8 ]
+  (TTT) [ 1.0 1.0 0.0 ]
+>> def
+() StartStack
+ 1.000000 0.000000 (TTG) ShowSymbol
+ 1.000000 0.000000 (TGT) ShowSymbol
+ 1.000000 0.000000 (TGG) ShowSymbol
+ 1.000000 0.000000 (TGC) ShowSymbol
+ 1.000000 0.000000 (TGA) ShowSymbol
+ 1.000000 0.000000 (TCT) ShowSymbol
+ 1.000000 0.000000 (TCG) ShowSymbol
+ 1.000000 0.000000 (TCC) ShowSymbol
+ 1.000000 0.000000 (TAT) ShowSymbol
+ 1.000000 0.000000 (TAG) ShowSymbol
+ 1.000000 0.000000 (TAC) ShowSymbol
+ 1.000000 0.000000 (TAA) ShowSymbol
+ 1.000000 0.000000 (GTT) ShowSymbol
+ 1.000000 0.000000 (GTG) ShowSymbol
+ 1.000000 0.000000 (GTA) ShowSymbol
+ 1.000000 0.000000 (GGT) ShowSymbol
+ 1.000000 0.000000 (GGG) ShowSymbol
+ 1.000000 0.000000 (GGC) ShowSymbol
+ 1.000000 0.000000 (GGA) ShowSymbol
+ 1.000000 0.000000 (GCT) ShowSymbol
+ 1.000000 0.000000 (GCG) ShowSymbol
+ 1.000000 0.000000 (GCC) ShowSymbol
+ 1.000000 0.000000 (GCA) ShowSymbol
+ 1.000000 0.000000 (GAT) ShowSymbol
+ 1.000000 0.000000 (GAG) ShowSymbol
+ 1.000000 0.000000 (GAC) ShowSymbol
+ 1.000000 0.000000 (GAA) ShowSymbol
+ 1.000000 0.000000 (CTT) ShowSymbol
+ 1.000000 0.000000 (CTA) ShowSymbol
+ 1.000000 0.000000 (CGT) ShowSymbol
+ 1.000000 0.000000 (CGG) ShowSymbol
+ 1.000000 0.000000 (CGC) ShowSymbol
+ 1.000000 0.000000 (CGA) ShowSymbol
+ 1.000000 0.000000 (CCT) ShowSymbol
+ 1.000000 0.000000 (CCG) ShowSymbol
+ 1.000000 0.000000 (CCC) ShowSymbol
+ 1.000000 0.000000 (CCA) ShowSymbol
+ 1.000000 0.000000 (CAT) ShowSymbol
+ 1.000000 0.000000 (CAG) ShowSymbol
+ 1.000000 0.000000 (CAC) ShowSymbol
+ 1.000000 0.000000 (CAA) ShowSymbol
+ 1.000000 0.000000 (ATT) ShowSymbol
+ 1.000000 0.000000 (ATG) ShowSymbol
+ 1.000000 0.000000 (AGT) ShowSymbol
+ 1.000000 0.000000 (AGG) ShowSymbol
+ 1.000000 0.000000 (AGA) ShowSymbol
+ 1.000000 0.000000 (ACG) ShowSymbol
+ 1.000000 0.000000 (ACC) ShowSymbol
+ 1.000000 0.000000 (ACA) ShowSymbol
+ 1.000000 0.000000 (AAT) ShowSymbol
+ 1.000000 0.000000 (AAG) ShowSymbol
+ 1.000000 0.000000 (AAC) ShowSymbol
+ 1.000000 0.000000 (AAA) ShowSymbol
+ 1.000000 0.134149 (TTT) ShowSymbol
+ 1.000000 0.134149 (TTC) ShowSymbol
+ 1.000000 0.134149 (TTA) ShowSymbol
+ 1.000000 0.134149 (TCA) ShowSymbol
+ 1.000000 0.134149 (GTC) ShowSymbol
+ 1.000000 0.134149 (ATC) ShowSymbol
+ 1.000000 0.134149 (AGC) ShowSymbol
+ 1.000000 0.134149 (ACT) ShowSymbol
+ 1.000000 0.268298 (CTG) ShowSymbol
+ 1.000000 0.268298 (ATA) ShowSymbol
+ 1.000000 0.804894 (CTC) ShowSymbol
+ 0.627887 0.627887 DrawErrorbar
+EndStack
+
+/color_dict <<
+  (AAA) [ 0.0 1.0 0.8 ]
+  (AAC) [ 0.0 1.0 0.8 ]
+  (AAG) [ 0.0 1.0 0.8 ]
+  (AAT) [ 0.0 1.0 0.8 ]
+  (ACA) [ 0.0 1.0 0.8 ]
+  (ACC) [ 1.0 0.4 0.0 ]
+  (ACG) [ 0.0 1.0 0.8 ]
+  (ACT) [ 1.0 0.4 0.0 ]
+  (AGA) [ 0.0 1.0 0.8 ]
+  (AGC) [ 0.0 1.0 0.8 ]
+  (AGG) [ 0.0 1.0 0.8 ]
+  (AGT) [ 0.0 1.0 0.8 ]
+  (ATA) [ 0.0 1.0 0.8 ]
+  (ATC) [ 0.0 1.0 0.8 ]
+  (ATG) [ 0.0 1.0 0.8 ]
+  (ATT) [ 0.0 1.0 0.8 ]
+  (CAA) [ 0.0 1.0 0.8 ]
+  (CAC) [ 0.0 1.0 0.8 ]
+  (CAG) [ 0.0 1.0 0.8 ]
+  (CAT) [ 0.0 1.0 0.8 ]
+  (CCA) [ 0.0 1.0 0.8 ]
+  (CCC) [ 0.0 1.0 0.8 ]
+  (CCG) [ 0.0 1.0 0.8 ]
+  (CCT) [ 0.0 1.0 0.8 ]
+  (CGA) [ 0.0 1.0 0.8 ]
+  (CGC) [ 0.0 1.0 0.8 ]
+  (CGG) [ 0.0 1.0 0.8 ]
+  (CGT) [ 0.0 1.0 0.8 ]
+  (CTA) [ 0.0 1.0 0.8 ]
+  (CTC) [ 0.0 1.0 0.8 ]
+  (CTG) [ 0.0 1.0 0.8 ]
+  (CTT) [ 1.0 1.0 0.0 ]
+  (GAA) [ 0.0 1.0 0.8 ]
+  (GAC) [ 0.0 1.0 0.8 ]
+  (GAG) [ 0.0 1.0 0.8 ]
+  (GAT) [ 0.0 1.0 0.8 ]
+  (GCA) [ 1.0 0.0 0.0 ]
+  (GCC) [ 1.0 0.8 0.0 ]
+  (GCG) [ 1.0 1.0 0.0 ]
+  (GCT) [ 1.0 0.0 0.0 ]
+  (GGA) [ 0.0 1.0 0.8 ]
+  (GGC) [ 0.0 1.0 0.8 ]
+  (GGG) [ 0.0 1.0 0.8 ]
+  (GGT) [ 0.0 1.0 0.8 ]
+  (GTA) [ 0.0 1.0 0.8 ]
+  (GTC) [ 0.0 1.0 0.8 ]
+  (GTG) [ 0.0 1.0 0.8 ]
+  (GTT) [ 0.0 1.0 0.8 ]
+  (TAA) [ 0.0 1.0 0.8 ]
+  (TAC) [ 0.0 1.0 0.8 ]
+  (TAG) [ 0.0 1.0 0.8 ]
+  (TAT) [ 0.0 1.0 0.8 ]
+  (TCA) [ 0.0 1.0 0.8 ]
+  (TCC) [ 1.0 0.0 0.0 ]
+  (TCG) [ 1.0 0.0 0.0 ]
+  (TCT) [ 0.0 1.0 0.8 ]
+  (TGA) [ 0.0 1.0 0.8 ]
+  (TGC) [ 0.0 1.0 0.8 ]
+  (TGG) [ 0.0 1.0 0.8 ]
+  (TGT) [ 0.0 1.0 0.8 ]
+  (TTA) [ 0.0 1.0 0.8 ]
+  (TTC) [ 0.0 1.0 0.8 ]
+  (TTG) [ 0.0 1.0 0.8 ]
+  (TTT) [ 0.0 1.0 0.8 ]
+>> def
+() StartStack
+ 1.000000 0.000000 (TTT) ShowSymbol
+ 1.000000 0.000000 (TTG) ShowSymbol
+ 1.000000 0.000000 (TTC) ShowSymbol
+ 1.000000 0.000000 (TTA) ShowSymbol
+ 1.000000 0.000000 (TGT) ShowSymbol
+ 1.000000 0.000000 (TGG) ShowSymbol
+ 1.000000 0.000000 (TGC) ShowSymbol
+ 1.000000 0.000000 (TGA) ShowSymbol
+ 1.000000 0.000000 (TCT) ShowSymbol
+ 1.000000 0.000000 (TCA) ShowSymbol
+ 1.000000 0.000000 (TAT) ShowSymbol
+ 1.000000 0.000000 (TAG) ShowSymbol
+ 1.000000 0.000000 (TAC) ShowSymbol
+ 1.000000 0.000000 (TAA) ShowSymbol
+ 1.000000 0.000000 (GTT) ShowSymbol
+ 1.000000 0.000000 (GTG) ShowSymbol
+ 1.000000 0.000000 (GTC) ShowSymbol
+ 1.000000 0.000000 (GTA) ShowSymbol
+ 1.000000 0.000000 (GGT) ShowSymbol
+ 1.000000 0.000000 (GGG) ShowSymbol
+ 1.000000 0.000000 (GGC) ShowSymbol
+ 1.000000 0.000000 (GGA) ShowSymbol
+ 1.000000 0.000000 (GAT) ShowSymbol
+ 1.000000 0.000000 (GAG) ShowSymbol
+ 1.000000 0.000000 (GAC) ShowSymbol
+ 1.000000 0.000000 (GAA) ShowSymbol
+ 1.000000 0.000000 (CTG) ShowSymbol
+ 1.000000 0.000000 (CTC) ShowSymbol
+ 1.000000 0.000000 (CTA) ShowSymbol
+ 1.000000 0.000000 (CGT) ShowSymbol
+ 1.000000 0.000000 (CGG) ShowSymbol
+ 1.000000 0.000000 (CGC) ShowSymbol
+ 1.000000 0.000000 (CGA) ShowSymbol
+ 1.000000 0.000000 (CCT) ShowSymbol
+ 1.000000 0.000000 (CCG) ShowSymbol
+ 1.000000 0.000000 (CCC) ShowSymbol
+ 1.000000 0.000000 (CCA) ShowSymbol
+ 1.000000 0.000000 (CAT) ShowSymbol
+ 1.000000 0.000000 (CAG) ShowSymbol
+ 1.000000 0.000000 (CAC) ShowSymbol
+ 1.000000 0.000000 (CAA) ShowSymbol
+ 1.000000 0.000000 (ATT) ShowSymbol
+ 1.000000 0.000000 (ATG) ShowSymbol
+ 1.000000 0.000000 (ATC) ShowSymbol
+ 1.000000 0.000000 (ATA) ShowSymbol
+ 1.000000 0.000000 (AGT) ShowSymbol
+ 1.000000 0.000000 (AGG) ShowSymbol
+ 1.000000 0.000000 (AGC) ShowSymbol
+ 1.000000 0.000000 (AGA) ShowSymbol
+ 1.000000 0.000000 (ACG) ShowSymbol
+ 1.000000 0.000000 (ACA) ShowSymbol
+ 1.000000 0.000000 (AAT) ShowSymbol
+ 1.000000 0.000000 (AAG) ShowSymbol
+ 1.000000 0.000000 (AAC) ShowSymbol
+ 1.000000 0.000000 (AAA) ShowSymbol
+ 1.000000 0.119445 (TCC) ShowSymbol
+ 1.000000 0.119445 (CTT) ShowSymbol
+ 1.000000 0.119445 (ACT) ShowSymbol
+ 1.000000 0.238890 (TCG) ShowSymbol
+ 1.000000 0.238890 (GCT) ShowSymbol
+ 1.000000 0.238890 (GCG) ShowSymbol
+ 1.000000 0.238890 (GCC) ShowSymbol
+ 1.000000 0.238890 (ACC) ShowSymbol
+ 1.000000 0.597224 (GCA) ShowSymbol
+ 0.575880 0.575880 DrawErrorbar
+EndStack
+
+/color_dict <<
+  (AAA) [ 0.0 1.0 0.8 ]
+  (AAC) [ 0.0 1.0 0.8 ]
+  (AAG) [ 0.0 1.0 0.8 ]
+  (AAT) [ 0.0 1.0 0.8 ]
+  (ACA) [ 0.0 1.0 0.8 ]
+  (ACC) [ 0.8 1.0 0.2 ]
+  (ACG) [ 0.0 1.0 0.8 ]
+  (ACT) [ 0.0 1.0 0.8 ]
+  (AGA) [ 0.0 1.0 0.8 ]
+  (AGC) [ 0.0 1.0 0.8 ]
+  (AGG) [ 0.0 1.0 0.8 ]
+  (AGT) [ 0.0 1.0 0.8 ]
+  (ATA) [ 0.0 1.0 0.8 ]
+  (ATC) [ 0.0 1.0 0.8 ]
+  (ATG) [ 0.0 1.0 0.8 ]
+  (ATT) [ 0.0 1.0 0.8 ]
+  (CAA) [ 0.0 1.0 0.8 ]
+  (CAC) [ 0.0 1.0 0.8 ]
+  (CAG) [ 0.0 1.0 0.8 ]
+  (CAT) [ 0.0 1.0 0.8 ]
+  (CCA) [ 0.0 1.0 0.8 ]
+  (CCC) [ 0.0 1.0 0.8 ]
+  (CCG) [ 0.0 1.0 0.8 ]
+  (CCT) [ 0.0 1.0 0.8 ]
+  (CGA) [ 0.0 1.0 0.8 ]
+  (CGC) [ 0.0 1.0 0.8 ]
+  (CGG) [ 0.0 1.0 0.8 ]
+  (CGT) [ 0.0 1.0 0.8 ]
+  (CTA) [ 1.0 0.0 0.0 ]
+  (CTC) [ 1.0 0.8 0.0 ]
+  (CTG) [ 1.0 0.4 0.0 ]
+  (CTT) [ 1.0 0.0 0.0 ]
+  (GAA) [ 0.0 1.0 0.8 ]
+  (GAC) [ 0.0 1.0 0.8 ]
+  (GAG) [ 0.0 1.0 0.8 ]
+  (GAT) [ 0.0 1.0 0.8 ]
+  (GCA) [ 0.0 1.0 0.8 ]
+  (GCC) [ 0.0 1.0 0.8 ]
+  (GCG) [ 0.8 1.0 0.2 ]
+  (GCT) [ 0.0 1.0 0.8 ]
+  (GGA) [ 0.0 1.0 0.8 ]
+  (GGC) [ 0.0 1.0 0.8 ]
+  (GGG) [ 0.0 1.0 0.8 ]
+  (GGT) [ 0.0 1.0 0.8 ]
+  (GTA) [ 0.0 1.0 0.8 ]
+  (GTC) [ 0.0 1.0 0.8 ]
+  (GTG) [ 0.8 1.0 0.2 ]
+  (GTT) [ 0.0 1.0 0.8 ]
+  (TAA) [ 0.0 1.0 0.8 ]
+  (TAC) [ 0.0 1.0 0.8 ]
+  (TAG) [ 0.0 1.0 0.8 ]
+  (TAT) [ 0.0 1.0 0.8 ]
+  (TCA) [ 0.0 1.0 0.8 ]
+  (TCC) [ 0.0 1.0 0.8 ]
+  (TCG) [ 0.0 1.0 0.8 ]
+  (TCT) [ 0.0 1.0 0.8 ]
+  (TGA) [ 0.0 1.0 0.8 ]
+  (TGC) [ 0.0 1.0 0.8 ]
+  (TGG) [ 0.0 1.0 0.8 ]
+  (TGT) [ 0.0 1.0 0.8 ]
+  (TTA) [ 1.0 0.0 0.0 ]
+  (TTC) [ 0.0 1.0 0.8 ]
+  (TTG) [ 1.0 1.0 0.0 ]
+  (TTT) [ 0.0 1.0 0.8 ]
+>> def
+(15) StartStack
+ 1.000000 0.000000 (TTT) ShowSymbol
+ 1.000000 0.000000 (TTC) ShowSymbol
+ 1.000000 0.000000 (TGT) ShowSymbol
+ 1.000000 0.000000 (TGG) ShowSymbol
+ 1.000000 0.000000 (TGC) ShowSymbol
+ 1.000000 0.000000 (TGA) ShowSymbol
+ 1.000000 0.000000 (TCT) ShowSymbol
+ 1.000000 0.000000 (TCG) ShowSymbol
+ 1.000000 0.000000 (TCC) ShowSymbol
+ 1.000000 0.000000 (TCA) ShowSymbol
+ 1.000000 0.000000 (TAT) ShowSymbol
+ 1.000000 0.000000 (TAG) ShowSymbol
+ 1.000000 0.000000 (TAC) ShowSymbol
+ 1.000000 0.000000 (TAA) ShowSymbol
+ 1.000000 0.000000 (GTT) ShowSymbol
+ 1.000000 0.000000 (GTC) ShowSymbol
+ 1.000000 0.000000 (GTA) ShowSymbol
+ 1.000000 0.000000 (GGT) ShowSymbol
+ 1.000000 0.000000 (GGG) ShowSymbol
+ 1.000000 0.000000 (GGC) ShowSymbol
+ 1.000000 0.000000 (GGA) ShowSymbol
+ 1.000000 0.000000 (GCT) ShowSymbol
+ 1.000000 0.000000 (GCC) ShowSymbol
+ 1.000000 0.000000 (GCA) ShowSymbol
+ 1.000000 0.000000 (GAT) ShowSymbol
+ 1.000000 0.000000 (GAG) ShowSymbol
+ 1.000000 0.000000 (GAC) ShowSymbol
+ 1.000000 0.000000 (GAA) ShowSymbol
+ 1.000000 0.000000 (CGT) ShowSymbol
+ 1.000000 0.000000 (CGG) ShowSymbol
+ 1.000000 0.000000 (CGC) ShowSymbol
+ 1.000000 0.000000 (CGA) ShowSymbol
+ 1.000000 0.000000 (CCT) ShowSymbol
+ 1.000000 0.000000 (CCG) ShowSymbol
+ 1.000000 0.000000 (CCC) ShowSymbol
+ 1.000000 0.000000 (CCA) ShowSymbol
+ 1.000000 0.000000 (CAT) ShowSymbol
+ 1.000000 0.000000 (CAG) ShowSymbol
+ 1.000000 0.000000 (CAC) ShowSymbol
+ 1.000000 0.000000 (CAA) ShowSymbol
+ 1.000000 0.000000 (ATT) ShowSymbol
+ 1.000000 0.000000 (ATG) ShowSymbol
+ 1.000000 0.000000 (ATC) ShowSymbol
+ 1.000000 0.000000 (ATA) ShowSymbol
+ 1.000000 0.000000 (AGT) ShowSymbol
+ 1.000000 0.000000 (AGG) ShowSymbol
+ 1.000000 0.000000 (AGC) ShowSymbol
+ 1.000000 0.000000 (AGA) ShowSymbol
+ 1.000000 0.000000 (ACT) ShowSymbol
+ 1.000000 0.000000 (ACG) ShowSymbol
+ 1.000000 0.000000 (ACA) ShowSymbol
+ 1.000000 0.000000 (AAT) ShowSymbol
+ 1.000000 0.000000 (AAG) ShowSymbol
+ 1.000000 0.000000 (AAC) ShowSymbol
+ 1.000000 0.000000 (AAA) ShowSymbol
+ 1.000000 0.124005 (TTG) ShowSymbol
+ 1.000000 0.124005 (GTG) ShowSymbol
+ 1.000000 0.124005 (GCG) ShowSymbol
+ 1.000000 0.124005 (CTC) ShowSymbol
+ 1.000000 0.124005 (CTA) ShowSymbol
+ 1.000000 0.124005 (ACC) ShowSymbol
+ 1.000000 0.372014 (CTT) ShowSymbol
+ 1.000000 0.372014 (CTG) ShowSymbol
+ 1.000000 0.744028 (TTA) ShowSymbol
+ 0.614734 0.614734 DrawErrorbar
+EndStack
+
+/color_dict <<
+  (AAA) [ 0.0 1.0 0.8 ]
+  (AAC) [ 0.0 1.0 0.8 ]
+  (AAG) [ 0.0 1.0 0.8 ]
+  (AAT) [ 0.0 1.0 0.8 ]
+  (ACA) [ 0.0 1.0 0.8 ]
+  (ACC) [ 1.0 0.0 0.0 ]
+  (ACG) [ 0.0 1.0 0.8 ]
+  (ACT) [ 0.0 1.0 0.8 ]
+  (AGA) [ 0.0 1.0 0.8 ]
+  (AGC) [ 1.0 1.0 0.0 ]
+  (AGG) [ 0.0 1.0 0.8 ]
+  (AGT) [ 0.0 1.0 0.8 ]
+  (ATA) [ 0.0 1.0 0.8 ]
+  (ATC) [ 1.0 1.0 0.0 ]
+  (ATG) [ 0.0 1.0 0.8 ]
+  (ATT) [ 0.0 1.0 0.8 ]
+  (CAA) [ 0.0 1.0 0.8 ]
+  (CAC) [ 0.0 1.0 0.8 ]
+  (CAG) [ 0.0 1.0 0.8 ]
+  (CAT) [ 0.0 1.0 0.8 ]
+  (CCA) [ 0.0 1.0 0.8 ]
+  (CCC) [ 0.0 1.0 0.8 ]
+  (CCG) [ 0.0 1.0 0.8 ]
+  (CCT) [ 0.0 1.0 0.8 ]
+  (CGA) [ 0.0 1.0 0.8 ]
+  (CGC) [ 0.0 1.0 0.8 ]
+  (CGG) [ 0.0 1.0 0.8 ]
+  (CGT) [ 0.0 1.0 0.8 ]
+  (CTA) [ 0.0 1.0 0.8 ]
+  (CTC) [ 0.0 1.0 0.8 ]
+  (CTG) [ 0.0 1.0 0.8 ]
+  (CTT) [ 0.0 1.0 0.8 ]
+  (GAA) [ 0.0 1.0 0.8 ]
+  (GAC) [ 0.0 1.0 0.8 ]
+  (GAG) [ 0.0 1.0 0.8 ]
+  (GAT) [ 0.0 1.0 0.8 ]
+  (GCA) [ 0.0 1.0 0.8 ]
+  (GCC) [ 1.0 0.8 0.0 ]
+  (GCG) [ 0.0 1.0 0.8 ]
+  (GCT) [ 1.0 0.8 0.0 ]
+  (GGA) [ 0.0 1.0 0.8 ]
+  (GGC) [ 0.8 1.0 0.2 ]
+  (GGG) [ 0.0 1.0 0.8 ]
+  (GGT) [ 0.0 1.0 0.8 ]
+  (GTA) [ 0.0 1.0 0.8 ]
+  (GTC) [ 1.0 1.0 0.0 ]
+  (GTG) [ 0.0 1.0 0.8 ]
+  (GTT) [ 0.0 1.0 0.8 ]
+  (TAA) [ 0.0 1.0 0.8 ]
+  (TAC) [ 0.0 1.0 0.8 ]
+  (TAG) [ 0.0 1.0 0.8 ]
+  (TAT) [ 0.0 1.0 0.8 ]
+  (TCA) [ 0.0 1.0 0.8 ]
+  (TCC) [ 1.0 0.0 0.0 ]
+  (TCG) [ 1.0 0.4 0.0 ]
+  (TCT) [ 1.0 0.0 0.0 ]
+  (TGA) [ 0.0 1.0 0.8 ]
+  (TGC) [ 1.0 0.4 0.0 ]
+  (TGG) [ 0.0 1.0 0.8 ]
+  (TGT) [ 0.0 1.0 0.8 ]
+  (TTA) [ 0.0 1.0 0.8 ]
+  (TTC) [ 0.0 1.0 0.8 ]
+  (TTG) [ 0.0 1.0 0.8 ]
+  (TTT) [ 0.0 1.0 0.8 ]
+>> def
+() StartStack
+ 1.000000 0.000000 (TTT) ShowSymbol
+ 1.000000 0.000000 (TTG) ShowSymbol
+ 1.000000 0.000000 (TTC) ShowSymbol
+ 1.000000 0.000000 (TTA) ShowSymbol
+ 1.000000 0.000000 (TGT) ShowSymbol
+ 1.000000 0.000000 (TGG) ShowSymbol
+ 1.000000 0.000000 (TGA) ShowSymbol
+ 1.000000 0.000000 (TCA) ShowSymbol
+ 1.000000 0.000000 (TAT) ShowSymbol
+ 1.000000 0.000000 (TAG) ShowSymbol
+ 1.000000 0.000000 (TAC) ShowSymbol
+ 1.000000 0.000000 (TAA) ShowSymbol
+ 1.000000 0.000000 (GTT) ShowSymbol
+ 1.000000 0.000000 (GTG) ShowSymbol
+ 1.000000 0.000000 (GTA) ShowSymbol
+ 1.000000 0.000000 (GGT) ShowSymbol
+ 1.000000 0.000000 (GGG) ShowSymbol
+ 1.000000 0.000000 (GGA) ShowSymbol
+ 1.000000 0.000000 (GCG) ShowSymbol
+ 1.000000 0.000000 (GCA) ShowSymbol
+ 1.000000 0.000000 (GAT) ShowSymbol
+ 1.000000 0.000000 (GAG) ShowSymbol
+ 1.000000 0.000000 (GAC) ShowSymbol
+ 1.000000 0.000000 (GAA) ShowSymbol
+ 1.000000 0.000000 (CTT) ShowSymbol
+ 1.000000 0.000000 (CTG) ShowSymbol
+ 1.000000 0.000000 (CTC) ShowSymbol
+ 1.000000 0.000000 (CTA) ShowSymbol
+ 1.000000 0.000000 (CGT) ShowSymbol
+ 1.000000 0.000000 (CGG) ShowSymbol
+ 1.000000 0.000000 (CGC) ShowSymbol
+ 1.000000 0.000000 (CGA) ShowSymbol
+ 1.000000 0.000000 (CCT) ShowSymbol
+ 1.000000 0.000000 (CCG) ShowSymbol
+ 1.000000 0.000000 (CCC) ShowSymbol
+ 1.000000 0.000000 (CCA) ShowSymbol
+ 1.000000 0.000000 (CAT) ShowSymbol
+ 1.000000 0.000000 (CAG) ShowSymbol
+ 1.000000 0.000000 (CAC) ShowSymbol
+ 1.000000 0.000000 (CAA) ShowSymbol
+ 1.000000 0.000000 (ATT) ShowSymbol
+ 1.000000 0.000000 (ATG) ShowSymbol
+ 1.000000 0.000000 (ATA) ShowSymbol
+ 1.000000 0.000000 (AGT) ShowSymbol
+ 1.000000 0.000000 (AGG) ShowSymbol
+ 1.000000 0.000000 (AGA) ShowSymbol
+ 1.000000 0.000000 (ACT) ShowSymbol
+ 1.000000 0.000000 (ACG) ShowSymbol
+ 1.000000 0.000000 (ACA) ShowSymbol
+ 1.000000 0.000000 (AAT) ShowSymbol
+ 1.000000 0.000000 (AAG) ShowSymbol
+ 1.000000 0.000000 (AAC) ShowSymbol
+ 1.000000 0.000000 (AAA) ShowSymbol
+ 1.000000 0.133127 (TGC) ShowSymbol
+ 1.000000 0.133127 (TCT) ShowSymbol
+ 1.000000 0.133127 (TCG) ShowSymbol
+ 1.000000 0.133127 (GTC) ShowSymbol
+ 1.000000 0.133127 (GGC) ShowSymbol
+ 1.000000 0.133127 (GCT) ShowSymbol
+ 1.000000 0.133127 (ATC) ShowSymbol
+ 1.000000 0.133127 (AGC) ShowSymbol
+ 1.000000 0.266254 (GCC) ShowSymbol
+ 1.000000 0.399382 (ACC) ShowSymbol
+ 1.000000 0.665636 (TCC) ShowSymbol
+ 0.615354 0.615354 DrawErrorbar
+EndStack
+
+/color_dict <<
+  (AAA) [ 0.0 1.0 0.8 ]
+  (AAC) [ 0.0 1.0 0.8 ]
+  (AAG) [ 0.0 1.0 0.8 ]
+  (AAT) [ 0.0 1.0 0.8 ]
+  (ACA) [ 1.0 0.0 0.0 ]
+  (ACC) [ 0.0 1.0 0.8 ]
+  (ACG) [ 0.0 1.0 0.8 ]
+  (ACT) [ 0.0 1.0 0.8 ]
+  (AGA) [ 0.0 1.0 0.8 ]
+  (AGC) [ 0.0 1.0 0.8 ]
+  (AGG) [ 0.0 1.0 0.8 ]
+  (AGT) [ 0.0 1.0 0.8 ]
+  (ATA) [ 0.0 1.0 0.8 ]
+  (ATC) [ 0.0 1.0 0.8 ]
+  (ATG) [ 0.0 1.0 0.8 ]
+  (ATT) [ 1.0 0.8 0.0 ]
+  (CAA) [ 0.0 1.0 0.8 ]
+  (CAC) [ 0.0 1.0 0.8 ]
+  (CAG) [ 0.0 1.0 0.8 ]
+  (CAT) [ 0.0 1.0 0.8 ]
+  (CCA) [ 0.0 1.0 0.8 ]
+  (CCC) [ 0.0 1.0 0.8 ]
+  (CCG) [ 0.0 1.0 0.8 ]
+  (CCT) [ 0.0 1.0 0.8 ]
+  (CGA) [ 0.0 1.0 0.8 ]
+  (CGC) [ 0.0 1.0 0.8 ]
+  (CGG) [ 0.0 1.0 0.8 ]
+  (CGT) [ 0.0 1.0 0.8 ]
+  (CTA) [ 0.0 1.0 0.8 ]
+  (CTC) [ 0.0 1.0 0.8 ]
+  (CTG) [ 0.0 1.0 0.8 ]
+  (CTT) [ 1.0 1.0 0.0 ]
+  (GAA) [ 0.0 1.0 0.8 ]
+  (GAC) [ 0.0 1.0 0.8 ]
+  (GAG) [ 0.0 1.0 0.8 ]
+  (GAT) [ 0.0 1.0 0.8 ]
+  (GCA) [ 1.0 0.0 0.0 ]
+  (GCC) [ 1.0 0.8 0.0 ]
+  (GCG) [ 1.0 1.0 0.0 ]
+  (GCT) [ 0.0 1.0 0.8 ]
+  (GGA) [ 0.0 1.0 0.8 ]
+  (GGC) [ 0.0 1.0 0.8 ]
+  (GGG) [ 0.0 1.0 0.8 ]
+  (GGT) [ 0.8 1.0 0.2 ]
+  (GTA) [ 1.0 0.0 0.0 ]
+  (GTC) [ 0.0 1.0 0.8 ]
+  (GTG) [ 0.0 1.0 0.8 ]
+  (GTT) [ 1.0 1.0 0.0 ]
+  (TAA) [ 0.0 1.0 0.8 ]
+  (TAC) [ 0.0 1.0 0.8 ]
+  (TAG) [ 0.0 1.0 0.8 ]
+  (TAT) [ 0.0 1.0 0.8 ]
+  (TCA) [ 0.0 1.0 0.8 ]
+  (TCC) [ 0.0 1.0 0.8 ]
+  (TCG) [ 0.0 1.0 0.8 ]
+  (TCT) [ 0.0 1.0 0.8 ]
+  (TGA) [ 0.0 1.0 0.8 ]
+  (TGC) [ 0.0 1.0 0.8 ]
+  (TGG) [ 0.0 1.0 0.8 ]
+  (TGT) [ 0.0 1.0 0.8 ]
+  (TTA) [ 0.0 1.0 0.8 ]
+  (TTC) [ 0.0 1.0 0.8 ]
+  (TTG) [ 0.0 1.0 0.8 ]
+  (TTT) [ 0.0 1.0 0.8 ]
+>> def
+() StartStack
+ 1.000000 0.000000 (TTT) ShowSymbol
+ 1.000000 0.000000 (TTG) ShowSymbol
+ 1.000000 0.000000 (TTC) ShowSymbol
+ 1.000000 0.000000 (TTA) ShowSymbol
+ 1.000000 0.000000 (TGT) ShowSymbol
+ 1.000000 0.000000 (TGG) ShowSymbol
+ 1.000000 0.000000 (TGC) ShowSymbol
+ 1.000000 0.000000 (TGA) ShowSymbol
+ 1.000000 0.000000 (TCT) ShowSymbol
+ 1.000000 0.000000 (TCG) ShowSymbol
+ 1.000000 0.000000 (TCC) ShowSymbol
+ 1.000000 0.000000 (TCA) ShowSymbol
+ 1.000000 0.000000 (TAT) ShowSymbol
+ 1.000000 0.000000 (TAG) ShowSymbol
+ 1.000000 0.000000 (TAC) ShowSymbol
+ 1.000000 0.000000 (TAA) ShowSymbol
+ 1.000000 0.000000 (GTG) ShowSymbol
+ 1.000000 0.000000 (GTC) ShowSymbol
+ 1.000000 0.000000 (GGG) ShowSymbol
+ 1.000000 0.000000 (GGC) ShowSymbol
+ 1.000000 0.000000 (GGA) ShowSymbol
+ 1.000000 0.000000 (GCT) ShowSymbol
+ 1.000000 0.000000 (GAT) ShowSymbol
+ 1.000000 0.000000 (GAG) ShowSymbol
+ 1.000000 0.000000 (GAC) ShowSymbol
+ 1.000000 0.000000 (GAA) ShowSymbol
+ 1.000000 0.000000 (CTG) ShowSymbol
+ 1.000000 0.000000 (CTC) ShowSymbol
+ 1.000000 0.000000 (CTA) ShowSymbol
+ 1.000000 0.000000 (CGT) ShowSymbol
+ 1.000000 0.000000 (CGG) ShowSymbol
+ 1.000000 0.000000 (CGC) ShowSymbol
+ 1.000000 0.000000 (CGA) ShowSymbol
+ 1.000000 0.000000 (CCT) ShowSymbol
+ 1.000000 0.000000 (CCG) ShowSymbol
+ 1.000000 0.000000 (CCC) ShowSymbol
+ 1.000000 0.000000 (CCA) ShowSymbol
+ 1.000000 0.000000 (CAT) ShowSymbol
+ 1.000000 0.000000 (CAG) ShowSymbol
+ 1.000000 0.000000 (CAC) ShowSymbol
+ 1.000000 0.000000 (CAA) ShowSymbol
+ 1.000000 0.000000 (ATG) ShowSymbol
+ 1.000000 0.000000 (ATC) ShowSymbol
+ 1.000000 0.000000 (ATA) ShowSymbol
+ 1.000000 0.000000 (AGT) ShowSymbol
+ 1.000000 0.000000 (AGG) ShowSymbol
+ 1.000000 0.000000 (AGC) ShowSymbol
+ 1.000000 0.000000 (AGA) ShowSymbol
+ 1.000000 0.000000 (ACT) ShowSymbol
+ 1.000000 0.000000 (ACG) ShowSymbol
+ 1.000000 0.000000 (ACC) ShowSymbol
+ 1.000000 0.000000 (AAT) ShowSymbol
+ 1.000000 0.000000 (AAG) ShowSymbol
+ 1.000000 0.000000 (AAC) ShowSymbol
+ 1.000000 0.000000 (AAA) ShowSymbol
+ 1.000000 0.113558 (GTT) ShowSymbol
+ 1.000000 0.113558 (GGT) ShowSymbol
+ 1.000000 0.113558 (CTT) ShowSymbol
+ 1.000000 0.113558 (ACA) ShowSymbol
+ 1.000000 0.227117 (GTA) ShowSymbol
+ 1.000000 0.227117 (GCG) ShowSymbol
+ 1.000000 0.227117 (GCC) ShowSymbol
+ 1.000000 0.227117 (ATT) ShowSymbol
+ 1.000000 0.681350 (GCA) ShowSymbol
+ 0.578686 0.578686 DrawErrorbar
+EndStack
+
+/color_dict <<
+  (AAA) [ 0.0 1.0 0.8 ]
+  (AAC) [ 0.0 1.0 0.8 ]
+  (AAG) [ 0.0 1.0 0.8 ]
+  (AAT) [ 0.0 1.0 0.8 ]
+  (ACA) [ 0.0 1.0 0.8 ]
+  (ACC) [ 0.0 1.0 0.8 ]
+  (ACG) [ 0.0 1.0 0.8 ]
+  (ACT) [ 0.0 1.0 0.8 ]
+  (AGA) [ 0.0 1.0 0.8 ]
+  (AGC) [ 0.0 1.0 0.8 ]
+  (AGG) [ 0.0 1.0 0.8 ]
+  (AGT) [ 0.0 1.0 0.8 ]
+  (ATA) [ 0.0 1.0 0.8 ]
+  (ATC) [ 0.0 1.0 0.8 ]
+  (ATG) [ 1.0 0.4 0.0 ]
+  (ATT) [ 0.8 1.0 0.2 ]
+  (CAA) [ 0.0 1.0 0.8 ]
+  (CAC) [ 0.0 1.0 0.8 ]
+  (CAG) [ 0.0 1.0 0.8 ]
+  (CAT) [ 0.0 1.0 0.8 ]
+  (CCA) [ 0.0 1.0 0.8 ]
+  (CCC) [ 0.0 1.0 0.8 ]
+  (CCG) [ 0.0 1.0 0.8 ]
+  (CCT) [ 0.0 1.0 0.8 ]
+  (CGA) [ 0.0 1.0 0.8 ]
+  (CGC) [ 0.0 1.0 0.8 ]
+  (CGG) [ 0.0 1.0 0.8 ]
+  (CGT) [ 0.0 1.0 0.8 ]
+  (CTA) [ 0.0 1.0 0.8 ]
+  (CTC) [ 1.0 0.8 0.0 ]
+  (CTG) [ 1.0 0.0 0.0 ]
+  (CTT) [ 1.0 0.0 0.0 ]
+  (GAA) [ 0.0 1.0 0.8 ]
+  (GAC) [ 0.0 1.0 0.8 ]
+  (GAG) [ 0.0 1.0 0.8 ]
+  (GAT) [ 0.0 1.0 0.8 ]
+  (GCA) [ 0.0 1.0 0.8 ]
+  (GCC) [ 0.0 1.0 0.8 ]
+  (GCG) [ 0.0 1.0 0.8 ]
+  (GCT) [ 0.0 1.0 0.8 ]
+  (GGA) [ 0.0 1.0 0.8 ]
+  (GGC) [ 0.0 1.0 0.8 ]
+  (GGG) [ 0.0 1.0 0.8 ]
+  (GGT) [ 0.0 1.0 0.8 ]
+  (GTA) [ 0.0 1.0 0.8 ]
+  (GTC) [ 0.0 1.0 0.8 ]
+  (GTG) [ 0.0 1.0 0.8 ]
+  (GTT) [ 1.0 1.0 0.0 ]
+  (TAA) [ 0.0 1.0 0.8 ]
+  (TAC) [ 0.0 1.0 0.8 ]
+  (TAG) [ 0.0 1.0 0.8 ]
+  (TAT) [ 0.0 1.0 0.8 ]
+  (TCA) [ 1.0 0.0 0.0 ]
+  (TCC) [ 0.0 1.0 0.8 ]
+  (TCG) [ 0.0 1.0 0.8 ]
+  (TCT) [ 0.0 1.0 0.8 ]
+  (TGA) [ 0.0 1.0 0.8 ]
+  (TGC) [ 0.0 1.0 0.8 ]
+  (TGG) [ 0.0 1.0 0.8 ]
+  (TGT) [ 0.0 1.0 0.8 ]
+  (TTA) [ 1.0 0.0 0.0 ]
+  (TTC) [ 0.0 1.0 0.8 ]
+  (TTG) [ 0.0 1.0 0.8 ]
+  (TTT) [ 0.0 1.0 0.8 ]
+>> def
+() StartStack
+ 1.000000 0.000000 (TTT) ShowSymbol
+ 1.000000 0.000000 (TTG) ShowSymbol
+ 1.000000 0.000000 (TTC) ShowSymbol
+ 1.000000 0.000000 (TGT) ShowSymbol
+ 1.000000 0.000000 (TGG) ShowSymbol
+ 1.000000 0.000000 (TGC) ShowSymbol
+ 1.000000 0.000000 (TGA) ShowSymbol
+ 1.000000 0.000000 (TCT) ShowSymbol
+ 1.000000 0.000000 (TCG) ShowSymbol
+ 1.000000 0.000000 (TCC) ShowSymbol
+ 1.000000 0.000000 (TAT) ShowSymbol
+ 1.000000 0.000000 (TAG) ShowSymbol
+ 1.000000 0.000000 (TAC) ShowSymbol
+ 1.000000 0.000000 (TAA) ShowSymbol
+ 1.000000 0.000000 (GTG) ShowSymbol
+ 1.000000 0.000000 (GTC) ShowSymbol
+ 1.000000 0.000000 (GTA) ShowSymbol
+ 1.000000 0.000000 (GGT) ShowSymbol
+ 1.000000 0.000000 (GGG) ShowSymbol
+ 1.000000 0.000000 (GGC) ShowSymbol
+ 1.000000 0.000000 (GGA) ShowSymbol
+ 1.000000 0.000000 (GCT) ShowSymbol
+ 1.000000 0.000000 (GCG) ShowSymbol
+ 1.000000 0.000000 (GCC) ShowSymbol
+ 1.000000 0.000000 (GCA) ShowSymbol
+ 1.000000 0.000000 (GAT) ShowSymbol
+ 1.000000 0.000000 (GAG) ShowSymbol
+ 1.000000 0.000000 (GAC) ShowSymbol
+ 1.000000 0.000000 (GAA) ShowSymbol
+ 1.000000 0.000000 (CTA) ShowSymbol
+ 1.000000 0.000000 (CGT) ShowSymbol
+ 1.000000 0.000000 (CGG) ShowSymbol
+ 1.000000 0.000000 (CGC) ShowSymbol
+ 1.000000 0.000000 (CGA) ShowSymbol
+ 1.000000 0.000000 (CCT) ShowSymbol
+ 1.000000 0.000000 (CCG) ShowSymbol
+ 1.000000 0.000000 (CCC) ShowSymbol
+ 1.000000 0.000000 (CCA) ShowSymbol
+ 1.000000 0.000000 (CAT) ShowSymbol
+ 1.000000 0.000000 (CAG) ShowSymbol
+ 1.000000 0.000000 (CAC) ShowSymbol
+ 1.000000 0.000000 (CAA) ShowSymbol
+ 1.000000 0.000000 (ATC) ShowSymbol
+ 1.000000 0.000000 (ATA) ShowSymbol
+ 1.000000 0.000000 (AGT) ShowSymbol
+ 1.000000 0.000000 (AGG) ShowSymbol
+ 1.000000 0.000000 (AGC) ShowSymbol
+ 1.000000 0.000000 (AGA) ShowSymbol
+ 1.000000 0.000000 (ACT) ShowSymbol
+ 1.000000 0.000000 (ACG) ShowSymbol
+ 1.000000 0.000000 (ACC) ShowSymbol
+ 1.000000 0.000000 (ACA) ShowSymbol
+ 1.000000 0.000000 (AAT) ShowSymbol
+ 1.000000 0.000000 (AAG) ShowSymbol
+ 1.000000 0.000000 (AAC) ShowSymbol
+ 1.000000 0.000000 (AAA) ShowSymbol
+ 1.000000 0.120167 (GTT) ShowSymbol
+ 1.000000 0.120167 (CTC) ShowSymbol
+ 1.000000 0.120167 (ATT) ShowSymbol
+ 1.000000 0.240335 (TCA) ShowSymbol
+ 1.000000 0.240335 (CTT) ShowSymbol
+ 1.000000 0.240335 (ATG) ShowSymbol
+ 1.000000 0.480670 (CTG) ShowSymbol
+ 1.000000 0.600837 (TTA) ShowSymbol
+ 0.596507 0.596507 DrawErrorbar
+EndStack
+
+/color_dict <<
+  (AAA) [ 0.0 1.0 0.8 ]
+  (AAC) [ 0.0 1.0 0.8 ]
+  (AAG) [ 0.0 1.0 0.8 ]
+  (AAT) [ 0.0 1.0 0.8 ]
+  (ACA) [ 1.0 0.0 0.0 ]
+  (ACC) [ 1.0 0.4 0.0 ]
+  (ACG) [ 1.0 0.0 0.0 ]
+  (ACT) [ 0.0 1.0 0.8 ]
+  (AGA) [ 0.0 1.0 0.8 ]
+  (AGC) [ 0.0 1.0 0.8 ]
+  (AGG) [ 0.0 1.0 0.8 ]
+  (AGT) [ 0.0 1.0 0.8 ]
+  (ATA) [ 0.0 1.0 0.8 ]
+  (ATC) [ 1.0 1.0 0.0 ]
+  (ATG) [ 0.0 1.0 0.8 ]
+  (ATT) [ 0.8 1.0 0.2 ]
+  (CAA) [ 0.0 1.0 0.8 ]
+  (CAC) [ 0.0 1.0 0.8 ]
+  (CAG) [ 0.0 1.0 0.8 ]
+  (CAT) [ 0.0 1.0 0.8 ]
+  (CCA) [ 0.0 1.0 0.8 ]
+  (CCC) [ 0.0 1.0 0.8 ]
+  (CCG) [ 0.0 1.0 0.8 ]
+  (CCT) [ 0.0 1.0 0.8 ]
+  (CGA) [ 0.0 1.0 0.8 ]
+  (CGC) [ 0.0 1.0 0.8 ]
+  (CGG) [ 0.0 1.0 0.8 ]
+  (CGT) [ 0.0 1.0 0.8 ]
+  (CTA) [ 0.0 1.0 0.8 ]
+  (CTC) [ 0.0 1.0 0.8 ]
+  (CTG) [ 0.0 1.0 0.8 ]
+  (CTT) [ 0.0 1.0 0.8 ]
+  (GAA) [ 0.0 1.0 0.8 ]
+  (GAC) [ 0.0 1.0 0.8 ]
+  (GAG) [ 0.0 1.0 0.8 ]
+  (GAT) [ 0.0 1.0 0.8 ]
+  (GCA) [ 1.0 0.0 0.0 ]
+  (GCC) [ 1.0 0.0 0.0 ]
+  (GCG) [ 0.0 1.0 0.8 ]
+  (GCT) [ 1.0 0.0 0.0 ]
+  (GGA) [ 0.0 1.0 0.8 ]
+  (GGC) [ 0.0 1.0 0.8 ]
+  (GGG) [ 0.0 1.0 0.8 ]
+  (GGT) [ 0.0 1.0 0.8 ]
+  (GTA) [ 0.0 1.0 0.8 ]
+  (GTC) [ 0.0 1.0 0.8 ]
+  (GTG) [ 0.0 1.0 0.8 ]
+  (GTT) [ 0.0 1.0 0.8 ]
+  (TAA) [ 0.0 1.0 0.8 ]
+  (TAC) [ 0.0 1.0 0.8 ]
+  (TAG) [ 0.0 1.0 0.8 ]
+  (TAT) [ 0.0 1.0 0.8 ]
+  (TCA) [ 0.0 1.0 0.8 ]
+  (TCC) [ 0.0 1.0 0.8 ]
+  (TCG) [ 0.0 1.0 0.8 ]
+  (TCT) [ 0.0 1.0 0.8 ]
+  (TGA) [ 0.0 1.0 0.8 ]
+  (TGC) [ 0.0 1.0 0.8 ]
+  (TGG) [ 0.0 1.0 0.8 ]
+  (TGT) [ 0.0 1.0 0.8 ]
+  (TTA) [ 0.0 1.0 0.8 ]
+  (TTC) [ 0.0 1.0 0.8 ]
+  (TTG) [ 0.0 1.0 0.8 ]
+  (TTT) [ 1.0 1.0 0.0 ]
+>> def
+() StartStack
+ 1.000000 0.000000 (TTG) ShowSymbol
+ 1.000000 0.000000 (TTC) ShowSymbol
+ 1.000000 0.000000 (TTA) ShowSymbol
+ 1.000000 0.000000 (TGT) ShowSymbol
+ 1.000000 0.000000 (TGG) ShowSymbol
+ 1.000000 0.000000 (TGC) ShowSymbol
+ 1.000000 0.000000 (TGA) ShowSymbol
+ 1.000000 0.000000 (TCT) ShowSymbol
+ 1.000000 0.000000 (TCG) ShowSymbol
+ 1.000000 0.000000 (TCC) ShowSymbol
+ 1.000000 0.000000 (TCA) ShowSymbol
+ 1.000000 0.000000 (TAT) ShowSymbol
+ 1.000000 0.000000 (TAG) ShowSymbol
+ 1.000000 0.000000 (TAC) ShowSymbol
+ 1.000000 0.000000 (TAA) ShowSymbol
+ 1.000000 0.000000 (GTT) ShowSymbol
+ 1.000000 0.000000 (GTG) ShowSymbol
+ 1.000000 0.000000 (GTC) ShowSymbol
+ 1.000000 0.000000 (GTA) ShowSymbol
+ 1.000000 0.000000 (GGT) ShowSymbol
+ 1.000000 0.000000 (GGG) ShowSymbol
+ 1.000000 0.000000 (GGC) ShowSymbol
+ 1.000000 0.000000 (GGA) ShowSymbol
+ 1.000000 0.000000 (GCG) ShowSymbol
+ 1.000000 0.000000 (GAT) ShowSymbol
+ 1.000000 0.000000 (GAG) ShowSymbol
+ 1.000000 0.000000 (GAC) ShowSymbol
+ 1.000000 0.000000 (GAA) ShowSymbol
+ 1.000000 0.000000 (CTT) ShowSymbol
+ 1.000000 0.000000 (CTG) ShowSymbol
+ 1.000000 0.000000 (CTC) ShowSymbol
+ 1.000000 0.000000 (CTA) ShowSymbol
+ 1.000000 0.000000 (CGT) ShowSymbol
+ 1.000000 0.000000 (CGG) ShowSymbol
+ 1.000000 0.000000 (CGC) ShowSymbol
+ 1.000000 0.000000 (CGA) ShowSymbol
+ 1.000000 0.000000 (CCT) ShowSymbol
+ 1.000000 0.000000 (CCG) ShowSymbol
+ 1.000000 0.000000 (CCC) ShowSymbol
+ 1.000000 0.000000 (CCA) ShowSymbol
+ 1.000000 0.000000 (CAT) ShowSymbol
+ 1.000000 0.000000 (CAG) ShowSymbol
+ 1.000000 0.000000 (CAC) ShowSymbol
+ 1.000000 0.000000 (CAA) ShowSymbol
+ 1.000000 0.000000 (ATG) ShowSymbol
+ 1.000000 0.000000 (ATA) ShowSymbol
+ 1.000000 0.000000 (AGT) ShowSymbol
+ 1.000000 0.000000 (AGG) ShowSymbol
+ 1.000000 0.000000 (AGC) ShowSymbol
+ 1.000000 0.000000 (AGA) ShowSymbol
+ 1.000000 0.000000 (ACT) ShowSymbol
+ 1.000000 0.000000 (AAT) ShowSymbol
+ 1.000000 0.000000 (AAG) ShowSymbol
+ 1.000000 0.000000 (AAC) ShowSymbol
+ 1.000000 0.000000 (AAA) ShowSymbol
+ 1.000000 0.114705 (TTT) ShowSymbol
+ 1.000000 0.114705 (ATT) ShowSymbol
+ 1.000000 0.114705 (ATC) ShowSymbol
+ 1.000000 0.114705 (ACA) ShowSymbol
+ 1.000000 0.229411 (GCT) ShowSymbol
+ 1.000000 0.229411 (ACC) ShowSymbol
+ 1.000000 0.344116 (GCA) ShowSymbol
+ 1.000000 0.344116 (ACG) ShowSymbol
+ 1.000000 0.458822 (GCC) ShowSymbol
+ 0.542320 0.542320 DrawErrorbar
+EndStack
+
+/color_dict <<
+  (AAA) [ 0.0 1.0 0.8 ]
+  (AAC) [ 0.0 1.0 0.8 ]
+  (AAG) [ 0.0 1.0 0.8 ]
+  (AAT) [ 0.0 1.0 0.8 ]
+  (ACA) [ 0.0 1.0 0.8 ]
+  (ACC) [ 0.0 1.0 0.8 ]
+  (ACG) [ 1.0 0.0 0.0 ]
+  (ACT) [ 1.0 0.4 0.0 ]
+  (AGA) [ 0.0 1.0 0.8 ]
+  (AGC) [ 0.0 1.0 0.8 ]
+  (AGG) [ 0.0 1.0 0.8 ]
+  (AGT) [ 0.0 1.0 0.8 ]
+  (ATA) [ 0.0 1.0 0.8 ]
+  (ATC) [ 0.0 1.0 0.8 ]
+  (ATG) [ 0.0 1.0 0.8 ]
+  (ATT) [ 0.0 1.0 0.8 ]
+  (CAA) [ 0.0 1.0 0.8 ]
+  (CAC) [ 0.0 1.0 0.8 ]
+  (CAG) [ 0.0 1.0 0.8 ]
+  (CAT) [ 0.0 1.0 0.8 ]
+  (CCA) [ 0.0 1.0 0.8 ]
+  (CCC) [ 0.0 1.0 0.8 ]
+  (CCG) [ 0.0 1.0 0.8 ]
+  (CCT) [ 0.0 1.0 0.8 ]
+  (CGA) [ 0.0 1.0 0.8 ]
+  (CGC) [ 0.0 1.0 0.8 ]
+  (CGG) [ 0.0 1.0 0.8 ]
+  (CGT) [ 0.0 1.0 0.8 ]
+  (CTA) [ 0.0 1.0 0.8 ]
+  (CTC) [ 0.0 1.0 0.8 ]
+  (CTG) [ 0.0 1.0 0.0 ]
+  (CTT) [ 0.0 1.0 0.8 ]
+  (GAA) [ 0.0 1.0 0.8 ]
+  (GAC) [ 0.0 1.0 0.8 ]
+  (GAG) [ 0.0 1.0 0.8 ]
+  (GAT) [ 0.0 1.0 0.8 ]
+  (GCA) [ 1.0 0.0 0.0 ]
+  (GCC) [ 0.8 1.0 0.2 ]
+  (GCG) [ 0.8 1.0 0.2 ]
+  (GCT) [ 1.0 0.8 0.0 ]
+  (GGA) [ 1.0 0.8 0.0 ]
+  (GGC) [ 0.8 1.0 0.2 ]
+  (GGG) [ 0.0 1.0 0.8 ]
+  (GGT) [ 0.8 1.0 0.2 ]
+  (GTA) [ 0.0 1.0 0.8 ]
+  (GTC) [ 0.0 1.0 0.8 ]
+  (GTG) [ 0.8 1.0 0.2 ]
+  (GTT) [ 0.0 1.0 0.8 ]
+  (TAA) [ 0.0 1.0 0.8 ]
+  (TAC) [ 0.0 1.0 0.8 ]
+  (TAG) [ 0.0 1.0 0.8 ]
+  (TAT) [ 0.0 1.0 0.8 ]
+  (TCA) [ 1.0 0.4 0.0 ]
+  (TCC) [ 0.0 1.0 0.8 ]
+  (TCG) [ 0.0 1.0 0.8 ]
+  (TCT) [ 0.0 1.0 0.8 ]
+  (TGA) [ 0.0 1.0 0.8 ]
+  (TGC) [ 0.0 1.0 0.8 ]
+  (TGG) [ 0.0 1.0 0.8 ]
+  (TGT) [ 0.0 1.0 0.8 ]
+  (TTA) [ 0.0 1.0 0.8 ]
+  (TTC) [ 0.0 1.0 0.8 ]
+  (TTG) [ 0.0 1.0 0.8 ]
+  (TTT) [ 0.0 1.0 0.8 ]
+>> def
+(20) StartStack
+ 1.000000 0.000000 (TTT) ShowSymbol
+ 1.000000 0.000000 (TTG) ShowSymbol
+ 1.000000 0.000000 (TTC) ShowSymbol
+ 1.000000 0.000000 (TTA) ShowSymbol
+ 1.000000 0.000000 (TGT) ShowSymbol
+ 1.000000 0.000000 (TGG) ShowSymbol
+ 1.000000 0.000000 (TGC) ShowSymbol
+ 1.000000 0.000000 (TGA) ShowSymbol
+ 1.000000 0.000000 (TCT) ShowSymbol
+ 1.000000 0.000000 (TCG) ShowSymbol
+ 1.000000 0.000000 (TCC) ShowSymbol
+ 1.000000 0.000000 (TAT) ShowSymbol
+ 1.000000 0.000000 (TAG) ShowSymbol
+ 1.000000 0.000000 (TAC) ShowSymbol
+ 1.000000 0.000000 (TAA) ShowSymbol
+ 1.000000 0.000000 (GTT) ShowSymbol
+ 1.000000 0.000000 (GTC) ShowSymbol
+ 1.000000 0.000000 (GTA) ShowSymbol
+ 1.000000 0.000000 (GGG) ShowSymbol
+ 1.000000 0.000000 (GAT) ShowSymbol
+ 1.000000 0.000000 (GAG) ShowSymbol
+ 1.000000 0.000000 (GAC) ShowSymbol
+ 1.000000 0.000000 (GAA) ShowSymbol
+ 1.000000 0.000000 (CTT) ShowSymbol
+ 1.000000 0.000000 (CTC) ShowSymbol
+ 1.000000 0.000000 (CTA) ShowSymbol
+ 1.000000 0.000000 (CGT) ShowSymbol
+ 1.000000 0.000000 (CGG) ShowSymbol
+ 1.000000 0.000000 (CGC) ShowSymbol
+ 1.000000 0.000000 (CGA) ShowSymbol
+ 1.000000 0.000000 (CCT) ShowSymbol
+ 1.000000 0.000000 (CCG) ShowSymbol
+ 1.000000 0.000000 (CCC) ShowSymbol
+ 1.000000 0.000000 (CCA) ShowSymbol
+ 1.000000 0.000000 (CAT) ShowSymbol
+ 1.000000 0.000000 (CAG) ShowSymbol
+ 1.000000 0.000000 (CAC) ShowSymbol
+ 1.000000 0.000000 (CAA) ShowSymbol
+ 1.000000 0.000000 (ATT) ShowSymbol
+ 1.000000 0.000000 (ATG) ShowSymbol
+ 1.000000 0.000000 (ATC) ShowSymbol
+ 1.000000 0.000000 (ATA) ShowSymbol
+ 1.000000 0.000000 (AGT) ShowSymbol
+ 1.000000 0.000000 (AGG) ShowSymbol
+ 1.000000 0.000000 (AGC) ShowSymbol
+ 1.000000 0.000000 (AGA) ShowSymbol
+ 1.000000 0.000000 (ACC) ShowSymbol
+ 1.000000 0.000000 (ACA) ShowSymbol
+ 1.000000 0.000000 (AAT) ShowSymbol
+ 1.000000 0.000000 (AAG) ShowSymbol
+ 1.000000 0.000000 (AAC) ShowSymbol
+ 1.000000 0.000000 (AAA) ShowSymbol
+ 1.000000 0.113868 (TCA) ShowSymbol
+ 1.000000 0.113868 (GTG) ShowSymbol
+ 1.000000 0.113868 (GGT) ShowSymbol
+ 1.000000 0.113868 (GGC) ShowSymbol
+ 1.000000 0.113868 (GGA) ShowSymbol
+ 1.000000 0.113868 (GCT) ShowSymbol
+ 1.000000 0.113868 (GCG) ShowSymbol
+ 1.000000 0.113868 (GCC) ShowSymbol
+ 1.000000 0.113868 (CTG) ShowSymbol
+ 1.000000 0.113868 (ACT) ShowSymbol
+ 1.000000 0.341603 (GCA) ShowSymbol
+ 1.000000 0.569338 (ACG) ShowSymbol
+ 0.567828 0.567828 DrawErrorbar
+EndStack
+
+/color_dict <<
+  (AAA) [ 0.0 1.0 0.8 ]
+  (AAC) [ 0.0 1.0 0.8 ]
+  (AAG) [ 0.0 1.0 0.8 ]
+  (AAT) [ 0.0 1.0 0.8 ]
+  (ACA) [ 0.0 1.0 0.8 ]
+  (ACC) [ 0.0 1.0 0.8 ]
+  (ACG) [ 0.0 1.0 0.8 ]
+  (ACT) [ 0.0 1.0 0.8 ]
+  (AGA) [ 0.0 1.0 0.8 ]
+  (AGC) [ 0.0 1.0 0.8 ]
+  (AGG) [ 0.0 1.0 0.8 ]
+  (AGT) [ 0.0 1.0 0.8 ]
+  (ATA) [ 0.0 1.0 0.8 ]
+  (ATC) [ 0.0 1.0 0.8 ]
+  (ATG) [ 1.0 0.0 0.0 ]
+  (ATT) [ 0.0 1.0 0.8 ]
+  (CAA) [ 0.0 1.0 0.8 ]
+  (CAC) [ 0.0 1.0 0.8 ]
+  (CAG) [ 0.0 1.0 0.8 ]
+  (CAT) [ 0.0 1.0 0.8 ]
+  (CCA) [ 0.0 1.0 0.8 ]
+  (CCC) [ 0.0 1.0 0.8 ]
+  (CCG) [ 0.0 1.0 0.8 ]
+  (CCT) [ 0.0 1.0 0.8 ]
+  (CGA) [ 0.0 1.0 0.8 ]
+  (CGC) [ 0.0 1.0 0.8 ]
+  (CGG) [ 0.0 1.0 0.8 ]
+  (CGT) [ 0.0 1.0 0.8 ]
+  (CTA) [ 1.0 0.0 0.0 ]
+  (CTC) [ 1.0 0.8 0.0 ]
+  (CTG) [ 1.0 0.0 0.0 ]
+  (CTT) [ 1.0 0.0 0.0 ]
+  (GAA) [ 0.0 1.0 0.8 ]
+  (GAC) [ 0.0 1.0 0.8 ]
+  (GAG) [ 0.0 1.0 0.8 ]
+  (GAT) [ 0.0 1.0 0.8 ]
+  (GCA) [ 0.0 1.0 0.8 ]
+  (GCC) [ 0.0 1.0 0.8 ]
+  (GCG) [ 0.0 1.0 0.8 ]
+  (GCT) [ 0.0 1.0 0.8 ]
+  (GGA) [ 0.0 1.0 0.8 ]
+  (GGC) [ 0.0 1.0 0.8 ]
+  (GGG) [ 0.0 1.0 0.8 ]
+  (GGT) [ 0.0 1.0 0.8 ]
+  (GTA) [ 0.0 1.0 0.8 ]
+  (GTC) [ 0.0 1.0 0.8 ]
+  (GTG) [ 0.0 1.0 0.8 ]
+  (GTT) [ 0.0 1.0 0.8 ]
+  (TAA) [ 0.0 1.0 0.8 ]
+  (TAC) [ 0.0 1.0 0.8 ]
+  (TAG) [ 0.0 1.0 0.8 ]
+  (TAT) [ 0.0 1.0 0.8 ]
+  (TCA) [ 0.0 1.0 0.8 ]
+  (TCC) [ 0.0 1.0 0.8 ]
+  (TCG) [ 0.0 1.0 0.8 ]
+  (TCT) [ 0.0 1.0 0.8 ]
+  (TGA) [ 0.0 1.0 0.8 ]
+  (TGC) [ 0.0 1.0 0.8 ]
+  (TGG) [ 0.0 1.0 0.8 ]
+  (TGT) [ 0.0 1.0 0.8 ]
+  (TTA) [ 1.0 0.0 0.0 ]
+  (TTC) [ 0.0 1.0 0.8 ]
+  (TTG) [ 0.0 1.0 0.8 ]
+  (TTT) [ 0.0 1.0 0.8 ]
+>> def
+() StartStack
+ 1.000000 0.000000 (TTT) ShowSymbol
+ 1.000000 0.000000 (TTG) ShowSymbol
+ 1.000000 0.000000 (TTC) ShowSymbol
+ 1.000000 0.000000 (TGT) ShowSymbol
+ 1.000000 0.000000 (TGG) ShowSymbol
+ 1.000000 0.000000 (TGC) ShowSymbol
+ 1.000000 0.000000 (TGA) ShowSymbol
+ 1.000000 0.000000 (TCT) ShowSymbol
+ 1.000000 0.000000 (TCG) ShowSymbol
+ 1.000000 0.000000 (TCC) ShowSymbol
+ 1.000000 0.000000 (TCA) ShowSymbol
+ 1.000000 0.000000 (TAT) ShowSymbol
+ 1.000000 0.000000 (TAG) ShowSymbol
+ 1.000000 0.000000 (TAC) ShowSymbol
+ 1.000000 0.000000 (TAA) ShowSymbol
+ 1.000000 0.000000 (GTT) ShowSymbol
+ 1.000000 0.000000 (GTG) ShowSymbol
+ 1.000000 0.000000 (GTC) ShowSymbol
+ 1.000000 0.000000 (GTA) ShowSymbol
+ 1.000000 0.000000 (GGT) ShowSymbol
+ 1.000000 0.000000 (GGG) ShowSymbol
+ 1.000000 0.000000 (GGC) ShowSymbol
+ 1.000000 0.000000 (GGA) ShowSymbol
+ 1.000000 0.000000 (GCT) ShowSymbol
+ 1.000000 0.000000 (GCG) ShowSymbol
+ 1.000000 0.000000 (GCC) ShowSymbol
+ 1.000000 0.000000 (GCA) ShowSymbol
+ 1.000000 0.000000 (GAT) ShowSymbol
+ 1.000000 0.000000 (GAG) ShowSymbol
+ 1.000000 0.000000 (GAC) ShowSymbol
+ 1.000000 0.000000 (GAA) ShowSymbol
+ 1.000000 0.000000 (CGT) ShowSymbol
+ 1.000000 0.000000 (CGG) ShowSymbol
+ 1.000000 0.000000 (CGC) ShowSymbol
+ 1.000000 0.000000 (CGA) ShowSymbol
+ 1.000000 0.000000 (CCT) ShowSymbol
+ 1.000000 0.000000 (CCG) ShowSymbol
+ 1.000000 0.000000 (CCC) ShowSymbol
+ 1.000000 0.000000 (CCA) ShowSymbol
+ 1.000000 0.000000 (CAT) ShowSymbol
+ 1.000000 0.000000 (CAG) ShowSymbol
+ 1.000000 0.000000 (CAC) ShowSymbol
+ 1.000000 0.000000 (CAA) ShowSymbol
+ 1.000000 0.000000 (ATT) ShowSymbol
+ 1.000000 0.000000 (ATC) ShowSymbol
+ 1.000000 0.000000 (ATA) ShowSymbol
+ 1.000000 0.000000 (AGT) ShowSymbol
+ 1.000000 0.000000 (AGG) ShowSymbol
+ 1.000000 0.000000 (AGC) ShowSymbol
+ 1.000000 0.000000 (AGA) ShowSymbol
+ 1.000000 0.000000 (ACT) ShowSymbol
+ 1.000000 0.000000 (ACG) ShowSymbol
+ 1.000000 0.000000 (ACC) ShowSymbol
+ 1.000000 0.000000 (ACA) ShowSymbol
+ 1.000000 0.000000 (AAT) ShowSymbol
+ 1.000000 0.000000 (AAG) ShowSymbol
+ 1.000000 0.000000 (AAC) ShowSymbol
+ 1.000000 0.000000 (AAA) ShowSymbol
+ 1.000000 0.125944 (CTC) ShowSymbol
+ 1.000000 0.125944 (CTA) ShowSymbol
+ 1.000000 0.377831 (TTA) ShowSymbol
+ 1.000000 0.377831 (CTT) ShowSymbol
+ 1.000000 0.629718 (CTG) ShowSymbol
+ 1.000000 0.629718 (ATG) ShowSymbol
+ 0.632813 0.632813 DrawErrorbar
+EndStack
+
+/color_dict <<
+  (AAA) [ 0.0 1.0 0.8 ]
+  (AAC) [ 0.0 1.0 0.8 ]
+  (AAG) [ 0.0 1.0 0.8 ]
+  (AAT) [ 0.0 1.0 0.8 ]
+  (ACA) [ 0.0 1.0 0.8 ]
+  (ACC) [ 0.0 1.0 0.8 ]
+  (ACG) [ 0.0 1.0 0.8 ]
+  (ACT) [ 0.0 1.0 0.8 ]
+  (AGA) [ 0.0 1.0 0.8 ]
+  (AGC) [ 0.0 1.0 0.8 ]
+  (AGG) [ 0.0 1.0 0.8 ]
+  (AGT) [ 0.0 1.0 0.8 ]
+  (ATA) [ 0.0 1.0 0.8 ]
+  (ATC) [ 0.0 1.0 0.8 ]
+  (ATG) [ 1.0 0.0 0.0 ]
+  (ATT) [ 0.0 1.0 0.8 ]
+  (CAA) [ 0.0 1.0 0.8 ]
+  (CAC) [ 0.0 1.0 0.8 ]
+  (CAG) [ 0.0 1.0 0.8 ]
+  (CAT) [ 0.0 1.0 0.8 ]
+  (CCA) [ 0.0 1.0 0.8 ]
+  (CCC) [ 0.0 1.0 0.8 ]
+  (CCG) [ 0.0 1.0 0.8 ]
+  (CCT) [ 0.0 1.0 0.8 ]
+  (CGA) [ 0.0 1.0 0.8 ]
+  (CGC) [ 0.0 1.0 0.8 ]
+  (CGG) [ 0.0 1.0 0.8 ]
+  (CGT) [ 0.0 1.0 0.8 ]
+  (CTA) [ 1.0 0.0 0.0 ]
+  (CTC) [ 1.0 0.8 0.0 ]
+  (CTG) [ 0.0 1.0 0.8 ]
+  (CTT) [ 0.0 1.0 0.8 ]
+  (GAA) [ 0.0 1.0 0.8 ]
+  (GAC) [ 0.0 1.0 0.8 ]
+  (GAG) [ 0.0 1.0 0.8 ]
+  (GAT) [ 0.0 1.0 0.8 ]
+  (GCA) [ 0.0 1.0 0.8 ]
+  (GCC) [ 0.8 1.0 0.2 ]
+  (GCG) [ 0.0 1.0 0.8 ]
+  (GCT) [ 0.0 1.0 0.8 ]
+  (GGA) [ 0.0 1.0 0.8 ]
+  (GGC) [ 0.8 1.0 0.2 ]
+  (GGG) [ 0.0 1.0 0.8 ]
+  (GGT) [ 1.0 0.0 0.0 ]
+  (GTA) [ 0.0 1.0 0.8 ]
+  (GTC) [ 1.0 0.0 0.0 ]
+  (GTG) [ 1.0 0.4 0.0 ]
+  (GTT) [ 1.0 1.0 0.0 ]
+  (TAA) [ 0.0 1.0 0.8 ]
+  (TAC) [ 0.0 1.0 0.8 ]
+  (TAG) [ 0.0 1.0 0.8 ]
+  (TAT) [ 0.0 1.0 0.8 ]
+  (TCA) [ 0.0 1.0 0.8 ]
+  (TCC) [ 0.0 1.0 0.8 ]
+  (TCG) [ 0.0 1.0 0.8 ]
+  (TCT) [ 0.0 1.0 0.8 ]
+  (TGA) [ 0.0 1.0 0.8 ]
+  (TGC) [ 0.0 1.0 0.8 ]
+  (TGG) [ 1.0 0.8 0.0 ]
+  (TGT) [ 1.0 0.0 0.0 ]
+  (TTA) [ 0.0 1.0 0.8 ]
+  (TTC) [ 0.0 1.0 0.8 ]
+  (TTG) [ 0.0 1.0 0.8 ]
+  (TTT) [ 0.0 1.0 0.8 ]
+>> def
+() StartStack
+ 1.000000 0.000000 (TTT) ShowSymbol
+ 1.000000 0.000000 (TTG) ShowSymbol
+ 1.000000 0.000000 (TTC) ShowSymbol
+ 1.000000 0.000000 (TTA) ShowSymbol
+ 1.000000 0.000000 (TGC) ShowSymbol
+ 1.000000 0.000000 (TGA) ShowSymbol
+ 1.000000 0.000000 (TCT) ShowSymbol
+ 1.000000 0.000000 (TCG) ShowSymbol
+ 1.000000 0.000000 (TCC) ShowSymbol
+ 1.000000 0.000000 (TCA) ShowSymbol
+ 1.000000 0.000000 (TAT) ShowSymbol
+ 1.000000 0.000000 (TAG) ShowSymbol
+ 1.000000 0.000000 (TAC) ShowSymbol
+ 1.000000 0.000000 (TAA) ShowSymbol
+ 1.000000 0.000000 (GTA) ShowSymbol
+ 1.000000 0.000000 (GGG) ShowSymbol
+ 1.000000 0.000000 (GGA) ShowSymbol
+ 1.000000 0.000000 (GCT) ShowSymbol
+ 1.000000 0.000000 (GCG) ShowSymbol
+ 1.000000 0.000000 (GCA) ShowSymbol
+ 1.000000 0.000000 (GAT) ShowSymbol
+ 1.000000 0.000000 (GAG) ShowSymbol
+ 1.000000 0.000000 (GAC) ShowSymbol
+ 1.000000 0.000000 (GAA) ShowSymbol
+ 1.000000 0.000000 (CTT) ShowSymbol
+ 1.000000 0.000000 (CTG) ShowSymbol
+ 1.000000 0.000000 (CGT) ShowSymbol
+ 1.000000 0.000000 (CGG) ShowSymbol
+ 1.000000 0.000000 (CGC) ShowSymbol
+ 1.000000 0.000000 (CGA) ShowSymbol
+ 1.000000 0.000000 (CCT) ShowSymbol
+ 1.000000 0.000000 (CCG) ShowSymbol
+ 1.000000 0.000000 (CCC) ShowSymbol
+ 1.000000 0.000000 (CCA) ShowSymbol
+ 1.000000 0.000000 (CAT) ShowSymbol
+ 1.000000 0.000000 (CAG) ShowSymbol
+ 1.000000 0.000000 (CAC) ShowSymbol
+ 1.000000 0.000000 (CAA) ShowSymbol
+ 1.000000 0.000000 (ATT) ShowSymbol
+ 1.000000 0.000000 (ATC) ShowSymbol
+ 1.000000 0.000000 (ATA) ShowSymbol
+ 1.000000 0.000000 (AGT) ShowSymbol
+ 1.000000 0.000000 (AGG) ShowSymbol
+ 1.000000 0.000000 (AGC) ShowSymbol
+ 1.000000 0.000000 (AGA) ShowSymbol
+ 1.000000 0.000000 (ACT) ShowSymbol
+ 1.000000 0.000000 (ACG) ShowSymbol
+ 1.000000 0.000000 (ACC) ShowSymbol
+ 1.000000 0.000000 (ACA) ShowSymbol
+ 1.000000 0.000000 (AAT) ShowSymbol
+ 1.000000 0.000000 (AAG) ShowSymbol
+ 1.000000 0.000000 (AAC) ShowSymbol
+ 1.000000 0.000000 (AAA) ShowSymbol
+ 1.000000 0.111945 (TGT) ShowSymbol
+ 1.000000 0.111945 (TGG) ShowSymbol
+ 1.000000 0.111945 (GTT) ShowSymbol
+ 1.000000 0.111945 (GGC) ShowSymbol
+ 1.000000 0.111945 (GCC) ShowSymbol
+ 1.000000 0.111945 (CTC) ShowSymbol
+ 1.000000 0.111945 (CTA) ShowSymbol
+ 1.000000 0.223890 (GTG) ShowSymbol
+ 1.000000 0.223890 (GTC) ShowSymbol
+ 1.000000 0.223890 (GGT) ShowSymbol
+ 1.000000 0.559725 (ATG) ShowSymbol
+ 0.564960 0.564960 DrawErrorbar
+EndStack
+
+/color_dict <<
+  (AAA) [ 0.0 1.0 0.8 ]
+  (AAC) [ 0.0 1.0 0.8 ]
+  (AAG) [ 0.0 1.0 0.8 ]
+  (AAT) [ 0.0 1.0 0.8 ]
+  (ACA) [ 0.0 1.0 0.8 ]
+  (ACC) [ 0.0 1.0 0.8 ]
+  (ACG) [ 0.0 1.0 0.8 ]
+  (ACT) [ 0.0 1.0 0.8 ]
+  (AGA) [ 0.0 1.0 0.8 ]
+  (AGC) [ 0.0 1.0 0.8 ]
+  (AGG) [ 0.0 1.0 0.8 ]
+  (AGT) [ 0.0 1.0 0.8 ]
+  (ATA) [ 0.0 1.0 0.8 ]
+  (ATC) [ 1.0 0.0 0.0 ]
+  (ATG) [ 0.8 1.0 0.2 ]
+  (ATT) [ 1.0 0.0 0.0 ]
+  (CAA) [ 0.0 1.0 0.8 ]
+  (CAC) [ 0.0 1.0 0.8 ]
+  (CAG) [ 0.0 1.0 0.8 ]
+  (CAT) [ 0.0 1.0 0.8 ]
+  (CCA) [ 0.0 1.0 0.8 ]
+  (CCC) [ 0.0 1.0 0.8 ]
+  (CCG) [ 0.0 1.0 0.8 ]
+  (CCT) [ 0.0 1.0 0.8 ]
+  (CGA) [ 0.0 1.0 0.8 ]
+  (CGC) [ 0.0 1.0 0.8 ]
+  (CGG) [ 0.0 1.0 0.8 ]
+  (CGT) [ 0.0 1.0 0.8 ]
+  (CTA) [ 0.0 1.0 0.8 ]
+  (CTC) [ 0.0 1.0 0.8 ]
+  (CTG) [ 0.0 1.0 0.8 ]
+  (CTT) [ 1.0 0.8 0.0 ]
+  (GAA) [ 0.0 1.0 0.8 ]
+  (GAC) [ 0.0 1.0 0.8 ]
+  (GAG) [ 0.0 1.0 0.8 ]
+  (GAT) [ 0.0 1.0 0.8 ]
+  (GCA) [ 0.0 1.0 0.8 ]
+  (GCC) [ 0.0 1.0 0.8 ]
+  (GCG) [ 0.0 1.0 0.8 ]
+  (GCT) [ 1.0 0.8 0.0 ]
+  (GGA) [ 0.0 1.0 0.8 ]
+  (GGC) [ 0.0 1.0 0.8 ]
+  (GGG) [ 0.0 1.0 0.8 ]
+  (GGT) [ 0.0 1.0 0.8 ]
+  (GTA) [ 0.0 1.0 0.8 ]
+  (GTC) [ 0.0 1.0 0.8 ]
+  (GTG) [ 1.0 0.4 0.0 ]
+  (GTT) [ 0.0 1.0 0.8 ]
+  (TAA) [ 0.0 1.0 0.8 ]
+  (TAC) [ 0.0 1.0 0.8 ]
+  (TAG) [ 0.0 1.0 0.8 ]
+  (TAT) [ 0.0 1.0 0.8 ]
+  (TCA) [ 0.0 1.0 0.8 ]
+  (TCC) [ 0.0 1.0 0.8 ]
+  (TCG) [ 0.0 1.0 0.8 ]
+  (TCT) [ 0.0 1.0 0.8 ]
+  (TGA) [ 0.0 1.0 0.8 ]
+  (TGC) [ 0.0 1.0 0.8 ]
+  (TGG) [ 0.0 1.0 0.8 ]
+  (TGT) [ 0.0 1.0 0.8 ]
+  (TTA) [ 1.0 0.0 0.0 ]
+  (TTC) [ 0.0 1.0 0.8 ]
+  (TTG) [ 0.0 1.0 0.8 ]
+  (TTT) [ 1.0 0.0 0.0 ]
+>> def
+() StartStack
+ 1.000000 0.000000 (TTG) ShowSymbol
+ 1.000000 0.000000 (TTC) ShowSymbol
+ 1.000000 0.000000 (TGT) ShowSymbol
+ 1.000000 0.000000 (TGG) ShowSymbol
+ 1.000000 0.000000 (TGC) ShowSymbol
+ 1.000000 0.000000 (TGA) ShowSymbol
+ 1.000000 0.000000 (TCT) ShowSymbol
+ 1.000000 0.000000 (TCG) ShowSymbol
+ 1.000000 0.000000 (TCC) ShowSymbol
+ 1.000000 0.000000 (TCA) ShowSymbol
+ 1.000000 0.000000 (TAT) ShowSymbol
+ 1.000000 0.000000 (TAG) ShowSymbol
+ 1.000000 0.000000 (TAC) ShowSymbol
+ 1.000000 0.000000 (TAA) ShowSymbol
+ 1.000000 0.000000 (GTT) ShowSymbol
+ 1.000000 0.000000 (GTC) ShowSymbol
+ 1.000000 0.000000 (GTA) ShowSymbol
+ 1.000000 0.000000 (GGT) ShowSymbol
+ 1.000000 0.000000 (GGG) ShowSymbol
+ 1.000000 0.000000 (GGC) ShowSymbol
+ 1.000000 0.000000 (GGA) ShowSymbol
+ 1.000000 0.000000 (GCG) ShowSymbol
+ 1.000000 0.000000 (GCC) ShowSymbol
+ 1.000000 0.000000 (GCA) ShowSymbol
+ 1.000000 0.000000 (GAT) ShowSymbol
+ 1.000000 0.000000 (GAG) ShowSymbol
+ 1.000000 0.000000 (GAC) ShowSymbol
+ 1.000000 0.000000 (GAA) ShowSymbol
+ 1.000000 0.000000 (CTG) ShowSymbol
+ 1.000000 0.000000 (CTC) ShowSymbol
+ 1.000000 0.000000 (CTA) ShowSymbol
+ 1.000000 0.000000 (CGT) ShowSymbol
+ 1.000000 0.000000 (CGG) ShowSymbol
+ 1.000000 0.000000 (CGC) ShowSymbol
+ 1.000000 0.000000 (CGA) ShowSymbol
+ 1.000000 0.000000 (CCT) ShowSymbol
+ 1.000000 0.000000 (CCG) ShowSymbol
+ 1.000000 0.000000 (CCC) ShowSymbol
+ 1.000000 0.000000 (CCA) ShowSymbol
+ 1.000000 0.000000 (CAT) ShowSymbol
+ 1.000000 0.000000 (CAG) ShowSymbol
+ 1.000000 0.000000 (CAC) ShowSymbol
+ 1.000000 0.000000 (CAA) ShowSymbol
+ 1.000000 0.000000 (ATA) ShowSymbol
+ 1.000000 0.000000 (AGT) ShowSymbol
+ 1.000000 0.000000 (AGG) ShowSymbol
+ 1.000000 0.000000 (AGC) ShowSymbol
+ 1.000000 0.000000 (AGA) ShowSymbol
+ 1.000000 0.000000 (ACT) ShowSymbol
+ 1.000000 0.000000 (ACG) ShowSymbol
+ 1.000000 0.000000 (ACC) ShowSymbol
+ 1.000000 0.000000 (ACA) ShowSymbol
+ 1.000000 0.000000 (AAT) ShowSymbol
+ 1.000000 0.000000 (AAG) ShowSymbol
+ 1.000000 0.000000 (AAC) ShowSymbol
+ 1.000000 0.000000 (AAA) ShowSymbol
+ 1.000000 0.120006 (GCT) ShowSymbol
+ 1.000000 0.120006 (CTT) ShowSymbol
+ 1.000000 0.120006 (ATG) ShowSymbol
+ 1.000000 0.240011 (TTA) ShowSymbol
+ 1.000000 0.240011 (GTG) ShowSymbol
+ 1.000000 0.240011 (ATC) ShowSymbol
+ 1.000000 0.480022 (TTT) ShowSymbol
+ 1.000000 0.480022 (ATT) ShowSymbol
+ 0.546500 0.546500 DrawErrorbar
+EndStack
+
+/color_dict <<
+  (AAA) [ 0.0 1.0 0.8 ]
+  (AAC) [ 0.0 1.0 0.8 ]
+  (AAG) [ 0.0 1.0 0.8 ]
+  (AAT) [ 0.0 1.0 0.8 ]
+  (ACA) [ 0.0 1.0 0.8 ]
+  (ACC) [ 0.8 1.0 0.2 ]
+  (ACG) [ 0.0 1.0 0.8 ]
+  (ACT) [ 0.0 1.0 0.8 ]
+  (AGA) [ 0.0 1.0 0.8 ]
+  (AGC) [ 1.0 1.0 0.0 ]
+  (AGG) [ 0.0 1.0 0.8 ]
+  (AGT) [ 0.0 1.0 0.8 ]
+  (ATA) [ 0.0 1.0 0.8 ]
+  (ATC) [ 0.0 1.0 0.8 ]
+  (ATG) [ 0.0 1.0 0.8 ]
+  (ATT) [ 0.0 1.0 0.8 ]
+  (CAA) [ 0.0 1.0 0.8 ]
+  (CAC) [ 0.0 1.0 0.8 ]
+  (CAG) [ 0.0 1.0 0.8 ]
+  (CAT) [ 0.0 1.0 0.8 ]
+  (CCA) [ 0.0 1.0 0.8 ]
+  (CCC) [ 1.0 0.0 0.0 ]
+  (CCG) [ 0.0 1.0 0.8 ]
+  (CCT) [ 0.0 1.0 0.8 ]
+  (CGA) [ 0.0 1.0 0.8 ]
+  (CGC) [ 0.0 1.0 0.8 ]
+  (CGG) [ 0.0 1.0 0.8 ]
+  (CGT) [ 0.0 1.0 0.8 ]
+  (CTA) [ 0.0 1.0 0.8 ]
+  (CTC) [ 0.0 1.0 0.8 ]
+  (CTG) [ 0.0 1.0 0.8 ]
+  (CTT) [ 0.0 1.0 0.8 ]
+  (GAA) [ 0.0 1.0 0.8 ]
+  (GAC) [ 0.0 1.0 0.8 ]
+  (GAG) [ 0.0 1.0 0.8 ]
+  (GAT) [ 0.0 1.0 0.8 ]
+  (GCA) [ 0.0 1.0 0.8 ]
+  (GCC) [ 0.0 1.0 0.8 ]
+  (GCG) [ 0.0 1.0 0.8 ]
+  (GCT) [ 1.0 0.0 0.0 ]
+  (GGA) [ 0.0 1.0 0.8 ]
+  (GGC) [ 0.0 1.0 0.8 ]
+  (GGG) [ 0.0 1.0 0.8 ]
+  (GGT) [ 0.0 1.0 0.8 ]
+  (GTA) [ 0.0 1.0 0.8 ]
+  (GTC) [ 0.0 1.0 0.8 ]
+  (GTG) [ 0.0 1.0 0.8 ]
+  (GTT) [ 0.0 1.0 0.8 ]
+  (TAA) [ 0.0 1.0 0.8 ]
+  (TAC) [ 0.0 1.0 0.8 ]
+  (TAG) [ 0.0 1.0 0.8 ]
+  (TAT) [ 0.0 1.0 0.8 ]
+  (TCA) [ 1.0 0.4 0.0 ]
+  (TCC) [ 1.0 0.0 0.0 ]
+  (TCG) [ 1.0 0.4 0.0 ]
+  (TCT) [ 1.0 0.0 0.0 ]
+  (TGA) [ 0.0 1.0 0.8 ]
+  (TGC) [ 0.0 1.0 0.8 ]
+  (TGG) [ 0.0 1.0 0.8 ]
+  (TGT) [ 0.0 1.0 0.8 ]
+  (TTA) [ 0.0 1.0 0.8 ]
+  (TTC) [ 0.0 1.0 0.8 ]
+  (TTG) [ 0.0 1.0 0.8 ]
+  (TTT) [ 0.0 1.0 0.8 ]
+>> def
+() StartStack
+ 1.000000 0.000000 (TTT) ShowSymbol
+ 1.000000 0.000000 (TTG) ShowSymbol
+ 1.000000 0.000000 (TTC) ShowSymbol
+ 1.000000 0.000000 (TTA) ShowSymbol
+ 1.000000 0.000000 (TGT) ShowSymbol
+ 1.000000 0.000000 (TGG) ShowSymbol
+ 1.000000 0.000000 (TGC) ShowSymbol
+ 1.000000 0.000000 (TGA) ShowSymbol
+ 1.000000 0.000000 (TAT) ShowSymbol
+ 1.000000 0.000000 (TAG) ShowSymbol
+ 1.000000 0.000000 (TAC) ShowSymbol
+ 1.000000 0.000000 (TAA) ShowSymbol
+ 1.000000 0.000000 (GTT) ShowSymbol
+ 1.000000 0.000000 (GTG) ShowSymbol
+ 1.000000 0.000000 (GTC) ShowSymbol
+ 1.000000 0.000000 (GTA) ShowSymbol
+ 1.000000 0.000000 (GGT) ShowSymbol
+ 1.000000 0.000000 (GGG) ShowSymbol
+ 1.000000 0.000000 (GGC) ShowSymbol
+ 1.000000 0.000000 (GGA) ShowSymbol
+ 1.000000 0.000000 (GCG) ShowSymbol
+ 1.000000 0.000000 (GCC) ShowSymbol
+ 1.000000 0.000000 (GCA) ShowSymbol
+ 1.000000 0.000000 (GAT) ShowSymbol
+ 1.000000 0.000000 (GAG) ShowSymbol
+ 1.000000 0.000000 (GAC) ShowSymbol
+ 1.000000 0.000000 (GAA) ShowSymbol
+ 1.000000 0.000000 (CTT) ShowSymbol
+ 1.000000 0.000000 (CTG) ShowSymbol
+ 1.000000 0.000000 (CTC) ShowSymbol
+ 1.000000 0.000000 (CTA) ShowSymbol
+ 1.000000 0.000000 (CGT) ShowSymbol
+ 1.000000 0.000000 (CGG) ShowSymbol
+ 1.000000 0.000000 (CGC) ShowSymbol
+ 1.000000 0.000000 (CGA) ShowSymbol
+ 1.000000 0.000000 (CCT) ShowSymbol
+ 1.000000 0.000000 (CCG) ShowSymbol
+ 1.000000 0.000000 (CCA) ShowSymbol
+ 1.000000 0.000000 (CAT) ShowSymbol
+ 1.000000 0.000000 (CAG) ShowSymbol
+ 1.000000 0.000000 (CAC) ShowSymbol
+ 1.000000 0.000000 (CAA) ShowSymbol
+ 1.000000 0.000000 (ATT) ShowSymbol
+ 1.000000 0.000000 (ATG) ShowSymbol
+ 1.000000 0.000000 (ATC) ShowSymbol
+ 1.000000 0.000000 (ATA) ShowSymbol
+ 1.000000 0.000000 (AGT) ShowSymbol
+ 1.000000 0.000000 (AGG) ShowSymbol
+ 1.000000 0.000000 (AGA) ShowSymbol
+ 1.000000 0.000000 (ACT) ShowSymbol
+ 1.000000 0.000000 (ACG) ShowSymbol
+ 1.000000 0.000000 (ACA) ShowSymbol
+ 1.000000 0.000000 (AAT) ShowSymbol
+ 1.000000 0.000000 (AAG) ShowSymbol
+ 1.000000 0.000000 (AAC) ShowSymbol
+ 1.000000 0.000000 (AAA) ShowSymbol
+ 1.000000 0.175130 (TCG) ShowSymbol
+ 1.000000 0.175130 (TCA) ShowSymbol
+ 1.000000 0.175130 (CCC) ShowSymbol
+ 1.000000 0.175130 (AGC) ShowSymbol
+ 1.000000 0.175130 (ACC) ShowSymbol
+ 1.000000 0.525391 (TCT) ShowSymbol
+ 1.000000 0.525391 (GCT) ShowSymbol
+ 1.000000 1.225912 (TCC) ShowSymbol
+ 0.666507 0.666507 DrawErrorbar
+EndStack
+
+/color_dict <<
+  (AAA) [ 0.0 1.0 0.8 ]
+  (AAC) [ 0.0 1.0 0.8 ]
+  (AAG) [ 0.0 1.0 0.8 ]
+  (AAT) [ 0.0 1.0 0.8 ]
+  (ACA) [ 0.0 1.0 0.8 ]
+  (ACC) [ 0.0 1.0 0.8 ]
+  (ACG) [ 0.0 1.0 0.8 ]
+  (ACT) [ 0.0 1.0 0.8 ]
+  (AGA) [ 0.0 1.0 0.8 ]
+  (AGC) [ 0.0 1.0 0.8 ]
+  (AGG) [ 0.0 1.0 0.8 ]
+  (AGT) [ 0.0 1.0 0.8 ]
+  (ATA) [ 0.0 1.0 0.8 ]
+  (ATC) [ 0.0 1.0 0.8 ]
+  (ATG) [ 0.0 1.0 0.8 ]
+  (ATT) [ 0.0 1.0 0.8 ]
+  (CAA) [ 0.0 1.0 0.8 ]
+  (CAC) [ 0.0 1.0 0.8 ]
+  (CAG) [ 0.0 1.0 0.8 ]
+  (CAT) [ 0.0 1.0 0.8 ]
+  (CCA) [ 0.0 1.0 0.8 ]
+  (CCC) [ 0.0 1.0 0.8 ]
+  (CCG) [ 0.0 1.0 0.8 ]
+  (CCT) [ 0.0 1.0 0.8 ]
+  (CGA) [ 0.0 1.0 0.8 ]
+  (CGC) [ 0.0 1.0 0.8 ]
+  (CGG) [ 0.0 1.0 0.8 ]
+  (CGT) [ 0.0 1.0 0.8 ]
+  (CTA) [ 0.0 1.0 0.8 ]
+  (CTC) [ 0.0 1.0 0.8 ]
+  (CTG) [ 0.0 1.0 0.8 ]
+  (CTT) [ 0.0 1.0 0.8 ]
+  (GAA) [ 0.0 1.0 0.8 ]
+  (GAC) [ 0.0 1.0 0.8 ]
+  (GAG) [ 0.0 1.0 0.8 ]
+  (GAT) [ 0.0 1.0 0.8 ]
+  (GCA) [ 0.0 1.0 0.8 ]
+  (GCC) [ 0.0 1.0 0.8 ]
+  (GCG) [ 0.0 1.0 0.8 ]
+  (GCT) [ 0.0 1.0 0.8 ]
+  (GGA) [ 0.0 1.0 0.8 ]
+  (GGC) [ 1.0 0.4 0.0 ]
+  (GGG) [ 0.0 1.0 0.8 ]
+  (GGT) [ 0.0 1.0 0.8 ]
+  (GTA) [ 0.0 1.0 0.8 ]
+  (GTC) [ 0.0 1.0 0.8 ]
+  (GTG) [ 0.0 1.0 0.8 ]
+  (GTT) [ 0.0 1.0 0.8 ]
+  (TAA) [ 0.0 1.0 0.8 ]
+  (TAC) [ 0.0 1.0 0.8 ]
+  (TAG) [ 0.0 1.0 0.8 ]
+  (TAT) [ 0.0 1.0 0.8 ]
+  (TCA) [ 0.0 1.0 0.8 ]
+  (TCC) [ 0.0 1.0 0.8 ]
+  (TCG) [ 0.0 1.0 0.8 ]
+  (TCT) [ 0.0 1.0 0.8 ]
+  (TGA) [ 0.0 1.0 0.8 ]
+  (TGC) [ 0.0 1.0 0.8 ]
+  (TGG) [ 0.0 1.0 0.8 ]
+  (TGT) [ 0.0 1.0 0.8 ]
+  (TTA) [ 0.0 1.0 0.8 ]
+  (TTC) [ 0.0 1.0 0.8 ]
+  (TTG) [ 0.0 1.0 0.8 ]
+  (TTT) [ 0.0 1.0 0.8 ]
+>> def
+(25) StartStack
+ 1.000000 0.000000 (TTT) ShowSymbol
+ 1.000000 0.000000 (TTG) ShowSymbol
+ 1.000000 0.000000 (TTC) ShowSymbol
+ 1.000000 0.000000 (TTA) ShowSymbol
+ 1.000000 0.000000 (TGT) ShowSymbol
+ 1.000000 0.000000 (TGG) ShowSymbol
+ 1.000000 0.000000 (TGC) ShowSymbol
+ 1.000000 0.000000 (TGA) ShowSymbol
+ 1.000000 0.000000 (TCT) ShowSymbol
+ 1.000000 0.000000 (TCG) ShowSymbol
+ 1.000000 0.000000 (TCC) ShowSymbol
+ 1.000000 0.000000 (TCA) ShowSymbol
+ 1.000000 0.000000 (TAT) ShowSymbol
+ 1.000000 0.000000 (TAG) ShowSymbol
+ 1.000000 0.000000 (TAC) ShowSymbol
+ 1.000000 0.000000 (TAA) ShowSymbol
+ 1.000000 0.000000 (GTT) ShowSymbol
+ 1.000000 0.000000 (GTG) ShowSymbol
+ 1.000000 0.000000 (GTC) ShowSymbol
+ 1.000000 0.000000 (GTA) ShowSymbol
+ 1.000000 0.000000 (GGT) ShowSymbol
+ 1.000000 0.000000 (GGG) ShowSymbol
+ 1.000000 0.000000 (GGA) ShowSymbol
+ 1.000000 0.000000 (GCT) ShowSymbol
+ 1.000000 0.000000 (GCG) ShowSymbol
+ 1.000000 0.000000 (GCC) ShowSymbol
+ 1.000000 0.000000 (GCA) ShowSymbol
+ 1.000000 0.000000 (GAT) ShowSymbol
+ 1.000000 0.000000 (GAG) ShowSymbol
+ 1.000000 0.000000 (GAC) ShowSymbol
+ 1.000000 0.000000 (GAA) ShowSymbol
+ 1.000000 0.000000 (CTT) ShowSymbol
+ 1.000000 0.000000 (CTG) ShowSymbol
+ 1.000000 0.000000 (CTC) ShowSymbol
+ 1.000000 0.000000 (CTA) ShowSymbol
+ 1.000000 0.000000 (CGT) ShowSymbol
+ 1.000000 0.000000 (CGG) ShowSymbol
+ 1.000000 0.000000 (CGC) ShowSymbol
+ 1.000000 0.000000 (CGA) ShowSymbol
+ 1.000000 0.000000 (CCT) ShowSymbol
+ 1.000000 0.000000 (CCG) ShowSymbol
+ 1.000000 0.000000 (CCC) ShowSymbol
+ 1.000000 0.000000 (CCA) ShowSymbol
+ 1.000000 0.000000 (CAT) ShowSymbol
+ 1.000000 0.000000 (CAG) ShowSymbol
+ 1.000000 0.000000 (CAC) ShowSymbol
+ 1.000000 0.000000 (CAA) ShowSymbol
+ 1.000000 0.000000 (ATT) ShowSymbol
+ 1.000000 0.000000 (ATG) ShowSymbol
+ 1.000000 0.000000 (ATC) ShowSymbol
+ 1.000000 0.000000 (ATA) ShowSymbol
+ 1.000000 0.000000 (AGT) ShowSymbol
+ 1.000000 0.000000 (AGG) ShowSymbol
+ 1.000000 0.000000 (AGC) ShowSymbol
+ 1.000000 0.000000 (AGA) ShowSymbol
+ 1.000000 0.000000 (ACT) ShowSymbol
+ 1.000000 0.000000 (ACG) ShowSymbol
+ 1.000000 0.000000 (ACC) ShowSymbol
+ 1.000000 0.000000 (ACA) ShowSymbol
+ 1.000000 0.000000 (AAT) ShowSymbol
+ 1.000000 0.000000 (AAG) ShowSymbol
+ 1.000000 0.000000 (AAC) ShowSymbol
+ 1.000000 0.000000 (AAA) ShowSymbol
+ 1.000000 2.045530 (GGC) ShowSymbol
+ 0.848854 0.848854 DrawErrorbar
+EndStack
+
+/color_dict <<
+  (AAA) [ 0.0 1.0 0.8 ]
+  (AAC) [ 0.0 1.0 0.8 ]
+  (AAG) [ 0.0 1.0 0.8 ]
+  (AAT) [ 0.0 1.0 0.8 ]
+  (ACA) [ 0.0 1.0 0.8 ]
+  (ACC) [ 0.0 1.0 0.8 ]
+  (ACG) [ 0.0 1.0 0.8 ]
+  (ACT) [ 0.0 1.0 0.8 ]
+  (AGA) [ 0.0 1.0 0.8 ]
+  (AGC) [ 0.0 1.0 0.8 ]
+  (AGG) [ 0.0 1.0 0.8 ]
+  (AGT) [ 0.0 1.0 0.8 ]
+  (ATA) [ 0.0 1.0 0.8 ]
+  (ATC) [ 0.0 1.0 0.8 ]
+  (ATG) [ 0.0 1.0 0.8 ]
+  (ATT) [ 0.0 1.0 0.8 ]
+  (CAA) [ 0.0 1.0 0.8 ]
+  (CAC) [ 0.0 1.0 0.8 ]
+  (CAG) [ 0.0 1.0 0.8 ]
+  (CAT) [ 0.0 1.0 0.8 ]
+  (CCA) [ 0.0 1.0 0.8 ]
+  (CCC) [ 0.0 1.0 0.8 ]
+  (CCG) [ 0.0 1.0 0.8 ]
+  (CCT) [ 0.0 1.0 0.8 ]
+  (CGA) [ 0.0 1.0 0.8 ]
+  (CGC) [ 0.0 1.0 0.8 ]
+  (CGG) [ 0.0 1.0 0.8 ]
+  (CGT) [ 0.0 1.0 0.8 ]
+  (CTA) [ 0.0 1.0 0.8 ]
+  (CTC) [ 0.0 1.0 0.8 ]
+  (CTG) [ 0.0 1.0 0.8 ]
+  (CTT) [ 0.0 1.0 0.8 ]
+  (GAA) [ 0.0 1.0 0.8 ]
+  (GAC) [ 0.0 1.0 0.8 ]
+  (GAG) [ 0.0 1.0 0.8 ]
+  (GAT) [ 0.0 1.0 0.8 ]
+  (GCA) [ 0.0 1.0 0.8 ]
+  (GCC) [ 0.0 1.0 0.8 ]
+  (GCG) [ 0.0 1.0 0.8 ]
+  (GCT) [ 0.0 1.0 0.8 ]
+  (GGA) [ 0.0 1.0 0.8 ]
+  (GGC) [ 0.0 1.0 0.8 ]
+  (GGG) [ 0.0 1.0 0.8 ]
+  (GGT) [ 0.0 1.0 0.8 ]
+  (GTA) [ 0.0 1.0 0.8 ]
+  (GTC) [ 0.0 1.0 0.8 ]
+  (GTG) [ 1.0 0.4 0.0 ]
+  (GTT) [ 0.0 1.0 0.8 ]
+  (TAA) [ 0.0 1.0 0.8 ]
+  (TAC) [ 0.0 1.0 0.8 ]
+  (TAG) [ 0.0 1.0 0.8 ]
+  (TAT) [ 0.0 1.0 0.8 ]
+  (TCA) [ 0.0 1.0 0.8 ]
+  (TCC) [ 0.0 1.0 0.8 ]
+  (TCG) [ 0.0 1.0 0.8 ]
+  (TCT) [ 0.0 1.0 0.8 ]
+  (TGA) [ 0.0 1.0 0.8 ]
+  (TGC) [ 0.0 1.0 0.8 ]
+  (TGG) [ 0.0 1.0 0.8 ]
+  (TGT) [ 0.0 1.0 0.8 ]
+  (TTA) [ 0.0 1.0 0.8 ]
+  (TTC) [ 0.0 1.0 0.8 ]
+  (TTG) [ 0.0 1.0 0.8 ]
+  (TTT) [ 0.0 1.0 0.8 ]
+>> def
+() StartStack
+ 1.000000 0.000000 (TTT) ShowSymbol
+ 1.000000 0.000000 (TTG) ShowSymbol
+ 1.000000 0.000000 (TTC) ShowSymbol
+ 1.000000 0.000000 (TTA) ShowSymbol
+ 1.000000 0.000000 (TGT) ShowSymbol
+ 1.000000 0.000000 (TGG) ShowSymbol
+ 1.000000 0.000000 (TGC) ShowSymbol
+ 1.000000 0.000000 (TGA) ShowSymbol
+ 1.000000 0.000000 (TCT) ShowSymbol
+ 1.000000 0.000000 (TCG) ShowSymbol
+ 1.000000 0.000000 (TCC) ShowSymbol
+ 1.000000 0.000000 (TCA) ShowSymbol
+ 1.000000 0.000000 (TAT) ShowSymbol
+ 1.000000 0.000000 (TAG) ShowSymbol
+ 1.000000 0.000000 (TAC) ShowSymbol
+ 1.000000 0.000000 (TAA) ShowSymbol
+ 1.000000 0.000000 (GTT) ShowSymbol
+ 1.000000 0.000000 (GTC) ShowSymbol
+ 1.000000 0.000000 (GTA) ShowSymbol
+ 1.000000 0.000000 (GGT) ShowSymbol
+ 1.000000 0.000000 (GGG) ShowSymbol
+ 1.000000 0.000000 (GGC) ShowSymbol
+ 1.000000 0.000000 (GGA) ShowSymbol
+ 1.000000 0.000000 (GCT) ShowSymbol
+ 1.000000 0.000000 (GCG) ShowSymbol
+ 1.000000 0.000000 (GCC) ShowSymbol
+ 1.000000 0.000000 (GCA) ShowSymbol
+ 1.000000 0.000000 (GAT) ShowSymbol
+ 1.000000 0.000000 (GAG) ShowSymbol
+ 1.000000 0.000000 (GAC) ShowSymbol
+ 1.000000 0.000000 (GAA) ShowSymbol
+ 1.000000 0.000000 (CTT) ShowSymbol
+ 1.000000 0.000000 (CTG) ShowSymbol
+ 1.000000 0.000000 (CTC) ShowSymbol
+ 1.000000 0.000000 (CTA) ShowSymbol
+ 1.000000 0.000000 (CGT) ShowSymbol
+ 1.000000 0.000000 (CGG) ShowSymbol
+ 1.000000 0.000000 (CGC) ShowSymbol
+ 1.000000 0.000000 (CGA) ShowSymbol
+ 1.000000 0.000000 (CCT) ShowSymbol
+ 1.000000 0.000000 (CCG) ShowSymbol
+ 1.000000 0.000000 (CCC) ShowSymbol
+ 1.000000 0.000000 (CCA) ShowSymbol
+ 1.000000 0.000000 (CAT) ShowSymbol
+ 1.000000 0.000000 (CAG) ShowSymbol
+ 1.000000 0.000000 (CAC) ShowSymbol
+ 1.000000 0.000000 (CAA) ShowSymbol
+ 1.000000 0.000000 (ATT) ShowSymbol
+ 1.000000 0.000000 (ATG) ShowSymbol
+ 1.000000 0.000000 (ATC) ShowSymbol
+ 1.000000 0.000000 (ATA) ShowSymbol
+ 1.000000 0.000000 (AGT) ShowSymbol
+ 1.000000 0.000000 (AGG) ShowSymbol
+ 1.000000 0.000000 (AGC) ShowSymbol
+ 1.000000 0.000000 (AGA) ShowSymbol
+ 1.000000 0.000000 (ACT) ShowSymbol
+ 1.000000 0.000000 (ACG) ShowSymbol
+ 1.000000 0.000000 (ACC) ShowSymbol
+ 1.000000 0.000000 (ACA) ShowSymbol
+ 1.000000 0.000000 (AAT) ShowSymbol
+ 1.000000 0.000000 (AAG) ShowSymbol
+ 1.000000 0.000000 (AAC) ShowSymbol
+ 1.000000 0.000000 (AAA) ShowSymbol
+ 1.000000 2.072496 (GTG) ShowSymbol
+ 0.835906 0.835906 DrawErrorbar
+EndStack
+
+/color_dict <<
+  (AAA) [ 0.0 1.0 0.8 ]
+  (AAC) [ 0.0 1.0 0.8 ]
+  (AAG) [ 0.0 1.0 0.8 ]
+  (AAT) [ 0.0 1.0 0.8 ]
+  (ACA) [ 0.0 1.0 0.8 ]
+  (ACC) [ 1.0 1.0 0.0 ]
+  (ACG) [ 0.0 1.0 0.8 ]
+  (ACT) [ 1.0 0.4 0.0 ]
+  (AGA) [ 0.0 1.0 0.8 ]
+  (AGC) [ 0.0 1.0 0.8 ]
+  (AGG) [ 0.0 1.0 0.8 ]
+  (AGT) [ 0.0 1.0 0.8 ]
+  (ATA) [ 0.0 1.0 0.8 ]
+  (ATC) [ 0.0 1.0 0.8 ]
+  (ATG) [ 0.0 1.0 0.8 ]
+  (ATT) [ 0.8 1.0 0.2 ]
+  (CAA) [ 1.0 0.8 0.0 ]
+  (CAC) [ 0.0 1.0 0.8 ]
+  (CAG) [ 0.0 1.0 0.8 ]
+  (CAT) [ 0.0 1.0 0.8 ]
+  (CCA) [ 0.0 1.0 0.8 ]
+  (CCC) [ 0.0 1.0 0.8 ]
+  (CCG) [ 0.0 1.0 0.8 ]
+  (CCT) [ 0.0 1.0 0.8 ]
+  (CGA) [ 0.0 1.0 0.8 ]
+  (CGC) [ 0.0 1.0 0.8 ]
+  (CGG) [ 0.0 1.0 0.8 ]
+  (CGT) [ 0.0 1.0 0.8 ]
+  (CTA) [ 0.0 1.0 0.8 ]
+  (CTC) [ 1.0 0.8 0.0 ]
+  (CTG) [ 0.0 1.0 0.8 ]
+  (CTT) [ 0.0 1.0 0.8 ]
+  (GAA) [ 0.0 1.0 0.8 ]
+  (GAC) [ 0.0 1.0 0.8 ]
+  (GAG) [ 0.0 1.0 0.8 ]
+  (GAT) [ 0.0 1.0 0.8 ]
+  (GCA) [ 1.0 0.0 0.0 ]
+  (GCC) [ 1.0 0.0 0.0 ]
+  (GCG) [ 0.0 1.0 0.8 ]
+  (GCT) [ 1.0 0.8 0.0 ]
+  (GGA) [ 0.0 1.0 0.8 ]
+  (GGC) [ 0.0 1.0 0.8 ]
+  (GGG) [ 0.0 1.0 0.8 ]
+  (GGT) [ 0.0 1.0 0.8 ]
+  (GTA) [ 0.0 1.0 0.8 ]
+  (GTC) [ 0.0 1.0 0.8 ]
+  (GTG) [ 0.0 1.0 0.8 ]
+  (GTT) [ 1.0 1.0 0.0 ]
+  (TAA) [ 0.0 1.0 0.8 ]
+  (TAC) [ 0.0 1.0 0.8 ]
+  (TAG) [ 0.0 1.0 0.8 ]
+  (TAT) [ 0.0 1.0 0.8 ]
+  (TCA) [ 0.0 1.0 0.8 ]
+  (TCC) [ 0.0 1.0 0.8 ]
+  (TCG) [ 0.0 1.0 0.8 ]
+  (TCT) [ 1.0 0.0 0.0 ]
+  (TGA) [ 0.0 1.0 0.8 ]
+  (TGC) [ 1.0 0.4 0.0 ]
+  (TGG) [ 0.0 1.0 0.8 ]
+  (TGT) [ 0.0 1.0 0.8 ]
+  (TTA) [ 0.0 1.0 0.8 ]
+  (TTC) [ 0.0 1.0 0.8 ]
+  (TTG) [ 0.0 1.0 0.8 ]
+  (TTT) [ 0.0 1.0 0.8 ]
+>> def
+() StartStack
+ 1.000000 0.000000 (TTT) ShowSymbol
+ 1.000000 0.000000 (TTG) ShowSymbol
+ 1.000000 0.000000 (TTC) ShowSymbol
+ 1.000000 0.000000 (TTA) ShowSymbol
+ 1.000000 0.000000 (TGT) ShowSymbol
+ 1.000000 0.000000 (TGG) ShowSymbol
+ 1.000000 0.000000 (TGA) ShowSymbol
+ 1.000000 0.000000 (TCG) ShowSymbol
+ 1.000000 0.000000 (TCC) ShowSymbol
+ 1.000000 0.000000 (TCA) ShowSymbol
+ 1.000000 0.000000 (TAT) ShowSymbol
+ 1.000000 0.000000 (TAG) ShowSymbol
+ 1.000000 0.000000 (TAC) ShowSymbol
+ 1.000000 0.000000 (TAA) ShowSymbol
+ 1.000000 0.000000 (GTG) ShowSymbol
+ 1.000000 0.000000 (GTC) ShowSymbol
+ 1.000000 0.000000 (GTA) ShowSymbol
+ 1.000000 0.000000 (GGT) ShowSymbol
+ 1.000000 0.000000 (GGG) ShowSymbol
+ 1.000000 0.000000 (GGC) ShowSymbol
+ 1.000000 0.000000 (GGA) ShowSymbol
+ 1.000000 0.000000 (GCG) ShowSymbol
+ 1.000000 0.000000 (GAT) ShowSymbol
+ 1.000000 0.000000 (GAG) ShowSymbol
+ 1.000000 0.000000 (GAC) ShowSymbol
+ 1.000000 0.000000 (GAA) ShowSymbol
+ 1.000000 0.000000 (CTT) ShowSymbol
+ 1.000000 0.000000 (CTG) ShowSymbol
+ 1.000000 0.000000 (CTA) ShowSymbol
+ 1.000000 0.000000 (CGT) ShowSymbol
+ 1.000000 0.000000 (CGG) ShowSymbol
+ 1.000000 0.000000 (CGC) ShowSymbol
+ 1.000000 0.000000 (CGA) ShowSymbol
+ 1.000000 0.000000 (CCT) ShowSymbol
+ 1.000000 0.000000 (CCG) ShowSymbol
+ 1.000000 0.000000 (CCC) ShowSymbol
+ 1.000000 0.000000 (CCA) ShowSymbol
+ 1.000000 0.000000 (CAT) ShowSymbol
+ 1.000000 0.000000 (CAG) ShowSymbol
+ 1.000000 0.000000 (CAC) ShowSymbol
+ 1.000000 0.000000 (ATG) ShowSymbol
+ 1.000000 0.000000 (ATC) ShowSymbol
+ 1.000000 0.000000 (ATA) ShowSymbol
+ 1.000000 0.000000 (AGT) ShowSymbol
+ 1.000000 0.000000 (AGG) ShowSymbol
+ 1.000000 0.000000 (AGC) ShowSymbol
+ 1.000000 0.000000 (AGA) ShowSymbol
+ 1.000000 0.000000 (ACG) ShowSymbol
+ 1.000000 0.000000 (ACA) ShowSymbol
+ 1.000000 0.000000 (AAT) ShowSymbol
+ 1.000000 0.000000 (AAG) ShowSymbol
+ 1.000000 0.000000 (AAC) ShowSymbol
+ 1.000000 0.000000 (AAA) ShowSymbol
+ 1.000000 0.125832 (TGC) ShowSymbol
+ 1.000000 0.125832 (TCT) ShowSymbol
+ 1.000000 0.125832 (GTT) ShowSymbol
+ 1.000000 0.125832 (GCT) ShowSymbol
+ 1.000000 0.125832 (CTC) ShowSymbol
+ 1.000000 0.125832 (CAA) ShowSymbol
+ 1.000000 0.125832 (ATT) ShowSymbol
+ 1.000000 0.125832 (ACT) ShowSymbol
+ 1.000000 0.125832 (ACC) ShowSymbol
+ 1.000000 0.251663 (GCA) ShowSymbol
+ 1.000000 0.629159 (GCC) ShowSymbol
+ 0.608803 0.608803 DrawErrorbar
+EndStack
+
+/color_dict <<
+  (AAA) [ 0.0 1.0 0.8 ]
+  (AAC) [ 0.8 1.0 0.2 ]
+  (AAG) [ 0.0 1.0 0.8 ]
+  (AAT) [ 0.0 1.0 0.8 ]
+  (ACA) [ 0.0 1.0 0.8 ]
+  (ACC) [ 0.0 1.0 0.8 ]
+  (ACG) [ 0.0 1.0 0.8 ]
+  (ACT) [ 0.0 1.0 0.8 ]
+  (AGA) [ 0.0 1.0 0.8 ]
+  (AGC) [ 1.0 1.0 0.0 ]
+  (AGG) [ 0.0 1.0 0.8 ]
+  (AGT) [ 0.0 1.0 0.8 ]
+  (ATA) [ 0.0 1.0 0.8 ]
+  (ATC) [ 0.0 1.0 0.8 ]
+  (ATG) [ 0.0 1.0 0.8 ]
+  (ATT) [ 0.0 1.0 0.8 ]
+  (CAA) [ 0.0 1.0 0.8 ]
+  (CAC) [ 0.0 1.0 0.8 ]
+  (CAG) [ 0.0 1.0 0.8 ]
+  (CAT) [ 0.0 1.0 0.8 ]
+  (CCA) [ 0.0 1.0 0.8 ]
+  (CCC) [ 0.0 1.0 0.8 ]
+  (CCG) [ 1.0 0.0 0.0 ]
+  (CCT) [ 0.0 1.0 0.8 ]
+  (CGA) [ 0.0 1.0 0.8 ]
+  (CGC) [ 0.8 1.0 0.2 ]
+  (CGG) [ 0.0 1.0 0.8 ]
+  (CGT) [ 0.0 1.0 0.8 ]
+  (CTA) [ 0.0 1.0 0.8 ]
+  (CTC) [ 0.0 1.0 0.8 ]
+  (CTG) [ 0.0 1.0 0.8 ]
+  (CTT) [ 0.0 1.0 0.8 ]
+  (GAA) [ 0.0 1.0 0.8 ]
+  (GAC) [ 0.0 1.0 0.8 ]
+  (GAG) [ 0.0 1.0 0.8 ]
+  (GAT) [ 0.0 1.0 0.8 ]
+  (GCA) [ 0.0 1.0 0.8 ]
+  (GCC) [ 0.0 1.0 0.8 ]
+  (GCG) [ 0.0 1.0 0.8 ]
+  (GCT) [ 1.0 0.8 0.0 ]
+  (GGA) [ 0.0 1.0 0.8 ]
+  (GGC) [ 0.0 1.0 0.8 ]
+  (GGG) [ 0.0 1.0 0.8 ]
+  (GGT) [ 1.0 1.0 0.0 ]
+  (GTA) [ 0.0 1.0 0.8 ]
+  (GTC) [ 0.0 1.0 0.8 ]
+  (GTG) [ 0.0 1.0 0.8 ]
+  (GTT) [ 0.0 1.0 0.8 ]
+  (TAA) [ 0.0 1.0 0.8 ]
+  (TAC) [ 0.0 1.0 0.8 ]
+  (TAG) [ 0.0 1.0 0.8 ]
+  (TAT) [ 0.0 1.0 0.8 ]
+  (TCA) [ 0.0 1.0 0.8 ]
+  (TCC) [ 1.0 0.0 0.0 ]
+  (TCG) [ 1.0 0.0 0.0 ]
+  (TCT) [ 1.0 0.0 0.0 ]
+  (TGA) [ 0.0 1.0 0.8 ]
+  (TGC) [ 0.0 1.0 0.8 ]
+  (TGG) [ 0.0 1.0 0.8 ]
+  (TGT) [ 0.0 1.0 0.8 ]
+  (TTA) [ 0.0 1.0 0.8 ]
+  (TTC) [ 0.0 1.0 0.8 ]
+  (TTG) [ 0.0 1.0 0.8 ]
+  (TTT) [ 0.0 1.0 0.8 ]
+>> def
+() StartStack
+ 1.000000 0.000000 (TTT) ShowSymbol
+ 1.000000 0.000000 (TTG) ShowSymbol
+ 1.000000 0.000000 (TTC) ShowSymbol
+ 1.000000 0.000000 (TTA) ShowSymbol
+ 1.000000 0.000000 (TGT) ShowSymbol
+ 1.000000 0.000000 (TGG) ShowSymbol
+ 1.000000 0.000000 (TGC) ShowSymbol
+ 1.000000 0.000000 (TGA) ShowSymbol
+ 1.000000 0.000000 (TCA) ShowSymbol
+ 1.000000 0.000000 (TAT) ShowSymbol
+ 1.000000 0.000000 (TAG) ShowSymbol
+ 1.000000 0.000000 (TAC) ShowSymbol
+ 1.000000 0.000000 (TAA) ShowSymbol
+ 1.000000 0.000000 (GTT) ShowSymbol
+ 1.000000 0.000000 (GTG) ShowSymbol
+ 1.000000 0.000000 (GTC) ShowSymbol
+ 1.000000 0.000000 (GTA) ShowSymbol
+ 1.000000 0.000000 (GGG) ShowSymbol
+ 1.000000 0.000000 (GGC) ShowSymbol
+ 1.000000 0.000000 (GGA) ShowSymbol
+ 1.000000 0.000000 (GCG) ShowSymbol
+ 1.000000 0.000000 (GCC) ShowSymbol
+ 1.000000 0.000000 (GCA) ShowSymbol
+ 1.000000 0.000000 (GAT) ShowSymbol
+ 1.000000 0.000000 (GAG) ShowSymbol
+ 1.000000 0.000000 (GAC) ShowSymbol
+ 1.000000 0.000000 (GAA) ShowSymbol
+ 1.000000 0.000000 (CTT) ShowSymbol
+ 1.000000 0.000000 (CTG) ShowSymbol
+ 1.000000 0.000000 (CTC) ShowSymbol
+ 1.000000 0.000000 (CTA) ShowSymbol
+ 1.000000 0.000000 (CGT) ShowSymbol
+ 1.000000 0.000000 (CGG) ShowSymbol
+ 1.000000 0.000000 (CGA) ShowSymbol
+ 1.000000 0.000000 (CCT) ShowSymbol
+ 1.000000 0.000000 (CCC) ShowSymbol
+ 1.000000 0.000000 (CCA) ShowSymbol
+ 1.000000 0.000000 (CAT) ShowSymbol
+ 1.000000 0.000000 (CAG) ShowSymbol
+ 1.000000 0.000000 (CAC) ShowSymbol
+ 1.000000 0.000000 (CAA) ShowSymbol
+ 1.000000 0.000000 (ATT) ShowSymbol
+ 1.000000 0.000000 (ATG) ShowSymbol
+ 1.000000 0.000000 (ATC) ShowSymbol
+ 1.000000 0.000000 (ATA) ShowSymbol
+ 1.000000 0.000000 (AGT) ShowSymbol
+ 1.000000 0.000000 (AGG) ShowSymbol
+ 1.000000 0.000000 (AGA) ShowSymbol
+ 1.000000 0.000000 (ACT) ShowSymbol
+ 1.000000 0.000000 (ACG) ShowSymbol
+ 1.000000 0.000000 (ACC) ShowSymbol
+ 1.000000 0.000000 (ACA) ShowSymbol
+ 1.000000 0.000000 (AAT) ShowSymbol
+ 1.000000 0.000000 (AAG) ShowSymbol
+ 1.000000 0.000000 (AAA) ShowSymbol
+ 1.000000 0.149537 (TCC) ShowSymbol
+ 1.000000 0.149537 (GGT) ShowSymbol
+ 1.000000 0.149537 (GCT) ShowSymbol
+ 1.000000 0.149537 (CGC) ShowSymbol
+ 1.000000 0.149537 (AGC) ShowSymbol
+ 1.000000 0.149537 (AAC) ShowSymbol
+ 1.000000 0.448612 (TCT) ShowSymbol
+ 1.000000 0.448612 (TCG) ShowSymbol
+ 1.000000 0.598149 (CCG) ShowSymbol
+ 0.624566 0.624566 DrawErrorbar
+EndStack
+
+/color_dict <<
+  (AAA) [ 0.8 1.0 0.2 ]
+  (AAC) [ 0.0 1.0 0.8 ]
+  (AAG) [ 0.0 1.0 0.8 ]
+  (AAT) [ 0.0 1.0 0.8 ]
+  (ACA) [ 0.0 1.0 0.8 ]
+  (ACC) [ 0.0 1.0 0.8 ]
+  (ACG) [ 0.0 1.0 0.8 ]
+  (ACT) [ 0.0 1.0 0.8 ]
+  (AGA) [ 0.0 1.0 0.8 ]
+  (AGC) [ 0.0 1.0 0.8 ]
+  (AGG) [ 0.0 1.0 0.8 ]
+  (AGT) [ 0.0 1.0 0.8 ]
+  (ATA) [ 0.0 1.0 0.8 ]
+  (ATC) [ 1.0 1.0 0.0 ]
+  (ATG) [ 0.0 1.0 0.8 ]
+  (ATT) [ 0.0 1.0 0.8 ]
+  (CAA) [ 0.0 1.0 0.8 ]
+  (CAC) [ 0.0 1.0 0.8 ]
+  (CAG) [ 0.0 1.0 0.8 ]
+  (CAT) [ 0.0 1.0 0.8 ]
+  (CCA) [ 0.0 1.0 0.8 ]
+  (CCC) [ 0.0 1.0 0.8 ]
+  (CCG) [ 0.0 1.0 0.8 ]
+  (CCT) [ 0.0 1.0 0.8 ]
+  (CGA) [ 0.0 1.0 0.8 ]
+  (CGC) [ 0.0 1.0 0.8 ]
+  (CGG) [ 0.0 1.0 0.8 ]
+  (CGT) [ 0.0 1.0 0.8 ]
+  (CTA) [ 0.0 1.0 0.8 ]
+  (CTC) [ 0.0 1.0 0.8 ]
+  (CTG) [ 0.0 1.0 0.8 ]
+  (CTT) [ 0.0 1.0 0.8 ]
+  (GAA) [ 0.0 1.0 0.8 ]
+  (GAC) [ 0.0 1.0 0.8 ]
+  (GAG) [ 0.0 1.0 0.8 ]
+  (GAT) [ 0.0 1.0 0.8 ]
+  (GCA) [ 1.0 1.0 0.0 ]
+  (GCC) [ 1.0 0.8 0.0 ]
+  (GCG) [ 1.0 0.0 0.0 ]
+  (GCT) [ 1.0 0.0 0.0 ]
+  (GGA) [ 0.0 1.0 0.8 ]
+  (GGC) [ 0.8 1.0 0.2 ]
+  (GGG) [ 0.0 1.0 0.8 ]
+  (GGT) [ 0.0 1.0 0.8 ]
+  (GTA) [ 0.0 1.0 0.8 ]
+  (GTC) [ 1.0 0.0 0.0 ]
+  (GTG) [ 0.0 1.0 0.8 ]
+  (GTT) [ 0.0 1.0 0.8 ]
+  (TAA) [ 0.0 1.0 0.8 ]
+  (TAC) [ 0.0 1.0 0.8 ]
+  (TAG) [ 0.0 1.0 0.8 ]
+  (TAT) [ 0.0 1.0 0.8 ]
+  (TCA) [ 0.0 1.0 0.8 ]
+  (TCC) [ 0.0 1.0 0.8 ]
+  (TCG) [ 0.0 1.0 0.8 ]
+  (TCT) [ 0.0 1.0 0.8 ]
+  (TGA) [ 0.0 1.0 0.8 ]
+  (TGC) [ 0.0 1.0 0.8 ]
+  (TGG) [ 0.0 1.0 0.8 ]
+  (TGT) [ 0.0 1.0 0.8 ]
+  (TTA) [ 0.0 1.0 0.8 ]
+  (TTC) [ 0.0 1.0 0.8 ]
+  (TTG) [ 0.0 1.0 0.8 ]
+  (TTT) [ 0.0 1.0 0.8 ]
+>> def
+() StartStack
+ 1.000000 0.000000 (TTT) ShowSymbol
+ 1.000000 0.000000 (TTG) ShowSymbol
+ 1.000000 0.000000 (TTC) ShowSymbol
+ 1.000000 0.000000 (TTA) ShowSymbol
+ 1.000000 0.000000 (TGT) ShowSymbol
+ 1.000000 0.000000 (TGG) ShowSymbol
+ 1.000000 0.000000 (TGC) ShowSymbol
+ 1.000000 0.000000 (TGA) ShowSymbol
+ 1.000000 0.000000 (TCT) ShowSymbol
+ 1.000000 0.000000 (TCG) ShowSymbol
+ 1.000000 0.000000 (TCC) ShowSymbol
+ 1.000000 0.000000 (TCA) ShowSymbol
+ 1.000000 0.000000 (TAT) ShowSymbol
+ 1.000000 0.000000 (TAG) ShowSymbol
+ 1.000000 0.000000 (TAC) ShowSymbol
+ 1.000000 0.000000 (TAA) ShowSymbol
+ 1.000000 0.000000 (GTT) ShowSymbol
+ 1.000000 0.000000 (GTG) ShowSymbol
+ 1.000000 0.000000 (GTA) ShowSymbol
+ 1.000000 0.000000 (GGT) ShowSymbol
+ 1.000000 0.000000 (GGG) ShowSymbol
+ 1.000000 0.000000 (GGA) ShowSymbol
+ 1.000000 0.000000 (GAT) ShowSymbol
+ 1.000000 0.000000 (GAG) ShowSymbol
+ 1.000000 0.000000 (GAC) ShowSymbol
+ 1.000000 0.000000 (GAA) ShowSymbol
+ 1.000000 0.000000 (CTT) ShowSymbol
+ 1.000000 0.000000 (CTG) ShowSymbol
+ 1.000000 0.000000 (CTC) ShowSymbol
+ 1.000000 0.000000 (CTA) ShowSymbol
+ 1.000000 0.000000 (CGT) ShowSymbol
+ 1.000000 0.000000 (CGG) ShowSymbol
+ 1.000000 0.000000 (CGC) ShowSymbol
+ 1.000000 0.000000 (CGA) ShowSymbol
+ 1.000000 0.000000 (CCT) ShowSymbol
+ 1.000000 0.000000 (CCG) ShowSymbol
+ 1.000000 0.000000 (CCC) ShowSymbol
+ 1.000000 0.000000 (CCA) ShowSymbol
+ 1.000000 0.000000 (CAT) ShowSymbol
+ 1.000000 0.000000 (CAG) ShowSymbol
+ 1.000000 0.000000 (CAC) ShowSymbol
+ 1.000000 0.000000 (CAA) ShowSymbol
+ 1.000000 0.000000 (ATT) ShowSymbol
+ 1.000000 0.000000 (ATG) ShowSymbol
+ 1.000000 0.000000 (ATA) ShowSymbol
+ 1.000000 0.000000 (AGT) ShowSymbol
+ 1.000000 0.000000 (AGG) ShowSymbol
+ 1.000000 0.000000 (AGC) ShowSymbol
+ 1.000000 0.000000 (AGA) ShowSymbol
+ 1.000000 0.000000 (ACT) ShowSymbol
+ 1.000000 0.000000 (ACG) ShowSymbol
+ 1.000000 0.000000 (ACC) ShowSymbol
+ 1.000000 0.000000 (ACA) ShowSymbol
+ 1.000000 0.000000 (AAT) ShowSymbol
+ 1.000000 0.000000 (AAG) ShowSymbol
+ 1.000000 0.000000 (AAC) ShowSymbol
+ 1.000000 0.133563 (GGC) ShowSymbol
+ 1.000000 0.133563 (GCA) ShowSymbol
+ 1.000000 0.133563 (ATC) ShowSymbol
+ 1.000000 0.133563 (AAA) ShowSymbol
+ 1.000000 0.267126 (GTC) ShowSymbol
+ 1.000000 0.267126 (GCC) ShowSymbol
+ 1.000000 0.400688 (GCG) ShowSymbol
+ 1.000000 0.667814 (GCT) ShowSymbol
+ 0.604541 0.604541 DrawErrorbar
+EndStack
+
+/color_dict <<
+  (AAA) [ 0.0 1.0 0.8 ]
+  (AAC) [ 0.0 1.0 0.8 ]
+  (AAG) [ 0.0 1.0 0.8 ]
+  (AAT) [ 1.0 0.0 0.0 ]
+  (ACA) [ 0.0 1.0 0.8 ]
+  (ACC) [ 0.0 1.0 0.8 ]
+  (ACG) [ 0.0 1.0 0.8 ]
+  (ACT) [ 1.0 0.4 0.0 ]
+  (AGA) [ 0.0 1.0 0.8 ]
+  (AGC) [ 1.0 1.0 0.0 ]
+  (AGG) [ 0.0 1.0 0.8 ]
+  (AGT) [ 0.0 1.0 0.8 ]
+  (ATA) [ 0.0 1.0 0.8 ]
+  (ATC) [ 0.0 1.0 0.8 ]
+  (ATG) [ 1.0 0.0 0.0 ]
+  (ATT) [ 0.0 1.0 0.8 ]
+  (CAA) [ 0.0 1.0 0.8 ]
+  (CAC) [ 0.0 1.0 0.8 ]
+  (CAG) [ 0.0 1.0 0.8 ]
+  (CAT) [ 1.0 1.0 0.0 ]
+  (CCA) [ 0.0 1.0 0.8 ]
+  (CCC) [ 0.0 1.0 0.8 ]
+  (CCG) [ 0.0 1.0 0.8 ]
+  (CCT) [ 0.0 1.0 0.8 ]
+  (CGA) [ 0.0 1.0 0.8 ]
+  (CGC) [ 0.0 1.0 0.8 ]
+  (CGG) [ 0.0 1.0 0.8 ]
+  (CGT) [ 0.0 1.0 0.8 ]
+  (CTA) [ 0.0 1.0 0.8 ]
+  (CTC) [ 1.0 0.0 0.0 ]
+  (CTG) [ 0.0 1.0 0.0 ]
+  (CTT) [ 0.0 1.0 0.8 ]
+  (GAA) [ 0.0 1.0 0.8 ]
+  (GAC) [ 0.0 1.0 0.8 ]
+  (GAG) [ 0.0 1.0 0.8 ]
+  (GAT) [ 0.0 1.0 0.8 ]
+  (GCA) [ 0.0 1.0 0.8 ]
+  (GCC) [ 0.8 1.0 0.2 ]
+  (GCG) [ 0.0 1.0 0.8 ]
+  (GCT) [ 0.0 1.0 0.8 ]
+  (GGA) [ 0.0 1.0 0.8 ]
+  (GGC) [ 0.0 1.0 0.8 ]
+  (GGG) [ 0.0 1.0 0.8 ]
+  (GGT) [ 0.0 1.0 0.8 ]
+  (GTA) [ 0.0 1.0 0.8 ]
+  (GTC) [ 0.0 1.0 0.8 ]
+  (GTG) [ 0.0 1.0 0.8 ]
+  (GTT) [ 0.0 1.0 0.8 ]
+  (TAA) [ 0.0 1.0 0.8 ]
+  (TAC) [ 0.0 1.0 0.8 ]
+  (TAG) [ 0.0 1.0 0.8 ]
+  (TAT) [ 0.0 1.0 0.8 ]
+  (TCA) [ 1.0 0.4 0.0 ]
+  (TCC) [ 0.0 1.0 0.8 ]
+  (TCG) [ 0.0 1.0 0.8 ]
+  (TCT) [ 1.0 0.0 0.0 ]
+  (TGA) [ 0.0 1.0 0.8 ]
+  (TGC) [ 0.0 1.0 0.8 ]
+  (TGG) [ 0.0 1.0 0.8 ]
+  (TGT) [ 0.0 1.0 0.8 ]
+  (TTA) [ 0.0 1.0 0.8 ]
+  (TTC) [ 0.0 1.0 0.8 ]
+  (TTG) [ 0.0 1.0 0.8 ]
+  (TTT) [ 1.0 1.0 0.0 ]
+>> def
+(30) StartStack
+ 1.000000 0.000000 (TTG) ShowSymbol
+ 1.000000 0.000000 (TTC) ShowSymbol
+ 1.000000 0.000000 (TTA) ShowSymbol
+ 1.000000 0.000000 (TGT) ShowSymbol
+ 1.000000 0.000000 (TGG) ShowSymbol
+ 1.000000 0.000000 (TGC) ShowSymbol
+ 1.000000 0.000000 (TGA) ShowSymbol
+ 1.000000 0.000000 (TCG) ShowSymbol
+ 1.000000 0.000000 (TCC) ShowSymbol
+ 1.000000 0.000000 (TAT) ShowSymbol
+ 1.000000 0.000000 (TAG) ShowSymbol
+ 1.000000 0.000000 (TAC) ShowSymbol
+ 1.000000 0.000000 (TAA) ShowSymbol
+ 1.000000 0.000000 (GTT) ShowSymbol
+ 1.000000 0.000000 (GTG) ShowSymbol
+ 1.000000 0.000000 (GTC) ShowSymbol
+ 1.000000 0.000000 (GTA) ShowSymbol
+ 1.000000 0.000000 (GGT) ShowSymbol
+ 1.000000 0.000000 (GGG) ShowSymbol
+ 1.000000 0.000000 (GGC) ShowSymbol
+ 1.000000 0.000000 (GGA) ShowSymbol
+ 1.000000 0.000000 (GCT) ShowSymbol
+ 1.000000 0.000000 (GCG) ShowSymbol
+ 1.000000 0.000000 (GCA) ShowSymbol
+ 1.000000 0.000000 (GAT) ShowSymbol
+ 1.000000 0.000000 (GAG) ShowSymbol
+ 1.000000 0.000000 (GAC) ShowSymbol
+ 1.000000 0.000000 (GAA) ShowSymbol
+ 1.000000 0.000000 (CTT) ShowSymbol
+ 1.000000 0.000000 (CTA) ShowSymbol
+ 1.000000 0.000000 (CGT) ShowSymbol
+ 1.000000 0.000000 (CGG) ShowSymbol
+ 1.000000 0.000000 (CGC) ShowSymbol
+ 1.000000 0.000000 (CGA) ShowSymbol
+ 1.000000 0.000000 (CCT) ShowSymbol
+ 1.000000 0.000000 (CCG) ShowSymbol
+ 1.000000 0.000000 (CCC) ShowSymbol
+ 1.000000 0.000000 (CCA) ShowSymbol
+ 1.000000 0.000000 (CAG) ShowSymbol
+ 1.000000 0.000000 (CAC) ShowSymbol
+ 1.000000 0.000000 (CAA) ShowSymbol
+ 1.000000 0.000000 (ATT) ShowSymbol
+ 1.000000 0.000000 (ATC) ShowSymbol
+ 1.000000 0.000000 (ATA) ShowSymbol
+ 1.000000 0.000000 (AGT) ShowSymbol
+ 1.000000 0.000000 (AGG) ShowSymbol
+ 1.000000 0.000000 (AGA) ShowSymbol
+ 1.000000 0.000000 (ACG) ShowSymbol
+ 1.000000 0.000000 (ACC) ShowSymbol
+ 1.000000 0.000000 (ACA) ShowSymbol
+ 1.000000 0.000000 (AAG) ShowSymbol
+ 1.000000 0.000000 (AAC) ShowSymbol
+ 1.000000 0.000000 (AAA) ShowSymbol
+ 1.000000 0.120333 (TTT) ShowSymbol
+ 1.000000 0.120333 (TCT) ShowSymbol
+ 1.000000 0.120333 (TCA) ShowSymbol
+ 1.000000 0.120333 (GCC) ShowSymbol
+ 1.000000 0.120333 (CTG) ShowSymbol
+ 1.000000 0.120333 (CAT) ShowSymbol
+ 1.000000 0.120333 (AGC) ShowSymbol
+ 1.000000 0.120333 (ACT) ShowSymbol
+ 1.000000 0.240667 (AAT) ShowSymbol
+ 1.000000 0.361000 (ATG) ShowSymbol
+ 1.000000 0.601666 (CTC) ShowSymbol
+ 0.573626 0.573626 DrawErrorbar
+EndStack
+
+/color_dict <<
+  (AAA) [ 0.0 1.0 0.8 ]
+  (AAC) [ 0.0 1.0 0.8 ]
+  (AAG) [ 0.0 1.0 0.8 ]
+  (AAT) [ 0.0 1.0 0.8 ]
+  (ACA) [ 0.0 1.0 0.8 ]
+  (ACC) [ 0.0 1.0 0.8 ]
+  (ACG) [ 1.0 0.8 0.0 ]
+  (ACT) [ 1.0 0.4 0.0 ]
+  (AGA) [ 0.0 1.0 0.8 ]
+  (AGC) [ 0.0 1.0 0.8 ]
+  (AGG) [ 0.0 1.0 0.8 ]
+  (AGT) [ 0.0 1.0 0.8 ]
+  (ATA) [ 0.0 1.0 0.8 ]
+  (ATC) [ 0.0 1.0 0.8 ]
+  (ATG) [ 0.0 1.0 0.8 ]
+  (ATT) [ 0.0 1.0 0.8 ]
+  (CAA) [ 0.0 1.0 0.8 ]
+  (CAC) [ 0.0 1.0 0.8 ]
+  (CAG) [ 0.8 1.0 0.2 ]
+  (CAT) [ 0.0 1.0 0.8 ]
+  (CCA) [ 0.0 1.0 0.8 ]
+  (CCC) [ 0.0 1.0 0.8 ]
+  (CCG) [ 0.0 1.0 0.8 ]
+  (CCT) [ 0.0 1.0 0.8 ]
+  (CGA) [ 0.0 1.0 0.8 ]
+  (CGC) [ 0.0 1.0 0.8 ]
+  (CGG) [ 0.0 1.0 0.8 ]
+  (CGT) [ 0.0 1.0 0.8 ]
+  (CTA) [ 0.0 1.0 0.8 ]
+  (CTC) [ 0.0 1.0 0.8 ]
+  (CTG) [ 0.0 1.0 0.8 ]
+  (CTT) [ 0.0 1.0 0.8 ]
+  (GAA) [ 0.0 1.0 0.8 ]
+  (GAC) [ 0.0 1.0 0.8 ]
+  (GAG) [ 0.0 1.0 0.8 ]
+  (GAT) [ 0.0 1.0 0.8 ]
+  (GCA) [ 1.0 0.0 0.0 ]
+  (GCC) [ 1.0 0.0 0.0 ]
+  (GCG) [ 0.8 1.0 0.2 ]
+  (GCT) [ 1.0 0.0 0.0 ]
+  (GGA) [ 0.0 1.0 0.8 ]
+  (GGC) [ 0.0 1.0 0.8 ]
+  (GGG) [ 0.0 1.0 0.8 ]
+  (GGT) [ 0.0 1.0 0.8 ]
+  (GTA) [ 0.0 1.0 0.8 ]
+  (GTC) [ 0.0 1.0 0.8 ]
+  (GTG) [ 0.0 1.0 0.8 ]
+  (GTT) [ 0.0 1.0 0.8 ]
+  (TAA) [ 0.0 1.0 0.8 ]
+  (TAC) [ 0.0 1.0 0.8 ]
+  (TAG) [ 0.0 1.0 0.8 ]
+  (TAT) [ 0.0 1.0 0.8 ]
+  (TCA) [ 0.0 1.0 0.8 ]
+  (TCC) [ 0.0 1.0 0.8 ]
+  (TCG) [ 0.0 1.0 0.8 ]
+  (TCT) [ 0.0 1.0 0.8 ]
+  (TGA) [ 0.0 1.0 0.8 ]
+  (TGC) [ 0.0 1.0 0.8 ]
+  (TGG) [ 0.0 1.0 0.8 ]
+  (TGT) [ 0.0 1.0 0.8 ]
+  (TTA) [ 0.0 1.0 0.8 ]
+  (TTC) [ 0.0 1.0 0.8 ]
+  (TTG) [ 0.0 1.0 0.8 ]
+  (TTT) [ 0.0 1.0 0.8 ]
+>> def
+() StartStack
+ 1.000000 0.000000 (TTT) ShowSymbol
+ 1.000000 0.000000 (TTG) ShowSymbol
+ 1.000000 0.000000 (TTC) ShowSymbol
+ 1.000000 0.000000 (TTA) ShowSymbol
+ 1.000000 0.000000 (TGT) ShowSymbol
+ 1.000000 0.000000 (TGG) ShowSymbol
+ 1.000000 0.000000 (TGC) ShowSymbol
+ 1.000000 0.000000 (TGA) ShowSymbol
+ 1.000000 0.000000 (TCT) ShowSymbol
+ 1.000000 0.000000 (TCG) ShowSymbol
+ 1.000000 0.000000 (TCC) ShowSymbol
+ 1.000000 0.000000 (TCA) ShowSymbol
+ 1.000000 0.000000 (TAT) ShowSymbol
+ 1.000000 0.000000 (TAG) ShowSymbol
+ 1.000000 0.000000 (TAC) ShowSymbol
+ 1.000000 0.000000 (TAA) ShowSymbol
+ 1.000000 0.000000 (GTT) ShowSymbol
+ 1.000000 0.000000 (GTG) ShowSymbol
+ 1.000000 0.000000 (GTC) ShowSymbol
+ 1.000000 0.000000 (GTA) ShowSymbol
+ 1.000000 0.000000 (GGT) ShowSymbol
+ 1.000000 0.000000 (GGG) ShowSymbol
+ 1.000000 0.000000 (GGC) ShowSymbol
+ 1.000000 0.000000 (GGA) ShowSymbol
+ 1.000000 0.000000 (GAT) ShowSymbol
+ 1.000000 0.000000 (GAG) ShowSymbol
+ 1.000000 0.000000 (GAC) ShowSymbol
+ 1.000000 0.000000 (GAA) ShowSymbol
+ 1.000000 0.000000 (CTT) ShowSymbol
+ 1.000000 0.000000 (CTG) ShowSymbol
+ 1.000000 0.000000 (CTC) ShowSymbol
+ 1.000000 0.000000 (CTA) ShowSymbol
+ 1.000000 0.000000 (CGT) ShowSymbol
+ 1.000000 0.000000 (CGG) ShowSymbol
+ 1.000000 0.000000 (CGC) ShowSymbol
+ 1.000000 0.000000 (CGA) ShowSymbol
+ 1.000000 0.000000 (CCT) ShowSymbol
+ 1.000000 0.000000 (CCG) ShowSymbol
+ 1.000000 0.000000 (CCC) ShowSymbol
+ 1.000000 0.000000 (CCA) ShowSymbol
+ 1.000000 0.000000 (CAT) ShowSymbol
+ 1.000000 0.000000 (CAC) ShowSymbol
+ 1.000000 0.000000 (CAA) ShowSymbol
+ 1.000000 0.000000 (ATT) ShowSymbol
+ 1.000000 0.000000 (ATG) ShowSymbol
+ 1.000000 0.000000 (ATC) ShowSymbol
+ 1.000000 0.000000 (ATA) ShowSymbol
+ 1.000000 0.000000 (AGT) ShowSymbol
+ 1.000000 0.000000 (AGG) ShowSymbol
+ 1.000000 0.000000 (AGC) ShowSymbol
+ 1.000000 0.000000 (AGA) ShowSymbol
+ 1.000000 0.000000 (ACC) ShowSymbol
+ 1.000000 0.000000 (ACA) ShowSymbol
+ 1.000000 0.000000 (AAT) ShowSymbol
+ 1.000000 0.000000 (AAG) ShowSymbol
+ 1.000000 0.000000 (AAC) ShowSymbol
+ 1.000000 0.000000 (AAA) ShowSymbol
+ 1.000000 0.127956 (GCG) ShowSymbol
+ 1.000000 0.127956 (CAG) ShowSymbol
+ 1.000000 0.127956 (ACT) ShowSymbol
+ 1.000000 0.127956 (ACG) ShowSymbol
+ 1.000000 0.255912 (GCT) ShowSymbol
+ 1.000000 0.383869 (GCA) ShowSymbol
+ 1.000000 1.151606 (GCC) ShowSymbol
+ 0.683341 0.683341 DrawErrorbar
+EndStack
+
+EndLine
+
+EndLogo
+
+%%EOF
+

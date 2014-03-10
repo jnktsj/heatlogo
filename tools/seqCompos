@@ -1,0 +1,68 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# Copyright 2013 Junko Tsuji
+
+import sys, os.path
+from optparse import OptionParser
+
+usage = "Usage: seqCompos [options] SpeciesName"
+
+def buildOptionParser():
+    description = "Return a species-specific sequence symbol composition"
+    op = OptionParser(usage=usage, description=description)
+
+    op.add_option("-p", "--protein",
+                  dest="aa_compos",
+                  action="store_true",
+                  default=False,
+                  help="Activate amino acid composition mode")
+
+    op.add_option("-d", "--dna-codon",
+                  dest="dna_codon_compos",
+                  action="store_true",
+                  default=False,
+                  help="Activate DNA codon usage composition mode")
+
+    op.add_option("-r", "--rna-codon",
+                  dest="rna_codon_compos",
+                  action="store_true",
+                  default=False,
+                  help="Activate RNA codon usage composition mode")
+    return op
+
+
+# search and print composition of input species names
+def printComposData(prog, args, db):
+    for arg in args:
+        if arg not in db:
+            print prog + ": can't find \"" + arg + "\""
+        else:
+            print db[arg]
+
+
+if __name__ == "__main__":
+    prog = os.path.basename(sys.argv[0])
+    op = buildOptionParser()
+    (opts, args) = op.parse_args()
+
+    if len(args) < 1:
+        sys.exit("\n" + usage + "\n")
+
+    try:
+        if not opts.aa_compos and \
+           not opts.rna_codon_compos and not opts.dna_codon_compos:
+            raise Exception("needs an sequence type option")
+        if opts.aa_compos:
+            from composdb.aa import aaDatabase
+            printComposData(prog, args, aaDatabase)
+        if opts.dna_codon_compos:
+            from composdb.codon import dnaCodonDatabase
+            printComposData(prog, args, dnaCodonDatabase)
+        if opts.rna_codon_compos:
+            from composdb.codon import rnaCodonDatabase
+            printComposData(prog, args, rnaCodonDatabase)
+
+    except KeyboardInterrupt: pass
+    except Exception, e:
+        sys.exit(prog + ": error: " + str(e))

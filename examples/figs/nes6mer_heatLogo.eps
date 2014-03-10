@@ -1,0 +1,1960 @@
+%!PS-Adobe-3.0 EPSF-3.0
+%%Title:        Sequence Logo: 
+%%Creator:      HeatLogo 1.0
+%%CreationDate: 2012-10-02 17:00:21.487417
+%%BoundingBox:  0  0  354  80 
+%%Pages: 0
+%%DocumentFonts: 
+%%EndComments
+
+
+% ---- VARIABLES ----
+
+/True   true def
+/False  false def
+
+/debug              False        def
+
+/logo_height        80  def
+/logo_width         354  def
+/logo_title         () def
+/show_title         False def
+
+/logo_margin        2 def
+/xaxis_label_height 6.0 def
+/title_height       0 def
+/stroke_width       0.5 def
+/tic_length         5 def
+
+/lines_per_logo     1 def
+/line_width         350.6 def
+/line_height        70.0 def
+/line_margin_left   30.0 def
+/line_margin_right  39.8 def
+/line_margin_bottom 12.0 def
+/line_margin_top    4 def
+
+/stack_width         10.8 def
+/stack_height        54.0 def
+/stacks_per_line     26 def
+/stack_margin        0.5 def
+
+/show_yaxis             True def      
+/show_yaxis_label       True def
+/yaxis_label            (probability) def
+/yaxis_scale          1.0 def              % height in units 
+/yaxis_tic_interval     0.5 def           % in units
+/yaxis_minor_tic_interval 0.1 def   % in units
+
+/show_xaxis_label       False def             % True or False
+/show_xaxis             True def                   % True or False
+/xaxis_label            () def
+/xaxis_tic_interval     1 def
+/rotate_numbers         False def               % True or False
+/number_interval        5 def
+/show_ends              False def
+/end_type               (-) def          % d: DNA, p: PROTEIN, -: none
+
+/show_colorkey          True def                % True or False
+/p_values               %
+[ (+0.01) %
+ (+0.025) %
+ (+0.05) %
+ (+0.1) %
+ (+0.3) %
+ ( 0.5) %
+ (-0.3) %
+ (-0.1) %
+ (-0.05) %
+ (-0.025) %
+ (-0.01) %
+] def
+/p_colors                %
+[[ 1.0 0.0 0.0 ] %
+[ 1.0 0.4 0.0 ] %
+[ 1.0 0.8 0.0 ] %
+[ 1.0 1.0 0.0 ] %
+[ 0.8 1.0 0.2 ] %
+[ 0.0 1.0 0.0 ] %
+[ 0.0 1.0 0.8 ] %
+[ 0.0 1.0 1.0 ] %
+[ 0.0 0.4 1.0 ] %
+[ 0.0 0.0 1.0 ] %
+[ 0.2 0.0 0.6 ] %
+] def
+
+/show_fineprint         True def
+/fineprint              (HeatLogo 1.0) def
+/logo_label             () def
+
+/show_boxes             False def    % True or False
+/shrink                 false def    % True or False
+/shrink_fraction        0.5 def               
+
+/show_errorbars         True def      % True or False
+/errorbar_fraction      0.9 def
+/errorbar_width_fraction  0.25 def
+/errorbar_gray          0.75 def
+
+/fontsize               10 def
+/small_fontsize         6 def
+/title_fontsize         12 def
+/number_fontsize        8 def
+
+
+/UseCIEColor true def       % Fix for issue 4
+/default_color [ 0.0 0.0 0.0 ] def 
+/color_dict << 
+
+>> def
+
+% ---- DERIVED PARAMETERS ----
+
+/char_width stack_width 2 stack_margin mul sub def
+/char_width2 char_width 2 div def
+/char_width4 char_width 4 div def
+
+% movements to place 5'/N and 3'/C symbols
+/leftEndDeltaX  fontsize neg         def
+/leftEndDeltaY  fontsize 1.25 mul neg def
+/rightEndDeltaX fontsize 0.25 mul     def
+/rightEndDeltaY leftEndDeltaY        def
+
+% ---- PROCEDURES ----
+
+
+/SetTitleFont {/ArialMT findfont title_fontsize scalefont setfont} bind def
+/SetLogoFont  {/Arial-BoldMT findfont char_width  scalefont setfont} bind def
+/SetStringFont{/ArialMT findfont fontsize scalefont setfont} bind def
+/SetPrimeFont {/Symbol findfont fontsize scalefont setfont} bind def
+/SetSmallFont {/ArialMT findfont small_fontsize scalefont setfont} bind def
+/SetNumberFont {/ArialMT findfont number_fontsize scalefont setfont} bind def
+
+/DrawBox { % width height 
+    /hh exch def
+    /ww exch def
+    gsave
+        0.2 setlinewidth
+        %0.5 setgray
+        
+        %0 0 moveto 
+        hh 0 rlineto
+        0 ww rlineto
+        hh neg 0 rlineto
+        0 ww neg rlineto
+        stroke
+    grestore
+} bind def
+
+/FillBox { % width height color
+    /cl exch def
+    /hh exch def
+    /ww exch def
+    gsave
+        cl aload pop setrgbcolor
+        hh 0 rlineto
+        0 ww rlineto
+        hh neg 0 rlineto
+        0 ww neg rlineto
+        fill
+    grestore
+} bind def
+
+/DrawArrow { % X bottomY topY arrowLen
+    /arrowLen exch def
+    /topY exch def
+    /bottomY exch def
+    /X exch def
+    gsave
+    stroke_width setlinewidth
+    X bottomY moveto
+    arrowLen 3 div neg arrowLen rlineto
+    X bottomY moveto
+    arrowLen 3 div arrowLen rlineto
+
+    X bottomY moveto
+    X topY lineto
+
+    X topY moveto
+    arrowLen 3 div neg arrowLen neg rlineto
+    X topY moveto
+    arrowLen 3 div arrowLen neg rlineto    
+    stroke
+    grestore
+} bind def
+
+/DrawColorKey {
+    /tlen p_colors length def
+    /index tlen 1 sub def
+
+    /box_height stack_height tlen div def
+    /box_width stack_width 2 div def
+    /box_margin box_height index div def
+
+    % movements to place color key chart
+    /colorKeyDeltaX line_width line_margin_right sub
+        fontsize add fontsize 0.5 mul add def
+    show_ends { /colorKeyDeltaX colorKeyDeltaX fontsize add def } if
+    /colorKeyDeltaY logo_height logo_margin sub title_height sub
+        line_height sub box_height 2 div add def
+
+    % draw arrow
+    gsave
+    colorKeyDeltaX box_width 0.7 mul sub
+    colorKeyDeltaY
+    colorKeyDeltaY box_height tlen mul add box_margin index mul add
+    box_height
+    DrawArrow
+    grestore
+    
+    gsave
+    tlen {
+            colorKeyDeltaX colorKeyDeltaY
+            moveto
+
+            gsave
+            box_height box_width
+            p_colors index get
+            FillBox
+            grestore
+            
+            colorKeyDeltaX box_width add
+            colorKeyDeltaY box_height 2 div add
+            moveto
+
+            SetSmallFont
+            0 0 0 setrgbcolor
+            p_values index get show
+            
+            /index index 1 sub def
+            /colorKeyDeltaY box_height box_margin add colorKeyDeltaY add def
+    } repeat
+
+    gsave
+    SetSmallFont
+    colorKeyDeltaX
+    colorKeyDeltaY small_fontsize 2 div add
+    moveto
+    0 0 0 setrgbcolor
+    (P-value) show
+    grestore
+    
+    grestore
+} def
+
+/StartLogo { 
+  %save 
+  gsave 
+
+  debug { 
+    logo_margin logo_margin moveto
+    logo_height logo_margin 2 mul sub
+    logo_width logo_margin 2 mul sub
+    DrawBox } if
+    
+  show_title { DrawTitle } if
+  show_xaxis_label { DrawXaxisLable } if
+  show_fineprint { DrawFineprint } if
+  show_colorkey { DrawColorKey } if
+  DrawLogoLabel
+
+  MoveToFirstLine
+} bind def
+
+
+/DrawLogoLabel {
+  gsave 
+    SetTitleFont
+    
+    logo_margin
+    logo_height title_fontsize sub logo_margin sub
+    moveto
+    
+    debug { title_fontsize logo_label stringwidth pop DrawBox } if
+    0 title_fontsize 4 div rmoveto % Move up to baseline (approximatly)
+    logo_label show
+    
+  grestore
+} bind def
+
+/DrawTitle {
+  gsave 
+    SetTitleFont
+    
+    logo_width 2 div logo_title stringwidth pop 2 div sub 
+    logo_height title_fontsize sub logo_margin sub
+    moveto
+    
+    debug { title_fontsize logo_title stringwidth pop DrawBox } if
+    
+    0 title_fontsize 4 div rmoveto % Move up to baseline (approximatly)
+    logo_title show
+    
+  grestore
+} bind def
+
+/DrawXaxisLable {
+  % Print X-axis label, bottom center
+  gsave
+    SetStringFont
+
+    logo_width 2 div xaxis_label stringwidth pop 2 div sub
+    xaxis_label_height logo_margin add fontsize sub
+    moveto
+    %fontsize 3 div
+    
+    debug { fontsize xaxis_label stringwidth pop DrawBox } if
+
+    xaxis_label show
+
+  grestore
+} bind def
+
+
+/DrawFineprint {
+    gsave
+    
+    SetSmallFont
+
+    logo_width fineprint stringwidth pop sub 
+        logo_margin sub line_margin_right sub
+    logo_margin 
+    moveto
+    
+    debug { small_fontsize fineprint stringwidth pop DrawBox } if
+        
+    fineprint show
+    grestore
+} bind def
+
+
+/MoveToFirstLine {
+    logo_margin 
+    logo_height logo_margin sub title_height sub line_height sub
+    moveto
+} bind def
+
+/EndLogo { 
+  grestore 
+  %showpage 
+  %restore 
+} bind def
+
+
+/StartLine{ 
+    gsave 
+  
+    % Draw outer box
+    debug { line_height line_width DrawBox } if  
+
+    % Move to lower left corner of content area
+    line_margin_left line_margin_bottom rmoveto
+
+    % Draw inner content box
+    debug { 
+        line_height line_margin_bottom sub line_margin_top sub
+        line_width line_margin_left sub line_margin_right sub
+        DrawBox
+    } if  
+  
+    show_yaxis { DrawYaxis } if
+    show_xaxis { DrawLeftEnd } if
+    
+} bind def
+
+/EndLine{ 
+    show_xaxis { DrawRightEnd } if
+    grestore 
+    0 line_height neg rmoveto 
+} bind def
+
+
+/DrawYaxis {
+  gsave    
+    stack_margin neg 0 translate
+    DrawYaxisBar
+    DrawYaxisLabel
+  grestore
+} bind def
+
+
+/DrawYaxisBar { 
+  gsave  
+    stack_margin neg 0 rmoveto
+    
+    SetNumberFont
+    stroke_width setlinewidth
+    
+    /str 10 string def % string to hold number  
+    /smallgap stack_margin  def
+
+    % Draw first tic and bar
+    gsave    
+      tic_length neg 0 rmoveto 
+      tic_length 0 rlineto 
+      0 stack_height rlineto
+      stroke
+    grestore
+
+    % Draw the tics
+    % initial increment limit proc for
+    0 yaxis_tic_interval yaxis_scale abs 
+    {/loopnumber exch def
+
+      % convert the number coming from the loop to a string
+      % and find its width
+      loopnumber 10 str cvrs
+      /stringnumber exch def % string representing the number
+
+      stringnumber stringwidth pop
+      /numberwidth exch def % width of number to show
+
+      /halfnumberheight
+         stringnumber CharBoxHeight 2 div
+      def
+
+      gsave
+        numberwidth % move back width of number
+        neg loopnumber stack_height yaxis_scale div mul % shift on y axis
+        halfnumberheight sub % down half the digit
+        rmoveto % move back the width of the string
+
+        tic_length neg smallgap sub % Move back a bit more  
+        0 rmoveto % move back the width of the tic  
+
+        stringnumber show
+        smallgap 0 rmoveto % Make a small gap  
+
+        % now show the tic mark
+        0 halfnumberheight rmoveto % shift up again
+        tic_length 0 rlineto
+        stroke
+     grestore
+    } for
+    
+    % Draw the minor tics
+    % initial increment limit proc for
+    0 yaxis_minor_tic_interval yaxis_scale abs 
+    {/loopnumber2 exch def
+      gsave
+        0
+        loopnumber2 stack_height yaxis_scale div mul 
+        rmoveto 
+
+        tic_length 2 div neg 0 rlineto
+        stroke
+     grestore
+    } for    
+    
+  grestore
+} bind def
+
+/DrawYaxisLabel {
+  gsave
+    SetStringFont
+
+    % How far we move left depends on the size of
+    % the tic labels.
+    /str 10 string def % string to hold number  
+    yaxis_scale yaxis_tic_interval div cvi yaxis_tic_interval mul 
+    str cvs stringwidth pop
+    tic_length 1.25 mul  add neg  
+
+    stack_height
+    yaxis_label stringwidth pop
+    sub 2 div
+
+    rmoveto
+    90 rotate
+    
+    yaxis_label show
+  grestore
+} bind def
+
+
+%Take a single character and return the bounding box
+/CharBox { % <char> CharBox <lx> <ly> <ux> <uy>
+  gsave
+    newpath
+    0 0 moveto
+    % take the character off the stack and use it here:
+    true charpath 
+    flattenpath 
+    pathbbox % compute bounding box of 1 pt. char => lx ly ux uy
+    % the path is here, but toss it away ...
+  grestore
+} bind def
+
+
+% The height of a characters bounding box
+/CharBoxHeight { % <char> CharBoxHeight <num>
+  CharBox
+  exch pop sub neg exch pop
+} bind def
+
+
+% The width of a characters bounding box
+/CharBoxWidth { % <char> CharBoxHeight <num>
+  CharBox
+  pop exch pop sub neg 
+} bind def
+
+
+/DrawLeftEnd {
+  gsave
+    SetStringFont
+    leftEndDeltaX leftEndDeltaY rmoveto
+    
+    show_ends {
+        debug { leftEndDeltaY neg leftEndDeltaX neg DrawBox } if
+        end_type (d) eq {(5) show DrawPrime} if
+        end_type (p) eq {(N) show} if
+    } if
+  grestore
+} bind def
+
+/DrawRightEnd { 
+  gsave
+    SetStringFont
+    rightEndDeltaX rightEndDeltaY rmoveto
+    
+    show_ends {
+        debug { rightEndDeltaY neg leftEndDeltaX neg  DrawBox } if
+        end_type (d) eq {(3) show DrawPrime} if
+        end_type (p) eq {(C) show} if
+    } if
+  grestore
+} bind def
+
+/DrawPrime {
+  gsave
+    SetPrimeFont
+    (\242) show 
+  grestore
+} bind def
+
+
+/StartStack {  % <stackNumber> startstack
+  show_xaxis {DrawNumber}{pop} ifelse
+  gsave
+  debug { stack_height stack_width DrawBox } if
+    
+} bind def
+
+/EndStack {
+  grestore
+  stack_width 0 rmoveto
+} bind def
+
+
+/DrawNumber { % number MakeNumber
+    /n exch def
+    
+    
+  gsave
+    %0 stack_margin neg rmoveto
+    stroke_width setlinewidth
+    stack_width  0 rlineto
+    stack_width 2 div neg 0 rmoveto
+    
+    n () eq 
+    {  0 tic_length 4 div neg rlineto  } 
+    { 0 tic_length 2 div neg rlineto } 
+    ifelse
+
+    stroke
+  grestore   
+
+
+
+  gsave
+    n
+    SetNumberFont
+    stack_width 2 div tic_length 2 div neg rmoveto 
+
+    rotate_numbers {
+        90 rotate     
+        dup stringwidth pop neg % find the length of the number
+        stack_margin sub        % Move down a bit
+        (0) CharBoxHeight 2 div neg % left half height of numbers
+        rmoveto 
+        show
+    } {
+        dup stringwidth pop neg 2 div number_fontsize neg  rmoveto
+        show
+    } ifelse
+    
+    
+
+  grestore
+} bind def
+
+
+
+% Draw a character whose height is proportional to symbol bits
+/ShowSymbol{ % interval character ShowSymbol
+    /char exch def
+    /interval exch def
+    /fraction_width exch def
+    
+    /char_height 
+       interval yaxis_scale div stack_height mul
+       stack_margin sub
+       dup 
+       % if char_height is negative or very small replace with zero 
+       % BUG FIX: This used to be '0.0 gt' but it seems that DrawHeight
+       % has a finite, non-zero minimum, which results in a rangecheck error
+       0.01 gt {}{pop 0.0} ifelse 
+    def 
+
+    char_height 0.0 gt {
+        show_boxes {
+            gsave
+                /ww char_height stack_margin add def
+                /hh stack_width def
+                stroke_width setlinewidth
+                hh 0 rlineto
+                0 ww rlineto
+                hh neg 0 rlineto
+                0 ww neg rlineto
+                stroke
+            grestore 
+        } if
+
+        gsave
+            stack_margin stack_margin rmoveto
+            debug { char_height char_width DrawBox } if
+            1 fraction_width sub char_width mul 2 div  0 rmoveto
+            fraction_width char_width mul char_height char DrawChar
+        grestore
+        
+    } if
+    0 interval yaxis_scale div stack_height mul rmoveto
+} bind def
+
+
+/DrawChar { % <width> <height> <char> ShowChar
+    /tc exch def    % The character
+    /ysize exch def % the y size of the character
+    /xsize exch def % the x size of the character
+    /xmulfactor 1 def 
+    /ymulfactor 1 def
+    
+    gsave
+        SetLogoFont    
+        tc SetColor
+
+        % IReplacementHack
+        % Deal with the lack of bars on the letter 'I' in Arial and Helvetica
+        % by replacing with 'I' from Courier.
+        tc (I) eq {
+            /Courier findfont char_width  scalefont setfont    
+        } if
+
+
+        shrink {
+            xsize 1 shrink_fraction sub 2 div mul
+            ysize 1 shrink_fraction sub 2 div mul rmoveto 
+            shrink_fraction shrink_fraction scale
+        } if
+        
+        % Calculate the font scaling factors
+        % Loop twice to catch small correction due to first scaling
+        2 {
+            gsave
+            xmulfactor ymulfactor scale
+      
+            ysize % desired size of character in points
+            tc CharBoxHeight 
+            dup 0.0 ne {
+                div % factor by which to scale up the character
+                /ymulfactor exch def
+            } {pop pop} ifelse
+
+            xsize % desired size of character in points
+            tc CharBoxWidth  
+            dup 0.0 ne {
+                div % factor by which to scale up the character
+                /xmulfactor exch def
+            } {pop pop} ifelse
+            grestore
+        } repeat
+
+
+  
+        % Draw the character
+        xmulfactor ymulfactor scale
+        % Move lower left corner of character to start point
+        tc CharBox pop pop % llx lly : Lower left corner
+        exch neg exch neg
+        rmoveto
+        
+        tc show    
+
+    grestore
+} bind def
+
+
+/SetColor{ % <char> SetColor
+  dup color_dict exch known {
+    color_dict exch get aload pop setrgbcolor
+  } {
+    pop
+    default_color aload pop setrgbcolor
+  } ifelse 
+} bind def
+
+/DrawErrorbar{ % interval_down interval_up DrawErrorbar
+    
+    gsave
+    /points_per_unit stack_height yaxis_scale div def 
+    /height_up   exch points_per_unit mul def 
+    /height_down exch points_per_unit mul def
+    
+    show_errorbars {
+    
+    stroke_width setlinewidth
+    errorbar_gray setgray     
+    stack_width 2 div 0 rmoveto
+    
+    /errorbar_width char_width errorbar_width_fraction mul def
+    /errorbar_width2 errorbar_width 2 div def
+    
+    gsave 
+        0 height_down neg rmoveto
+        errorbar_width2 neg 0 rlineto
+        errorbar_width 0 rlineto
+        errorbar_width2 neg 0 rlineto
+        0 height_down errorbar_fraction mul rlineto 
+        stroke
+    grestore
+
+    gsave 
+        0 height_up  rmoveto
+        errorbar_width2 neg 0 rlineto
+        errorbar_width 0 rlineto
+        errorbar_width2 neg 0 rlineto
+        0 height_up neg errorbar_fraction mul rlineto 
+        stroke
+    grestore
+    } if
+           
+    grestore
+    
+} bind def
+
+/DrawErrorbarFirst{ % interval_down interval_up center DrawErrorbarFirst
+    gsave
+    /points_per_unit stack_height yaxis_scale div def 
+    /center   exch points_per_unit mul def 
+
+    0 center rmoveto
+    DrawErrorbar
+    grestore
+} bind def
+
+
+%%EndProlog
+
+%%Page: 1 1
+
+% Example Data
+%StartLogo
+%    StartLine
+%        (1) StartStack
+%            1.2 (C) ShowSymbol
+%            2.2 (I) ShowSymbol
+%            0.5 0.5 DrawErrorbar
+%        EndStack
+%        (2) StartStack
+%            0.5 (I) ShowSymbol
+%            0.9 (L) ShowSymbol
+%            1.0 (G) ShowSymbol
+%            
+%            0.5 0.5 DrawErrorbar        
+%        EndStack
+%        (234) StartStack
+%        EndStack
+%        (235) StartStack
+%        EndStack
+%    EndLine
+%EndLogo
+
+StartLogo
+StartLine
+/color_dict <<
+  (A) [ 0.0 0.4 1.0 ]
+  (C) [ 0.0 1.0 1.0 ]
+  (D) [ 1.0 0.0 0.0 ]
+  (E) [ 0.8 1.0 0.2 ]
+  (F) [ 0.0 1.0 1.0 ]
+  (G) [ 0.0 1.0 0.8 ]
+  (H) [ 0.8 1.0 0.2 ]
+  (I) [ 0.0 1.0 0.8 ]
+  (K) [ 1.0 0.4 0.0 ]
+  (L) [ 0.0 1.0 0.8 ]
+  (M) [ 0.8 1.0 0.2 ]
+  (N) [ 0.0 1.0 0.0 ]
+  (P) [ 0.0 1.0 1.0 ]
+  (Q) [ 0.8 1.0 0.2 ]
+  (R) [ 0.0 1.0 0.8 ]
+  (S) [ 0.8 1.0 0.2 ]
+  (T) [ 0.0 1.0 1.0 ]
+  (V) [ 0.0 1.0 0.8 ]
+  (W) [ 0.0 1.0 0.8 ]
+  (Y) [ 1.0 0.4 0.0 ]
+>> def
+() StartStack
+ 1.000000 0.004505 (C) ShowSymbol
+ 1.000000 0.009009 (W) ShowSymbol
+ 1.000000 0.027027 (M) ShowSymbol
+ 1.000000 0.027027 (H) ShowSymbol
+ 1.000000 0.027027 (F) ShowSymbol
+ 1.000000 0.031532 (P) ShowSymbol
+ 1.000000 0.040541 (T) ShowSymbol
+ 1.000000 0.040541 (I) ShowSymbol
+ 1.000000 0.045045 (Q) ShowSymbol
+ 1.000000 0.045045 (N) ShowSymbol
+ 1.000000 0.049550 (A) ShowSymbol
+ 1.000000 0.054054 (Y) ShowSymbol
+ 1.000000 0.054054 (R) ShowSymbol
+ 1.000000 0.058559 (V) ShowSymbol
+ 1.000000 0.067568 (G) ShowSymbol
+ 1.000000 0.072072 (E) ShowSymbol
+ 1.000000 0.076577 (S) ShowSymbol
+ 1.000000 0.076577 (L) ShowSymbol
+ 1.000000 0.090090 (K) ShowSymbol
+ 1.000000 0.103604 (D) ShowSymbol
+EndStack
+
+/color_dict <<
+  (A) [ 0.0 1.0 0.8 ]
+  (C) [ 0.0 1.0 0.0 ]
+  (D) [ 1.0 0.4 0.0 ]
+  (E) [ 1.0 0.0 0.0 ]
+  (F) [ 0.0 1.0 1.0 ]
+  (G) [ 0.0 1.0 1.0 ]
+  (H) [ 0.0 1.0 1.0 ]
+  (I) [ 0.8 1.0 0.2 ]
+  (K) [ 0.0 1.0 0.0 ]
+  (L) [ 0.0 0.4 1.0 ]
+  (M) [ 0.8 1.0 0.2 ]
+  (N) [ 0.0 1.0 0.8 ]
+  (P) [ 1.0 1.0 0.0 ]
+  (Q) [ 0.0 1.0 0.0 ]
+  (R) [ 1.0 1.0 0.0 ]
+  (S) [ 1.0 1.0 0.0 ]
+  (T) [ 0.0 1.0 0.8 ]
+  (V) [ 0.0 1.0 1.0 ]
+  (W) [ 0.0 1.0 0.0 ]
+  (Y) [ 0.0 1.0 1.0 ]
+>> def
+() StartStack
+ 1.000000 0.009009 (H) ShowSymbol
+ 1.000000 0.013514 (W) ShowSymbol
+ 1.000000 0.018018 (Y) ShowSymbol
+ 1.000000 0.018018 (C) ShowSymbol
+ 1.000000 0.027027 (M) ShowSymbol
+ 1.000000 0.027027 (F) ShowSymbol
+ 1.000000 0.040541 (Q) ShowSymbol
+ 1.000000 0.040541 (N) ShowSymbol
+ 1.000000 0.045045 (T) ShowSymbol
+ 1.000000 0.049550 (V) ShowSymbol
+ 1.000000 0.049550 (G) ShowSymbol
+ 1.000000 0.058559 (L) ShowSymbol
+ 1.000000 0.058559 (K) ShowSymbol
+ 1.000000 0.058559 (I) ShowSymbol
+ 1.000000 0.067568 (P) ShowSymbol
+ 1.000000 0.072072 (R) ShowSymbol
+ 1.000000 0.076577 (A) ShowSymbol
+ 1.000000 0.081081 (D) ShowSymbol
+ 1.000000 0.085586 (S) ShowSymbol
+ 1.000000 0.103604 (E) ShowSymbol
+EndStack
+
+/color_dict <<
+  (A) [ 0.0 0.4 1.0 ]
+  (C) [ 0.0 1.0 0.8 ]
+  (D) [ 0.8 1.0 0.2 ]
+  (E) [ 1.0 1.0 0.0 ]
+  (F) [ 0.0 0.0 1.0 ]
+  (G) [ 1.0 1.0 0.0 ]
+  (H) [ 1.0 1.0 0.0 ]
+  (I) [ 0.0 1.0 0.8 ]
+  (K) [ 0.0 1.0 0.8 ]
+  (L) [ 0.0 1.0 0.0 ]
+  (M) [ 0.0 1.0 0.8 ]
+  (N) [ 1.0 0.0 0.0 ]
+  (P) [ 0.0 1.0 0.8 ]
+  (Q) [ 0.0 1.0 0.8 ]
+  (R) [ 0.0 1.0 0.8 ]
+  (S) [ 0.8 1.0 0.2 ]
+  (T) [ 0.8 1.0 0.2 ]
+  (V) [ 0.0 1.0 0.8 ]
+  (W) [ 0.0 1.0 0.8 ]
+  (Y) [ 0.0 1.0 0.8 ]
+>> def
+() StartStack
+ 1.000000 0.009009 (W) ShowSymbol
+ 1.000000 0.013514 (F) ShowSymbol
+ 1.000000 0.013514 (C) ShowSymbol
+ 1.000000 0.022523 (M) ShowSymbol
+ 1.000000 0.027027 (Y) ShowSymbol
+ 1.000000 0.036036 (Q) ShowSymbol
+ 1.000000 0.036036 (H) ShowSymbol
+ 1.000000 0.040541 (I) ShowSymbol
+ 1.000000 0.045045 (K) ShowSymbol
+ 1.000000 0.049550 (P) ShowSymbol
+ 1.000000 0.054054 (R) ShowSymbol
+ 1.000000 0.054054 (A) ShowSymbol
+ 1.000000 0.058559 (V) ShowSymbol
+ 1.000000 0.058559 (D) ShowSymbol
+ 1.000000 0.063063 (T) ShowSymbol
+ 1.000000 0.076577 (N) ShowSymbol
+ 1.000000 0.076577 (E) ShowSymbol
+ 1.000000 0.081081 (S) ShowSymbol
+ 1.000000 0.090090 (L) ShowSymbol
+ 1.000000 0.094595 (G) ShowSymbol
+EndStack
+
+/color_dict <<
+  (A) [ 0.0 0.0 1.0 ]
+  (C) [ 0.0 1.0 0.0 ]
+  (D) [ 0.8 1.0 0.2 ]
+  (E) [ 1.0 1.0 0.0 ]
+  (F) [ 1.0 1.0 0.0 ]
+  (G) [ 0.0 0.4 1.0 ]
+  (H) [ 0.0 1.0 0.0 ]
+  (I) [ 1.0 0.8 0.0 ]
+  (K) [ 0.8 1.0 0.2 ]
+  (L) [ 0.8 1.0 0.2 ]
+  (M) [ 0.0 1.0 0.8 ]
+  (N) [ 0.0 1.0 1.0 ]
+  (P) [ 0.0 1.0 0.8 ]
+  (Q) [ 1.0 0.4 0.0 ]
+  (R) [ 0.0 1.0 1.0 ]
+  (S) [ 0.0 1.0 0.8 ]
+  (T) [ 0.0 1.0 1.0 ]
+  (V) [ 1.0 0.0 0.0 ]
+  (W) [ 0.0 1.0 0.8 ]
+  (Y) [ 0.8 1.0 0.2 ]
+>> def
+() StartStack
+ 1.000000 0.009009 (W) ShowSymbol
+ 1.000000 0.018018 (C) ShowSymbol
+ 1.000000 0.022523 (M) ShowSymbol
+ 1.000000 0.022523 (H) ShowSymbol
+ 1.000000 0.027027 (N) ShowSymbol
+ 1.000000 0.036036 (Y) ShowSymbol
+ 1.000000 0.036036 (T) ShowSymbol
+ 1.000000 0.036036 (R) ShowSymbol
+ 1.000000 0.040541 (P) ShowSymbol
+ 1.000000 0.045045 (G) ShowSymbol
+ 1.000000 0.045045 (A) ShowSymbol
+ 1.000000 0.054054 (F) ShowSymbol
+ 1.000000 0.058559 (S) ShowSymbol
+ 1.000000 0.058559 (D) ShowSymbol
+ 1.000000 0.063063 (K) ShowSymbol
+ 1.000000 0.067568 (Q) ShowSymbol
+ 1.000000 0.076577 (I) ShowSymbol
+ 1.000000 0.076577 (E) ShowSymbol
+ 1.000000 0.099099 (L) ShowSymbol
+ 1.000000 0.108108 (V) ShowSymbol
+EndStack
+
+/color_dict <<
+  (A) [ 0.2 0.0 0.6 ]
+  (C) [ 0.0 0.0 1.0 ]
+  (D) [ 1.0 0.0 0.0 ]
+  (E) [ 0.8 1.0 0.2 ]
+  (F) [ 0.0 0.4 1.0 ]
+  (G) [ 0.0 1.0 1.0 ]
+  (H) [ 0.8 1.0 0.2 ]
+  (I) [ 0.0 1.0 0.8 ]
+  (K) [ 0.0 1.0 0.0 ]
+  (L) [ 0.0 1.0 0.0 ]
+  (M) [ 0.0 1.0 0.8 ]
+  (N) [ 1.0 1.0 0.0 ]
+  (P) [ 0.0 1.0 1.0 ]
+  (Q) [ 1.0 0.0 0.0 ]
+  (R) [ 1.0 1.0 0.0 ]
+  (S) [ 0.0 1.0 0.8 ]
+  (T) [ 0.0 1.0 0.8 ]
+  (V) [ 0.8 1.0 0.2 ]
+  (W) [ 0.0 1.0 1.0 ]
+  (Y) [ 0.0 1.0 0.8 ]
+>> def
+(5) StartStack
+ 1.000000 0.000000 (C) ShowSymbol
+ 1.000000 0.004505 (W) ShowSymbol
+ 1.000000 0.018018 (M) ShowSymbol
+ 1.000000 0.018018 (F) ShowSymbol
+ 1.000000 0.022523 (Y) ShowSymbol
+ 1.000000 0.027027 (H) ShowSymbol
+ 1.000000 0.036036 (P) ShowSymbol
+ 1.000000 0.036036 (A) ShowSymbol
+ 1.000000 0.045045 (I) ShowSymbol
+ 1.000000 0.049550 (T) ShowSymbol
+ 1.000000 0.049550 (G) ShowSymbol
+ 1.000000 0.058559 (S) ShowSymbol
+ 1.000000 0.058559 (N) ShowSymbol
+ 1.000000 0.058559 (K) ShowSymbol
+ 1.000000 0.067568 (E) ShowSymbol
+ 1.000000 0.072072 (R) ShowSymbol
+ 1.000000 0.076577 (V) ShowSymbol
+ 1.000000 0.090090 (Q) ShowSymbol
+ 1.000000 0.094595 (L) ShowSymbol
+ 1.000000 0.117117 (D) ShowSymbol
+EndStack
+
+/color_dict <<
+  (A) [ 0.2 0.0 0.6 ]
+  (C) [ 0.0 1.0 1.0 ]
+  (D) [ 1.0 0.0 0.0 ]
+  (E) [ 1.0 0.0 0.0 ]
+  (F) [ 0.0 0.4 1.0 ]
+  (G) [ 0.0 0.0 1.0 ]
+  (H) [ 1.0 1.0 0.0 ]
+  (I) [ 0.0 1.0 0.8 ]
+  (K) [ 0.8 1.0 0.2 ]
+  (L) [ 1.0 1.0 0.0 ]
+  (M) [ 0.0 1.0 1.0 ]
+  (N) [ 1.0 0.8 0.0 ]
+  (P) [ 0.0 1.0 0.8 ]
+  (Q) [ 1.0 0.8 0.0 ]
+  (R) [ 0.0 0.4 1.0 ]
+  (S) [ 0.0 1.0 0.0 ]
+  (T) [ 0.8 1.0 0.2 ]
+  (V) [ 0.0 0.4 1.0 ]
+  (W) [ 0.0 1.0 0.8 ]
+  (Y) [ 0.0 1.0 0.8 ]
+>> def
+() StartStack
+ 1.000000 0.004505 (C) ShowSymbol
+ 1.000000 0.009009 (W) ShowSymbol
+ 1.000000 0.013514 (M) ShowSymbol
+ 1.000000 0.018018 (F) ShowSymbol
+ 1.000000 0.027027 (Y) ShowSymbol
+ 1.000000 0.031532 (R) ShowSymbol
+ 1.000000 0.036036 (V) ShowSymbol
+ 1.000000 0.036036 (H) ShowSymbol
+ 1.000000 0.036036 (G) ShowSymbol
+ 1.000000 0.040541 (I) ShowSymbol
+ 1.000000 0.040541 (A) ShowSymbol
+ 1.000000 0.045045 (P) ShowSymbol
+ 1.000000 0.063063 (T) ShowSymbol
+ 1.000000 0.063063 (Q) ShowSymbol
+ 1.000000 0.063063 (K) ShowSymbol
+ 1.000000 0.067568 (N) ShowSymbol
+ 1.000000 0.072072 (S) ShowSymbol
+ 1.000000 0.085586 (D) ShowSymbol
+ 1.000000 0.112613 (L) ShowSymbol
+ 1.000000 0.135135 (E) ShowSymbol
+EndStack
+
+/color_dict <<
+  (A) [ 0.2 0.0 0.6 ]
+  (C) [ 0.0 1.0 0.8 ]
+  (D) [ 0.0 1.0 0.8 ]
+  (E) [ 0.0 1.0 0.8 ]
+  (F) [ 0.0 1.0 1.0 ]
+  (G) [ 0.2 0.0 0.6 ]
+  (H) [ 0.0 1.0 0.0 ]
+  (I) [ 1.0 0.0 0.0 ]
+  (K) [ 0.0 1.0 1.0 ]
+  (L) [ 1.0 0.0 0.0 ]
+  (M) [ 1.0 1.0 0.0 ]
+  (N) [ 0.0 1.0 1.0 ]
+  (P) [ 0.0 1.0 1.0 ]
+  (Q) [ 0.0 1.0 0.8 ]
+  (R) [ 0.0 1.0 1.0 ]
+  (S) [ 0.0 1.0 1.0 ]
+  (T) [ 0.0 1.0 0.8 ]
+  (V) [ 0.0 1.0 0.0 ]
+  (W) [ 0.0 1.0 0.8 ]
+  (Y) [ 0.0 1.0 0.8 ]
+>> def
+() StartStack
+ 1.000000 0.009009 (W) ShowSymbol
+ 1.000000 0.013514 (C) ShowSymbol
+ 1.000000 0.018018 (G) ShowSymbol
+ 1.000000 0.022523 (Y) ShowSymbol
+ 1.000000 0.022523 (H) ShowSymbol
+ 1.000000 0.027027 (F) ShowSymbol
+ 1.000000 0.027027 (A) ShowSymbol
+ 1.000000 0.031532 (N) ShowSymbol
+ 1.000000 0.036036 (R) ShowSymbol
+ 1.000000 0.036036 (Q) ShowSymbol
+ 1.000000 0.036036 (P) ShowSymbol
+ 1.000000 0.036036 (M) ShowSymbol
+ 1.000000 0.036036 (K) ShowSymbol
+ 1.000000 0.040541 (D) ShowSymbol
+ 1.000000 0.049550 (S) ShowSymbol
+ 1.000000 0.049550 (E) ShowSymbol
+ 1.000000 0.054054 (T) ShowSymbol
+ 1.000000 0.067568 (V) ShowSymbol
+ 1.000000 0.090090 (I) ShowSymbol
+ 1.000000 0.297297 (L) ShowSymbol
+EndStack
+
+/color_dict <<
+  (A) [ 0.0 0.4 1.0 ]
+  (C) [ 1.0 0.8 0.0 ]
+  (D) [ 1.0 1.0 0.0 ]
+  (E) [ 0.0 1.0 0.0 ]
+  (F) [ 0.0 1.0 1.0 ]
+  (G) [ 0.0 0.0 1.0 ]
+  (H) [ 0.8 1.0 0.2 ]
+  (I) [ 0.8 1.0 0.2 ]
+  (K) [ 1.0 0.8 0.0 ]
+  (L) [ 1.0 0.0 0.0 ]
+  (M) [ 0.0 0.4 1.0 ]
+  (N) [ 0.0 0.0 1.0 ]
+  (P) [ 0.0 0.4 1.0 ]
+  (Q) [ 1.0 1.0 0.0 ]
+  (R) [ 0.0 1.0 1.0 ]
+  (S) [ 0.0 1.0 0.8 ]
+  (T) [ 1.0 0.8 0.0 ]
+  (V) [ 0.0 1.0 0.8 ]
+  (W) [ 0.8 1.0 0.2 ]
+  (Y) [ 0.0 0.0 1.0 ]
+>> def
+() StartStack
+ 1.000000 0.009009 (Y) ShowSymbol
+ 1.000000 0.009009 (M) ShowSymbol
+ 1.000000 0.018018 (W) ShowSymbol
+ 1.000000 0.018018 (N) ShowSymbol
+ 1.000000 0.027027 (P) ShowSymbol
+ 1.000000 0.027027 (H) ShowSymbol
+ 1.000000 0.027027 (F) ShowSymbol
+ 1.000000 0.031532 (C) ShowSymbol
+ 1.000000 0.036036 (R) ShowSymbol
+ 1.000000 0.040541 (G) ShowSymbol
+ 1.000000 0.054054 (A) ShowSymbol
+ 1.000000 0.058559 (V) ShowSymbol
+ 1.000000 0.058559 (S) ShowSymbol
+ 1.000000 0.058559 (Q) ShowSymbol
+ 1.000000 0.063063 (I) ShowSymbol
+ 1.000000 0.063063 (E) ShowSymbol
+ 1.000000 0.067568 (D) ShowSymbol
+ 1.000000 0.081081 (K) ShowSymbol
+ 1.000000 0.085586 (T) ShowSymbol
+ 1.000000 0.166667 (L) ShowSymbol
+EndStack
+
+/color_dict <<
+  (A) [ 0.0 0.0 1.0 ]
+  (C) [ 0.0 1.0 0.8 ]
+  (D) [ 1.0 0.0 0.0 ]
+  (E) [ 1.0 0.0 0.0 ]
+  (F) [ 0.0 0.4 1.0 ]
+  (G) [ 0.2 0.0 0.6 ]
+  (H) [ 0.0 1.0 0.8 ]
+  (I) [ 0.0 1.0 1.0 ]
+  (K) [ 1.0 0.0 0.0 ]
+  (L) [ 1.0 0.0 0.0 ]
+  (M) [ 0.0 1.0 1.0 ]
+  (N) [ 0.0 1.0 0.8 ]
+  (P) [ 0.0 1.0 0.8 ]
+  (Q) [ 1.0 1.0 0.0 ]
+  (R) [ 0.8 1.0 0.2 ]
+  (S) [ 0.0 1.0 0.8 ]
+  (T) [ 0.0 0.4 1.0 ]
+  (V) [ 0.0 0.4 1.0 ]
+  (W) [ 0.0 1.0 0.8 ]
+  (Y) [ 0.2 0.0 0.6 ]
+>> def
+() StartStack
+ 1.000000 0.004505 (Y) ShowSymbol
+ 1.000000 0.009009 (W) ShowSymbol
+ 1.000000 0.013514 (M) ShowSymbol
+ 1.000000 0.013514 (C) ShowSymbol
+ 1.000000 0.018018 (H) ShowSymbol
+ 1.000000 0.018018 (F) ShowSymbol
+ 1.000000 0.027027 (G) ShowSymbol
+ 1.000000 0.031532 (T) ShowSymbol
+ 1.000000 0.036036 (V) ShowSymbol
+ 1.000000 0.036036 (N) ShowSymbol
+ 1.000000 0.036036 (I) ShowSymbol
+ 1.000000 0.045045 (A) ShowSymbol
+ 1.000000 0.049550 (P) ShowSymbol
+ 1.000000 0.054054 (Q) ShowSymbol
+ 1.000000 0.063063 (S) ShowSymbol
+ 1.000000 0.063063 (R) ShowSymbol
+ 1.000000 0.085586 (D) ShowSymbol
+ 1.000000 0.112613 (K) ShowSymbol
+ 1.000000 0.121622 (E) ShowSymbol
+ 1.000000 0.162162 (L) ShowSymbol
+EndStack
+
+/color_dict <<
+  (A) [ 0.0 1.0 0.8 ]
+  (C) [ 1.0 0.8 0.0 ]
+  (D) [ 1.0 0.8 0.0 ]
+  (E) [ 1.0 0.0 0.0 ]
+  (F) [ 0.0 0.4 1.0 ]
+  (G) [ 0.0 0.4 1.0 ]
+  (H) [ 0.0 1.0 1.0 ]
+  (I) [ 0.0 1.0 0.8 ]
+  (K) [ 1.0 0.0 0.0 ]
+  (L) [ 1.0 1.0 0.0 ]
+  (M) [ 0.0 1.0 0.8 ]
+  (N) [ 0.0 1.0 1.0 ]
+  (P) [ 0.0 1.0 1.0 ]
+  (Q) [ 1.0 0.0 0.0 ]
+  (R) [ 1.0 1.0 0.0 ]
+  (S) [ 0.0 1.0 0.8 ]
+  (T) [ 0.0 1.0 1.0 ]
+  (V) [ 0.0 0.4 1.0 ]
+  (W) [ 0.0 1.0 0.8 ]
+  (Y) [ 0.0 0.4 1.0 ]
+>> def
+(10) StartStack
+ 1.000000 0.009009 (W) ShowSymbol
+ 1.000000 0.013514 (Y) ShowSymbol
+ 1.000000 0.013514 (H) ShowSymbol
+ 1.000000 0.018018 (M) ShowSymbol
+ 1.000000 0.018018 (F) ShowSymbol
+ 1.000000 0.027027 (N) ShowSymbol
+ 1.000000 0.031532 (P) ShowSymbol
+ 1.000000 0.031532 (C) ShowSymbol
+ 1.000000 0.036036 (V) ShowSymbol
+ 1.000000 0.040541 (T) ShowSymbol
+ 1.000000 0.040541 (I) ShowSymbol
+ 1.000000 0.045045 (G) ShowSymbol
+ 1.000000 0.058559 (S) ShowSymbol
+ 1.000000 0.072072 (A) ShowSymbol
+ 1.000000 0.076577 (R) ShowSymbol
+ 1.000000 0.076577 (Q) ShowSymbol
+ 1.000000 0.076577 (D) ShowSymbol
+ 1.000000 0.094595 (K) ShowSymbol
+ 1.000000 0.103604 (E) ShowSymbol
+ 1.000000 0.117117 (L) ShowSymbol
+EndStack
+
+/color_dict <<
+  (A) [ 0.2 0.0 0.6 ]
+  (C) [ 0.0 0.0 1.0 ]
+  (D) [ 0.2 0.0 0.6 ]
+  (E) [ 0.2 0.0 0.6 ]
+  (F) [ 1.0 0.0 0.0 ]
+  (G) [ 0.2 0.0 0.6 ]
+  (H) [ 0.2 0.0 0.6 ]
+  (I) [ 1.0 0.0 0.0 ]
+  (K) [ 0.2 0.0 0.6 ]
+  (L) [ 1.0 0.0 0.0 ]
+  (M) [ 1.0 0.0 0.0 ]
+  (N) [ 0.2 0.0 0.6 ]
+  (P) [ 0.2 0.0 0.6 ]
+  (Q) [ 0.2 0.0 0.6 ]
+  (R) [ 0.2 0.0 0.6 ]
+  (S) [ 0.2 0.0 0.6 ]
+  (T) [ 0.2 0.0 0.6 ]
+  (V) [ 1.0 0.0 0.0 ]
+  (W) [ 0.0 0.4 1.0 ]
+  (Y) [ 0.2 0.0 0.6 ]
+>> def
+() StartStack
+ 1.000000 0.000000 (Y) ShowSymbol
+ 1.000000 0.000000 (W) ShowSymbol
+ 1.000000 0.000000 (T) ShowSymbol
+ 1.000000 0.000000 (S) ShowSymbol
+ 1.000000 0.000000 (R) ShowSymbol
+ 1.000000 0.000000 (Q) ShowSymbol
+ 1.000000 0.000000 (P) ShowSymbol
+ 1.000000 0.000000 (N) ShowSymbol
+ 1.000000 0.000000 (K) ShowSymbol
+ 1.000000 0.000000 (H) ShowSymbol
+ 1.000000 0.000000 (G) ShowSymbol
+ 1.000000 0.000000 (E) ShowSymbol
+ 1.000000 0.000000 (D) ShowSymbol
+ 1.000000 0.000000 (C) ShowSymbol
+ 1.000000 0.000000 (A) ShowSymbol
+ 1.000000 0.081081 (M) ShowSymbol
+ 1.000000 0.135135 (V) ShowSymbol
+ 1.000000 0.135135 (I) ShowSymbol
+ 1.000000 0.153153 (F) ShowSymbol
+ 1.000000 0.495495 (L) ShowSymbol
+EndStack
+
+/color_dict <<
+  (A) [ 0.0 1.0 0.8 ]
+  (C) [ 1.0 0.8 0.0 ]
+  (D) [ 1.0 0.0 0.0 ]
+  (E) [ 1.0 0.0 0.0 ]
+  (F) [ 0.0 1.0 1.0 ]
+  (G) [ 0.0 1.0 1.0 ]
+  (H) [ 0.0 1.0 0.0 ]
+  (I) [ 0.2 0.0 0.6 ]
+  (K) [ 0.0 1.0 0.8 ]
+  (L) [ 0.0 1.0 0.8 ]
+  (M) [ 0.0 1.0 1.0 ]
+  (N) [ 0.0 1.0 0.0 ]
+  (P) [ 0.2 0.0 0.6 ]
+  (Q) [ 1.0 0.8 0.0 ]
+  (R) [ 0.8 1.0 0.2 ]
+  (S) [ 1.0 0.0 0.0 ]
+  (T) [ 0.0 1.0 1.0 ]
+  (V) [ 0.0 0.0 1.0 ]
+  (W) [ 0.0 1.0 1.0 ]
+  (Y) [ 0.0 1.0 0.8 ]
+>> def
+() StartStack
+ 1.000000 0.004505 (W) ShowSymbol
+ 1.000000 0.009009 (P) ShowSymbol
+ 1.000000 0.009009 (I) ShowSymbol
+ 1.000000 0.013514 (M) ShowSymbol
+ 1.000000 0.022523 (Y) ShowSymbol
+ 1.000000 0.022523 (H) ShowSymbol
+ 1.000000 0.022523 (F) ShowSymbol
+ 1.000000 0.031532 (V) ShowSymbol
+ 1.000000 0.031532 (C) ShowSymbol
+ 1.000000 0.036036 (T) ShowSymbol
+ 1.000000 0.045045 (N) ShowSymbol
+ 1.000000 0.049550 (G) ShowSymbol
+ 1.000000 0.054054 (K) ShowSymbol
+ 1.000000 0.063063 (R) ShowSymbol
+ 1.000000 0.063063 (Q) ShowSymbol
+ 1.000000 0.072072 (A) ShowSymbol
+ 1.000000 0.081081 (L) ShowSymbol
+ 1.000000 0.090090 (D) ShowSymbol
+ 1.000000 0.108108 (S) ShowSymbol
+ 1.000000 0.171171 (E) ShowSymbol
+EndStack
+
+/color_dict <<
+  (A) [ 0.0 1.0 1.0 ]
+  (C) [ 0.0 1.0 0.0 ]
+  (D) [ 1.0 0.0 0.0 ]
+  (E) [ 1.0 0.0 0.0 ]
+  (F) [ 0.0 1.0 1.0 ]
+  (G) [ 0.0 1.0 0.8 ]
+  (H) [ 0.0 1.0 1.0 ]
+  (I) [ 0.2 0.0 0.6 ]
+  (K) [ 1.0 0.8 0.0 ]
+  (L) [ 0.0 0.0 1.0 ]
+  (M) [ 0.0 0.4 1.0 ]
+  (N) [ 1.0 1.0 0.0 ]
+  (P) [ 0.0 0.0 1.0 ]
+  (Q) [ 1.0 0.8 0.0 ]
+  (R) [ 1.0 0.8 0.0 ]
+  (S) [ 0.0 1.0 0.8 ]
+  (T) [ 0.8 1.0 0.2 ]
+  (V) [ 0.0 1.0 0.8 ]
+  (W) [ 0.0 0.4 1.0 ]
+  (Y) [ 0.0 1.0 1.0 ]
+>> def
+() StartStack
+ 1.000000 0.000000 (W) ShowSymbol
+ 1.000000 0.009009 (M) ShowSymbol
+ 1.000000 0.013514 (I) ShowSymbol
+ 1.000000 0.013514 (H) ShowSymbol
+ 1.000000 0.018018 (Y) ShowSymbol
+ 1.000000 0.018018 (C) ShowSymbol
+ 1.000000 0.022523 (P) ShowSymbol
+ 1.000000 0.027027 (F) ShowSymbol
+ 1.000000 0.054054 (V) ShowSymbol
+ 1.000000 0.054054 (L) ShowSymbol
+ 1.000000 0.058559 (S) ShowSymbol
+ 1.000000 0.058559 (N) ShowSymbol
+ 1.000000 0.058559 (A) ShowSymbol
+ 1.000000 0.063063 (Q) ShowSymbol
+ 1.000000 0.067568 (T) ShowSymbol
+ 1.000000 0.067568 (G) ShowSymbol
+ 1.000000 0.081081 (R) ShowSymbol
+ 1.000000 0.081081 (K) ShowSymbol
+ 1.000000 0.103604 (E) ShowSymbol
+ 1.000000 0.130631 (D) ShowSymbol
+EndStack
+
+/color_dict <<
+  (A) [ 0.2 0.0 0.6 ]
+  (C) [ 0.0 0.0 1.0 ]
+  (D) [ 0.2 0.0 0.6 ]
+  (E) [ 0.2 0.0 0.6 ]
+  (F) [ 1.0 0.8 0.0 ]
+  (G) [ 0.2 0.0 0.6 ]
+  (H) [ 0.2 0.0 0.6 ]
+  (I) [ 1.0 0.0 0.0 ]
+  (K) [ 0.2 0.0 0.6 ]
+  (L) [ 1.0 0.0 0.0 ]
+  (M) [ 1.0 0.0 0.0 ]
+  (N) [ 0.2 0.0 0.6 ]
+  (P) [ 0.2 0.0 0.6 ]
+  (Q) [ 0.2 0.0 0.6 ]
+  (R) [ 0.2 0.0 0.6 ]
+  (S) [ 0.2 0.0 0.6 ]
+  (T) [ 0.2 0.0 0.6 ]
+  (V) [ 1.0 1.0 0.0 ]
+  (W) [ 0.0 0.4 1.0 ]
+  (Y) [ 0.2 0.0 0.6 ]
+>> def
+() StartStack
+ 1.000000 0.000000 (Y) ShowSymbol
+ 1.000000 0.000000 (W) ShowSymbol
+ 1.000000 0.000000 (T) ShowSymbol
+ 1.000000 0.000000 (S) ShowSymbol
+ 1.000000 0.000000 (R) ShowSymbol
+ 1.000000 0.000000 (Q) ShowSymbol
+ 1.000000 0.000000 (P) ShowSymbol
+ 1.000000 0.000000 (N) ShowSymbol
+ 1.000000 0.000000 (K) ShowSymbol
+ 1.000000 0.000000 (H) ShowSymbol
+ 1.000000 0.000000 (G) ShowSymbol
+ 1.000000 0.000000 (E) ShowSymbol
+ 1.000000 0.000000 (D) ShowSymbol
+ 1.000000 0.000000 (C) ShowSymbol
+ 1.000000 0.000000 (A) ShowSymbol
+ 1.000000 0.058559 (F) ShowSymbol
+ 1.000000 0.090090 (V) ShowSymbol
+ 1.000000 0.094595 (M) ShowSymbol
+ 1.000000 0.135135 (I) ShowSymbol
+ 1.000000 0.621622 (L) ShowSymbol
+EndStack
+
+/color_dict <<
+  (A) [ 0.0 0.4 1.0 ]
+  (C) [ 0.0 1.0 1.0 ]
+  (D) [ 1.0 1.0 0.0 ]
+  (E) [ 0.0 1.0 0.8 ]
+  (F) [ 0.2 0.0 0.6 ]
+  (G) [ 0.0 1.0 1.0 ]
+  (H) [ 0.0 1.0 0.8 ]
+  (I) [ 0.0 1.0 0.8 ]
+  (K) [ 0.0 1.0 0.8 ]
+  (L) [ 0.0 0.4 1.0 ]
+  (M) [ 0.0 1.0 1.0 ]
+  (N) [ 0.8 1.0 0.2 ]
+  (P) [ 0.0 1.0 0.8 ]
+  (Q) [ 1.0 0.0 0.0 ]
+  (R) [ 1.0 0.8 0.0 ]
+  (S) [ 1.0 0.0 0.0 ]
+  (T) [ 1.0 0.0 0.0 ]
+  (V) [ 0.0 1.0 1.0 ]
+  (W) [ 0.0 0.4 1.0 ]
+  (Y) [ 0.0 1.0 0.8 ]
+>> def
+(15) StartStack
+ 1.000000 0.000000 (W) ShowSymbol
+ 1.000000 0.004505 (F) ShowSymbol
+ 1.000000 0.004505 (C) ShowSymbol
+ 1.000000 0.013514 (M) ShowSymbol
+ 1.000000 0.018018 (H) ShowSymbol
+ 1.000000 0.022523 (Y) ShowSymbol
+ 1.000000 0.040541 (P) ShowSymbol
+ 1.000000 0.045045 (V) ShowSymbol
+ 1.000000 0.045045 (I) ShowSymbol
+ 1.000000 0.049550 (N) ShowSymbol
+ 1.000000 0.049550 (A) ShowSymbol
+ 1.000000 0.054054 (K) ShowSymbol
+ 1.000000 0.054054 (G) ShowSymbol
+ 1.000000 0.058559 (L) ShowSymbol
+ 1.000000 0.058559 (E) ShowSymbol
+ 1.000000 0.067568 (D) ShowSymbol
+ 1.000000 0.081081 (R) ShowSymbol
+ 1.000000 0.085586 (Q) ShowSymbol
+ 1.000000 0.121622 (S) ShowSymbol
+ 1.000000 0.126126 (T) ShowSymbol
+EndStack
+
+/color_dict <<
+  (A) [ 0.2 0.0 0.6 ]
+  (C) [ 0.0 0.0 1.0 ]
+  (D) [ 0.2 0.0 0.6 ]
+  (E) [ 0.2 0.0 0.6 ]
+  (F) [ 1.0 0.0 0.0 ]
+  (G) [ 0.2 0.0 0.6 ]
+  (H) [ 0.2 0.0 0.6 ]
+  (I) [ 1.0 0.0 0.0 ]
+  (K) [ 0.2 0.0 0.6 ]
+  (L) [ 1.0 0.0 0.0 ]
+  (M) [ 1.0 0.0 0.0 ]
+  (N) [ 0.2 0.0 0.6 ]
+  (P) [ 0.2 0.0 0.6 ]
+  (Q) [ 0.2 0.0 0.6 ]
+  (R) [ 0.2 0.0 0.6 ]
+  (S) [ 0.2 0.0 0.6 ]
+  (T) [ 0.2 0.0 0.6 ]
+  (V) [ 1.0 0.0 0.0 ]
+  (W) [ 0.0 0.4 1.0 ]
+  (Y) [ 0.2 0.0 0.6 ]
+>> def
+() StartStack
+ 1.000000 0.000000 (Y) ShowSymbol
+ 1.000000 0.000000 (W) ShowSymbol
+ 1.000000 0.000000 (T) ShowSymbol
+ 1.000000 0.000000 (S) ShowSymbol
+ 1.000000 0.000000 (R) ShowSymbol
+ 1.000000 0.000000 (Q) ShowSymbol
+ 1.000000 0.000000 (P) ShowSymbol
+ 1.000000 0.000000 (N) ShowSymbol
+ 1.000000 0.000000 (K) ShowSymbol
+ 1.000000 0.000000 (H) ShowSymbol
+ 1.000000 0.000000 (G) ShowSymbol
+ 1.000000 0.000000 (E) ShowSymbol
+ 1.000000 0.000000 (D) ShowSymbol
+ 1.000000 0.000000 (C) ShowSymbol
+ 1.000000 0.000000 (A) ShowSymbol
+ 1.000000 0.054054 (M) ShowSymbol
+ 1.000000 0.076577 (F) ShowSymbol
+ 1.000000 0.153153 (V) ShowSymbol
+ 1.000000 0.189189 (I) ShowSymbol
+ 1.000000 0.527027 (L) ShowSymbol
+EndStack
+
+/color_dict <<
+  (A) [ 0.0 0.4 1.0 ]
+  (C) [ 0.0 1.0 1.0 ]
+  (D) [ 1.0 0.0 0.0 ]
+  (E) [ 1.0 0.0 0.0 ]
+  (F) [ 0.2 0.0 0.6 ]
+  (G) [ 0.0 1.0 0.8 ]
+  (H) [ 1.0 1.0 0.0 ]
+  (I) [ 0.0 1.0 1.0 ]
+  (K) [ 0.0 1.0 0.0 ]
+  (L) [ 1.0 1.0 0.0 ]
+  (M) [ 0.8 1.0 0.2 ]
+  (N) [ 0.8 1.0 0.2 ]
+  (P) [ 0.0 0.4 1.0 ]
+  (Q) [ 1.0 1.0 0.0 ]
+  (R) [ 0.0 1.0 0.8 ]
+  (S) [ 0.8 1.0 0.2 ]
+  (T) [ 0.0 1.0 0.8 ]
+  (V) [ 0.0 1.0 1.0 ]
+  (W) [ 0.0 1.0 0.8 ]
+  (Y) [ 0.0 1.0 0.8 ]
+>> def
+() StartStack
+ 1.000000 0.009009 (W) ShowSymbol
+ 1.000000 0.009009 (F) ShowSymbol
+ 1.000000 0.009009 (C) ShowSymbol
+ 1.000000 0.027027 (Y) ShowSymbol
+ 1.000000 0.027027 (P) ShowSymbol
+ 1.000000 0.031532 (M) ShowSymbol
+ 1.000000 0.036036 (I) ShowSymbol
+ 1.000000 0.036036 (H) ShowSymbol
+ 1.000000 0.045045 (R) ShowSymbol
+ 1.000000 0.049550 (V) ShowSymbol
+ 1.000000 0.049550 (N) ShowSymbol
+ 1.000000 0.049550 (A) ShowSymbol
+ 1.000000 0.054054 (T) ShowSymbol
+ 1.000000 0.054054 (Q) ShowSymbol
+ 1.000000 0.058559 (K) ShowSymbol
+ 1.000000 0.063063 (G) ShowSymbol
+ 1.000000 0.081081 (S) ShowSymbol
+ 1.000000 0.094595 (D) ShowSymbol
+ 1.000000 0.108108 (L) ShowSymbol
+ 1.000000 0.108108 (E) ShowSymbol
+EndStack
+
+/color_dict <<
+  (A) [ 0.0 0.4 1.0 ]
+  (C) [ 0.0 1.0 0.0 ]
+  (D) [ 1.0 0.0 0.0 ]
+  (E) [ 0.8 1.0 0.2 ]
+  (F) [ 0.0 1.0 0.8 ]
+  (G) [ 0.0 1.0 1.0 ]
+  (H) [ 0.0 1.0 0.8 ]
+  (I) [ 0.0 0.4 1.0 ]
+  (K) [ 1.0 0.4 0.0 ]
+  (L) [ 0.0 1.0 0.0 ]
+  (M) [ 0.0 0.4 1.0 ]
+  (N) [ 0.8 1.0 0.2 ]
+  (P) [ 1.0 0.0 0.0 ]
+  (Q) [ 0.0 1.0 0.8 ]
+  (R) [ 0.0 0.4 1.0 ]
+  (S) [ 1.0 1.0 0.0 ]
+  (T) [ 0.0 1.0 0.8 ]
+  (V) [ 0.0 1.0 0.8 ]
+  (W) [ 0.0 1.0 1.0 ]
+  (Y) [ 0.8 1.0 0.2 ]
+>> def
+() StartStack
+ 1.000000 0.004505 (W) ShowSymbol
+ 1.000000 0.009009 (M) ShowSymbol
+ 1.000000 0.018018 (H) ShowSymbol
+ 1.000000 0.018018 (C) ShowSymbol
+ 1.000000 0.027027 (I) ShowSymbol
+ 1.000000 0.031532 (R) ShowSymbol
+ 1.000000 0.036036 (Y) ShowSymbol
+ 1.000000 0.036036 (Q) ShowSymbol
+ 1.000000 0.036036 (F) ShowSymbol
+ 1.000000 0.049550 (T) ShowSymbol
+ 1.000000 0.049550 (G) ShowSymbol
+ 1.000000 0.049550 (A) ShowSymbol
+ 1.000000 0.054054 (N) ShowSymbol
+ 1.000000 0.063063 (V) ShowSymbol
+ 1.000000 0.072072 (E) ShowSymbol
+ 1.000000 0.085586 (S) ShowSymbol
+ 1.000000 0.085586 (P) ShowSymbol
+ 1.000000 0.090090 (L) ShowSymbol
+ 1.000000 0.090090 (K) ShowSymbol
+ 1.000000 0.094595 (D) ShowSymbol
+EndStack
+
+/color_dict <<
+  (A) [ 0.0 0.4 1.0 ]
+  (C) [ 0.0 1.0 0.8 ]
+  (D) [ 0.8 1.0 0.2 ]
+  (E) [ 1.0 0.0 0.0 ]
+  (F) [ 0.0 1.0 0.0 ]
+  (G) [ 0.0 1.0 1.0 ]
+  (H) [ 0.0 1.0 1.0 ]
+  (I) [ 0.0 1.0 1.0 ]
+  (K) [ 0.0 1.0 0.8 ]
+  (L) [ 0.0 1.0 0.8 ]
+  (M) [ 0.0 1.0 0.8 ]
+  (N) [ 1.0 1.0 0.0 ]
+  (P) [ 1.0 1.0 0.0 ]
+  (Q) [ 1.0 1.0 0.0 ]
+  (R) [ 0.0 1.0 1.0 ]
+  (S) [ 1.0 0.4 0.0 ]
+  (T) [ 0.0 1.0 1.0 ]
+  (V) [ 0.8 1.0 0.2 ]
+  (W) [ 0.0 1.0 1.0 ]
+  (Y) [ 0.0 1.0 0.8 ]
+>> def
+() StartStack
+ 1.000000 0.004505 (W) ShowSymbol
+ 1.000000 0.009009 (H) ShowSymbol
+ 1.000000 0.013514 (C) ShowSymbol
+ 1.000000 0.018018 (M) ShowSymbol
+ 1.000000 0.027027 (Y) ShowSymbol
+ 1.000000 0.036036 (I) ShowSymbol
+ 1.000000 0.040541 (T) ShowSymbol
+ 1.000000 0.040541 (R) ShowSymbol
+ 1.000000 0.040541 (F) ShowSymbol
+ 1.000000 0.049550 (G) ShowSymbol
+ 1.000000 0.054054 (Q) ShowSymbol
+ 1.000000 0.054054 (K) ShowSymbol
+ 1.000000 0.054054 (A) ShowSymbol
+ 1.000000 0.058559 (D) ShowSymbol
+ 1.000000 0.063063 (N) ShowSymbol
+ 1.000000 0.067568 (P) ShowSymbol
+ 1.000000 0.076577 (V) ShowSymbol
+ 1.000000 0.085586 (L) ShowSymbol
+ 1.000000 0.103604 (S) ShowSymbol
+ 1.000000 0.103604 (E) ShowSymbol
+EndStack
+
+/color_dict <<
+  (A) [ 0.0 0.0 1.0 ]
+  (C) [ 0.0 1.0 1.0 ]
+  (D) [ 1.0 1.0 0.0 ]
+  (E) [ 0.8 1.0 0.2 ]
+  (F) [ 0.0 1.0 1.0 ]
+  (G) [ 0.0 1.0 0.8 ]
+  (H) [ 0.8 1.0 0.2 ]
+  (I) [ 0.0 1.0 0.8 ]
+  (K) [ 0.8 1.0 0.2 ]
+  (L) [ 1.0 0.4 0.0 ]
+  (M) [ 0.2 0.0 0.6 ]
+  (N) [ 0.8 1.0 0.2 ]
+  (P) [ 1.0 0.0 0.0 ]
+  (Q) [ 1.0 0.4 0.0 ]
+  (R) [ 0.0 0.0 1.0 ]
+  (S) [ 1.0 0.8 0.0 ]
+  (T) [ 0.0 1.0 1.0 ]
+  (V) [ 0.0 1.0 1.0 ]
+  (W) [ 0.0 0.4 1.0 ]
+  (Y) [ 0.0 1.0 0.8 ]
+>> def
+(20) StartStack
+ 1.000000 0.000000 (W) ShowSymbol
+ 1.000000 0.000000 (M) ShowSymbol
+ 1.000000 0.009009 (C) ShowSymbol
+ 1.000000 0.022523 (Y) ShowSymbol
+ 1.000000 0.027027 (R) ShowSymbol
+ 1.000000 0.027027 (H) ShowSymbol
+ 1.000000 0.027027 (F) ShowSymbol
+ 1.000000 0.040541 (T) ShowSymbol
+ 1.000000 0.045045 (V) ShowSymbol
+ 1.000000 0.045045 (A) ShowSymbol
+ 1.000000 0.049550 (N) ShowSymbol
+ 1.000000 0.049550 (I) ShowSymbol
+ 1.000000 0.067568 (Q) ShowSymbol
+ 1.000000 0.067568 (K) ShowSymbol
+ 1.000000 0.067568 (G) ShowSymbol
+ 1.000000 0.067568 (D) ShowSymbol
+ 1.000000 0.072072 (E) ShowSymbol
+ 1.000000 0.085586 (P) ShowSymbol
+ 1.000000 0.099099 (S) ShowSymbol
+ 1.000000 0.130631 (L) ShowSymbol
+EndStack
+
+/color_dict <<
+  (A) [ 0.0 1.0 1.0 ]
+  (C) [ 1.0 0.8 0.0 ]
+  (D) [ 0.0 1.0 0.8 ]
+  (E) [ 0.8 1.0 0.2 ]
+  (F) [ 0.0 1.0 1.0 ]
+  (G) [ 0.0 1.0 0.8 ]
+  (H) [ 0.0 1.0 0.0 ]
+  (I) [ 0.0 1.0 0.8 ]
+  (K) [ 1.0 1.0 0.0 ]
+  (L) [ 1.0 0.0 0.0 ]
+  (M) [ 0.0 1.0 0.8 ]
+  (N) [ 0.0 0.4 1.0 ]
+  (P) [ 0.8 1.0 0.2 ]
+  (Q) [ 0.0 1.0 0.8 ]
+  (R) [ 0.0 1.0 0.8 ]
+  (S) [ 1.0 0.0 0.0 ]
+  (T) [ 0.0 1.0 1.0 ]
+  (V) [ 0.0 1.0 0.8 ]
+  (W) [ 0.0 1.0 0.8 ]
+  (Y) [ 0.0 0.0 1.0 ]
+>> def
+() StartStack
+ 1.000000 0.009009 (Y) ShowSymbol
+ 1.000000 0.009009 (W) ShowSymbol
+ 1.000000 0.022523 (N) ShowSymbol
+ 1.000000 0.022523 (M) ShowSymbol
+ 1.000000 0.022523 (H) ShowSymbol
+ 1.000000 0.027027 (F) ShowSymbol
+ 1.000000 0.031532 (Q) ShowSymbol
+ 1.000000 0.031532 (C) ShowSymbol
+ 1.000000 0.040541 (T) ShowSymbol
+ 1.000000 0.040541 (D) ShowSymbol
+ 1.000000 0.045045 (I) ShowSymbol
+ 1.000000 0.054054 (R) ShowSymbol
+ 1.000000 0.058559 (V) ShowSymbol
+ 1.000000 0.058559 (A) ShowSymbol
+ 1.000000 0.063063 (P) ShowSymbol
+ 1.000000 0.063063 (G) ShowSymbol
+ 1.000000 0.067568 (E) ShowSymbol
+ 1.000000 0.072072 (K) ShowSymbol
+ 1.000000 0.112613 (S) ShowSymbol
+ 1.000000 0.148649 (L) ShowSymbol
+EndStack
+
+/color_dict <<
+  (A) [ 0.2 0.0 0.6 ]
+  (C) [ 0.0 1.0 0.8 ]
+  (D) [ 1.0 0.8 0.0 ]
+  (E) [ 1.0 1.0 0.0 ]
+  (F) [ 0.8 1.0 0.2 ]
+  (G) [ 0.0 1.0 0.8 ]
+  (H) [ 0.0 1.0 0.0 ]
+  (I) [ 0.0 1.0 0.8 ]
+  (K) [ 0.0 1.0 1.0 ]
+  (L) [ 1.0 0.4 0.0 ]
+  (M) [ 0.0 1.0 0.8 ]
+  (N) [ 0.2 0.0 0.6 ]
+  (P) [ 1.0 1.0 0.0 ]
+  (Q) [ 0.0 1.0 0.8 ]
+  (R) [ 0.0 1.0 0.8 ]
+  (S) [ 1.0 0.0 0.0 ]
+  (T) [ 0.0 1.0 1.0 ]
+  (V) [ 0.0 0.4 1.0 ]
+  (W) [ 0.0 1.0 0.8 ]
+  (Y) [ 1.0 1.0 0.0 ]
+>> def
+() StartStack
+ 1.000000 0.009009 (W) ShowSymbol
+ 1.000000 0.009009 (N) ShowSymbol
+ 1.000000 0.013514 (C) ShowSymbol
+ 1.000000 0.022523 (M) ShowSymbol
+ 1.000000 0.022523 (H) ShowSymbol
+ 1.000000 0.031532 (Q) ShowSymbol
+ 1.000000 0.031532 (A) ShowSymbol
+ 1.000000 0.036036 (V) ShowSymbol
+ 1.000000 0.040541 (T) ShowSymbol
+ 1.000000 0.040541 (K) ShowSymbol
+ 1.000000 0.040541 (I) ShowSymbol
+ 1.000000 0.045045 (Y) ShowSymbol
+ 1.000000 0.045045 (F) ShowSymbol
+ 1.000000 0.054054 (R) ShowSymbol
+ 1.000000 0.063063 (G) ShowSymbol
+ 1.000000 0.067568 (P) ShowSymbol
+ 1.000000 0.076577 (D) ShowSymbol
+ 1.000000 0.081081 (E) ShowSymbol
+ 1.000000 0.130631 (L) ShowSymbol
+ 1.000000 0.139640 (S) ShowSymbol
+EndStack
+
+/color_dict <<
+  (A) [ 0.0 1.0 0.8 ]
+  (C) [ 1.0 1.0 0.0 ]
+  (D) [ 0.8 1.0 0.2 ]
+  (E) [ 1.0 1.0 0.0 ]
+  (F) [ 0.0 1.0 0.8 ]
+  (G) [ 0.0 1.0 0.0 ]
+  (H) [ 0.8 1.0 0.2 ]
+  (I) [ 0.0 1.0 1.0 ]
+  (K) [ 0.0 1.0 0.0 ]
+  (L) [ 1.0 0.4 0.0 ]
+  (M) [ 0.0 0.4 1.0 ]
+  (N) [ 0.0 1.0 1.0 ]
+  (P) [ 0.8 1.0 0.2 ]
+  (Q) [ 0.0 1.0 0.0 ]
+  (R) [ 0.0 1.0 0.8 ]
+  (S) [ 0.8 1.0 0.2 ]
+  (T) [ 0.0 1.0 0.8 ]
+  (V) [ 0.0 1.0 0.8 ]
+  (W) [ 0.8 1.0 0.2 ]
+  (Y) [ 0.0 1.0 1.0 ]
+>> def
+() StartStack
+ 1.000000 0.009009 (M) ShowSymbol
+ 1.000000 0.018018 (Y) ShowSymbol
+ 1.000000 0.018018 (W) ShowSymbol
+ 1.000000 0.027027 (N) ShowSymbol
+ 1.000000 0.027027 (H) ShowSymbol
+ 1.000000 0.027027 (C) ShowSymbol
+ 1.000000 0.031532 (F) ShowSymbol
+ 1.000000 0.036036 (I) ShowSymbol
+ 1.000000 0.040541 (Q) ShowSymbol
+ 1.000000 0.045045 (R) ShowSymbol
+ 1.000000 0.054054 (T) ShowSymbol
+ 1.000000 0.058559 (V) ShowSymbol
+ 1.000000 0.058559 (P) ShowSymbol
+ 1.000000 0.058559 (K) ShowSymbol
+ 1.000000 0.063063 (D) ShowSymbol
+ 1.000000 0.067568 (A) ShowSymbol
+ 1.000000 0.072072 (G) ShowSymbol
+ 1.000000 0.076577 (E) ShowSymbol
+ 1.000000 0.081081 (S) ShowSymbol
+ 1.000000 0.130631 (L) ShowSymbol
+EndStack
+
+/color_dict <<
+  (A) [ 0.0 1.0 1.0 ]
+  (C) [ 0.0 1.0 0.8 ]
+  (D) [ 0.8 1.0 0.2 ]
+  (E) [ 0.8 1.0 0.2 ]
+  (F) [ 0.0 1.0 0.0 ]
+  (G) [ 0.0 0.4 1.0 ]
+  (H) [ 0.0 1.0 1.0 ]
+  (I) [ 0.0 1.0 0.0 ]
+  (K) [ 1.0 0.4 0.0 ]
+  (L) [ 0.0 1.0 0.0 ]
+  (M) [ 1.0 1.0 0.0 ]
+  (N) [ 0.0 1.0 1.0 ]
+  (P) [ 1.0 0.4 0.0 ]
+  (Q) [ 0.0 1.0 0.0 ]
+  (R) [ 0.0 1.0 0.8 ]
+  (S) [ 1.0 0.4 0.0 ]
+  (T) [ 0.8 1.0 0.2 ]
+  (V) [ 0.0 0.4 1.0 ]
+  (W) [ 0.0 0.4 1.0 ]
+  (Y) [ 0.0 1.0 0.8 ]
+>> def
+() StartStack
+ 1.000000 0.000000 (W) ShowSymbol
+ 1.000000 0.009009 (H) ShowSymbol
+ 1.000000 0.013514 (C) ShowSymbol
+ 1.000000 0.027027 (Y) ShowSymbol
+ 1.000000 0.027027 (N) ShowSymbol
+ 1.000000 0.036036 (V) ShowSymbol
+ 1.000000 0.036036 (M) ShowSymbol
+ 1.000000 0.040541 (Q) ShowSymbol
+ 1.000000 0.040541 (F) ShowSymbol
+ 1.000000 0.045045 (G) ShowSymbol
+ 1.000000 0.054054 (R) ShowSymbol
+ 1.000000 0.054054 (I) ShowSymbol
+ 1.000000 0.058559 (D) ShowSymbol
+ 1.000000 0.063063 (T) ShowSymbol
+ 1.000000 0.063063 (A) ShowSymbol
+ 1.000000 0.067568 (E) ShowSymbol
+ 1.000000 0.081081 (P) ShowSymbol
+ 1.000000 0.090090 (L) ShowSymbol
+ 1.000000 0.090090 (K) ShowSymbol
+ 1.000000 0.103604 (S) ShowSymbol
+EndStack
+
+/color_dict <<
+  (A) [ 0.0 1.0 0.8 ]
+  (C) [ 0.0 1.0 0.0 ]
+  (D) [ 0.8 1.0 0.2 ]
+  (E) [ 0.8 1.0 0.2 ]
+  (F) [ 0.0 0.0 1.0 ]
+  (G) [ 0.0 1.0 1.0 ]
+  (H) [ 0.0 1.0 0.0 ]
+  (I) [ 0.0 1.0 0.8 ]
+  (K) [ 0.0 1.0 1.0 ]
+  (L) [ 1.0 1.0 0.0 ]
+  (M) [ 0.8 1.0 0.2 ]
+  (N) [ 0.8 1.0 0.2 ]
+  (P) [ 0.8 1.0 0.2 ]
+  (Q) [ 1.0 1.0 0.0 ]
+  (R) [ 0.0 0.4 1.0 ]
+  (S) [ 1.0 0.4 0.0 ]
+  (T) [ 0.0 1.0 0.8 ]
+  (V) [ 0.0 1.0 0.8 ]
+  (W) [ 0.8 1.0 0.2 ]
+  (Y) [ 0.0 1.0 0.8 ]
+>> def
+(25) StartStack
+ 1.000000 0.013514 (F) ShowSymbol
+ 1.000000 0.018018 (W) ShowSymbol
+ 1.000000 0.018018 (C) ShowSymbol
+ 1.000000 0.022523 (H) ShowSymbol
+ 1.000000 0.027027 (M) ShowSymbol
+ 1.000000 0.031532 (Y) ShowSymbol
+ 1.000000 0.031532 (R) ShowSymbol
+ 1.000000 0.040541 (K) ShowSymbol
+ 1.000000 0.040541 (I) ShowSymbol
+ 1.000000 0.049550 (T) ShowSymbol
+ 1.000000 0.054054 (Q) ShowSymbol
+ 1.000000 0.054054 (N) ShowSymbol
+ 1.000000 0.054054 (G) ShowSymbol
+ 1.000000 0.058559 (P) ShowSymbol
+ 1.000000 0.063063 (V) ShowSymbol
+ 1.000000 0.063063 (D) ShowSymbol
+ 1.000000 0.072072 (E) ShowSymbol
+ 1.000000 0.076577 (A) ShowSymbol
+ 1.000000 0.103604 (S) ShowSymbol
+ 1.000000 0.108108 (L) ShowSymbol
+EndStack
+
+/color_dict <<
+  (A) [ 0.0 1.0 0.0 ]
+  (C) [ 1.0 0.8 0.0 ]
+  (D) [ 0.8 1.0 0.2 ]
+  (E) [ 0.0 1.0 0.8 ]
+  (F) [ 0.0 1.0 0.0 ]
+  (G) [ 0.0 1.0 1.0 ]
+  (H) [ 0.8 1.0 0.2 ]
+  (I) [ 0.0 1.0 0.8 ]
+  (K) [ 0.0 1.0 0.8 ]
+  (L) [ 0.8 1.0 0.2 ]
+  (M) [ 1.0 0.0 0.0 ]
+  (N) [ 0.0 1.0 1.0 ]
+  (P) [ 0.0 1.0 1.0 ]
+  (Q) [ 1.0 1.0 0.0 ]
+  (R) [ 0.0 1.0 0.8 ]
+  (S) [ 0.8 1.0 0.2 ]
+  (T) [ 0.0 1.0 1.0 ]
+  (V) [ 0.0 1.0 0.0 ]
+  (W) [ 0.0 1.0 0.8 ]
+  (Y) [ 0.0 1.0 1.0 ]
+>> def
+() StartStack
+ 1.000000 0.009009 (W) ShowSymbol
+ 1.000000 0.018018 (Y) ShowSymbol
+ 1.000000 0.027027 (H) ShowSymbol
+ 1.000000 0.031532 (N) ShowSymbol
+ 1.000000 0.031532 (C) ShowSymbol
+ 1.000000 0.036036 (P) ShowSymbol
+ 1.000000 0.040541 (T) ShowSymbol
+ 1.000000 0.040541 (F) ShowSymbol
+ 1.000000 0.045045 (I) ShowSymbol
+ 1.000000 0.049550 (R) ShowSymbol
+ 1.000000 0.054054 (M) ShowSymbol
+ 1.000000 0.054054 (K) ShowSymbol
+ 1.000000 0.054054 (G) ShowSymbol
+ 1.000000 0.058559 (Q) ShowSymbol
+ 1.000000 0.058559 (E) ShowSymbol
+ 1.000000 0.058559 (D) ShowSymbol
+ 1.000000 0.067568 (V) ShowSymbol
+ 1.000000 0.081081 (S) ShowSymbol
+ 1.000000 0.085586 (A) ShowSymbol
+ 1.000000 0.099099 (L) ShowSymbol
+EndStack
+
+EndLine
+
+EndLogo
+
+%%EOF
+
